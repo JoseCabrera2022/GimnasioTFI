@@ -1,0 +1,66 @@
+/* Sidebar ocupa espacio fijo a la izquierda */
+.sidebar {
+  width: 180px;
+  background: #111;
+  color: #fff;
+  height: calc(100vh - 120px); /* toda la ventana menos el navbar */
+  padding: 10px;
+  position: fixed;            /* 🔹 sidebar fijo en la izquierda */
+  top: 104px;                  /* debajo del navbar */
+  left: 0;
+  box-shadow: 2px 0 6px rgba(0,0,0,0.3);
+  
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* Header con avatar y nombre */
+.sidebar-header {
+  margin: 0px 10px;  
+}
+
+
+/* Links de navegación */
+.sidebar-links {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: -20px;
+}
+
+.sidebar-links a {
+  color: #ddd;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.sidebar-links a:hover {
+  color: #4caf50;
+}
+
+/* Footer con botón logout */
+.sidebar-footer {
+  padding: 10px;
+  margin-top: 350px;
+  border-top: 1px solid #333;
+}
+
+.btn-logout {
+  width: 100%;
+  margin-bottom: 150px;
+  padding: 8px;
+  background-color: #dc3545;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.btn-logout:hover {
+  background-color: #b02a37;
+  transform: scale(1.05);
+}

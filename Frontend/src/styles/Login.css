@@ -1,0 +1,138 @@
+.login-box {
+  max-width: 420px;
+  margin: 60px auto;
+  padding: 28px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+  animation: fadeInLogin 0.6s ease; /* animación al cargar */
+}
+
+.login-title {
+  text-align: center;
+  margin-bottom: 25px;
+  color: #0077cc;
+  font-weight: 600;
+  position: relative;
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.login-title::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0%;
+  height: 2px;
+  background: #0077cc;
+  transition: width 0.3s ease;
+}
+
+.login-title:hover {
+  color: #3498db;
+  transform: scale(1.05);
+}
+
+.login-title:hover::after {
+  width: 60%; /* subrayado animado */
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.login-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.login-field label {
+  margin-bottom: 6px;
+  font-size: 0.95rem;
+  color: #555;
+}
+
+.login-field input {
+  padding: 12px 14px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+  background: #fdfdfd;
+  color: #333;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.login-field input:focus {
+  border-color: #0077cc;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0,119,204,0.15); /* glow animado */
+}
+
+.login-error {
+  color: #dc3545;
+  font-size: 0.85rem;
+  margin-top: 4px;
+  animation: fadeInLogin 0.3s ease; /* aparece suavemente */
+}
+
+.login-button {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, #007bff, #0056b3);
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.3s ease;
+}
+
+.login-button:hover {
+  background: linear-gradient(135deg, #0056b3, #004080);
+  transform: translateY(-2px) scale(1.02); /* zoom suave */
+}
+
+.login-link {
+  display: block;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: #0077cc;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  font: inherit;
+}
+
+.login-link:hover {
+  text-decoration: underline;
+}
+
+.login-message {
+  margin-top: 15px;
+  text-align: center;
+  font-weight: 500;
+  color: #0077cc;
+  animation: fadeInLogin 0.5s ease; /* aparece suavemente */
+}
+
+.expired-note {
+  color: #b00020;
+  background-color: #fdecea;
+  border: 1px solid #f5c2c7;
+  padding: 10px;
+  margin-bottom: 15px;
+  border-radius: 4px;
+  font-weight: bold;
+  animation: fadeInLogin 0.5s ease;
+}
+
+/* Animaciones */
+@keyframes fadeInLogin {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}

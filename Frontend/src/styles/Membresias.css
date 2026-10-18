@@ -1,0 +1,77 @@
+.membresias-container {
+  font-family: 'Segoe UI', sans-serif;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.hora-actual {
+  text-align: center;
+  font-weight: bold;
+  margin-bottom: 20px;
+  font-size: 1.1rem;
+}
+
+.membresias-empty {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.membresias-empty p {
+  background: #fdecea;
+  color: #b00020;
+  border: 1px solid #f5c2c7;
+  padding: 10px;
+  margin-bottom: 20px;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+.membresia-btn-link {
+  margin-top: 12px;
+  padding: 8px 16px;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 20px;
+}
+
+.membresia-btn-link:hover {
+  background: #0056b3;
+}
+
+.membresias-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.membresias-table th,
+.membresias-table td {
+  border: 1px solid #ccc;
+  padding: 10px;
+  text-align: center;
+  font-size: 0.95rem;
+}
+
+.membresias-table th {
+  background-color: #f0f8ff;
+  font-weight: bold;
+}
+
+/* Colores dinámicos por fila */
+.membresias-table tr.verde {
+  background: #e6ffed;
+  color: #155724;
+}
+
+.membresias-table tr.amarillo {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.membresias-table tr.rojo {
+  background: #fdecea;
+  color: #b00020;
+}

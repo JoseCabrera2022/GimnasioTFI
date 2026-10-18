@@ -1,0 +1,139 @@
+.comprobante-visual {
+  position: relative;
+  border: 2px solid #ccc;
+  padding: 100px 20px 20px;
+  max-width: 600px;
+  min-height: 700px;
+  margin: 30px auto;
+  margin-top: 80px;
+  background: #fff;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  font-family: 'Courier New', Courier, monospace;
+}
+
+.botones-superior {
+  position: fixed;
+  top: 105px;
+  right: 0px;
+  display: flex;
+  gap: 4px;
+  z-index: 100;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 4px 4px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* Botones generales */
+.btn-descargar,
+.btn-volver {
+  padding: 10px 18px;
+  font-size: 0.95rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+}
+
+.btn-descargar:hover,
+.btn-volver:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+/* Botón descargar PDF → azul corporativo */
+.btn-descargar {
+  background-color: #0077cc;
+  color: #fff;
+}
+
+.btn-descargar:hover {
+  background-color: #005fa3;
+}
+
+/* Botón volver con estados dinámicos */
+.btn-volver.approved {
+  background-color: #28a745; /* verde éxito */
+  color: #fff;
+}
+
+.btn-volver.approved:hover {
+  background-color: #218838;
+}
+
+.btn-volver.rejected {
+  background-color: #dc3545; /* rojo error */
+  color: #fff;
+}
+
+.btn-volver.rejected:hover {
+  background-color: #b02a37;
+}
+
+.btn-volver.pending {
+  background-color: #ffc107; /* amarillo pendiente */
+  color: #333;
+}
+
+.btn-volver.pending:hover {
+  background-color: #e0a800;
+}
+
+/* Badge para estado */
+.estado-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-weight: bold;
+  margin-left: 8px;
+}
+
+.estado-badge.approved {
+  background-color: #28a745;
+  color: #fff;
+}
+
+.estado-badge.rejected {
+  background-color: #dc3545;
+  color: #fff;
+}
+
+.estado-badge.pending {
+  background-color: #ffc107;
+  color: #333;
+}
+
+.logo {
+  display: block;
+  margin: 0 auto 10px;
+  width: 140px;
+}
+
+.datos p {
+  margin: 4px 0;
+}
+
+.beneficios {
+  list-style: none;
+  padding-left: 0;
+  margin-top: 10px;
+}
+
+.beneficios li {
+  border: 1px solid #ddd;
+  padding: 6px 10px;
+  margin-bottom: 5px;
+  border-radius: 4px;
+}
+
+.qr {
+  margin: 20px auto;
+  text-align: center;
+}
+
+.footer {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 0.9em;
+}

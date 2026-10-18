@@ -1,0 +1,27 @@
+.session-banner.warning {
+  background: #fdecea;
+  color: #b00020;
+  border: 1px solid #f5c2c7;
+  padding: 10px;
+  margin-bottom: 20px;
+  position: sticky;
+  top: 0;
+  border-radius: 4px;
+  font-weight: bold;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.session-banner button {
+  background: #3498db;
+  color: #fff;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.session-banner button:hover {
+  background: #2980b9;
+}

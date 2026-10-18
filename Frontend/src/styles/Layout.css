@@ -1,0 +1,21 @@
+.layout-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.layout-body {
+  display: flex;
+  flex: 1; /* 🔹 ocupa todo el espacio disponible */
+  background: #f5f5f5;
+}
+
+.layout-main {
+  flex: 1;
+  padding: 20px;
+  background: #f5f5f5;
+}
+
+.layout-main.with-sidebar {
+  margin-left: 180px;
+}

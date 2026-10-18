@@ -1,0 +1,173 @@
+.actividades-container {
+  max-width: 1000px;
+  margin: 30px auto;
+  padding: 20px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.actividades-container h2 {
+  text-align: center;
+  color: #0077cc;
+  margin-bottom: 20px;
+}
+
+/* 🔹 Filtros */
+.filtros-actividades {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  justify-content: center;
+  margin-bottom: 25px;
+}
+
+.filtros-actividades select {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  background: #f8f8f8;
+  color: #333;              /* 🔹 color del texto */
+  cursor: pointer;
+  min-width: 160px;
+}
+
+/* Opciones dentro del select */
+.filtros-actividades select option {
+  color: #333;              /* 🔹 color del texto de las opciones */
+  background: #fff;         /* 🔹 fondo blanco para contraste */
+}
+
+
+/* 🔹 Lista */
+.actividades-list {
+  list-style: none;
+  padding: 0;
+}
+
+/* 🔹 Tarjeta de actividad */
+.actividad-card {
+  display: grid;
+  grid-template-columns: 250px 150px 1fr; /* foto, info, descripción */
+  align-items: start;
+  background: #f8f9fa;
+  border: 1px solid #ddd;
+  padding: 15px;
+  border-radius: 6px;
+  margin-bottom: 15px;
+  gap: 20px;
+}
+
+/* 🔹 Imagen cuadrada adaptable */
+.actividad-foto {
+  width: 250px;
+  height: 200px;
+  flex-shrink: 0;
+}
+
+.actividad-foto img {
+  width: 100%;
+  height: 100%;
+  object-fit: fill; /* 🔹 se adapta y recorta sin deformar */
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+/* 🔹 Info básica */
+.actividad-info h4 {
+  margin: 0 0 8px;
+  color: #0077cc;
+}
+
+.actividad-info button {
+  margin-top: 10px;
+  padding: 8px 14px;
+  background-color: #0077cc;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.actividad-info button:hover {
+  background-color: #005fa3;
+}
+
+/* 🔹 Descripción */
+.actividad-descripcion {
+  font-size: 14px;
+  line-height: 1.4;
+  color: #333;
+}
+
+/* 🔹 Responsive */
+@media (max-width: 768px) {
+  .actividad-card {
+    grid-template-columns: 1fr;
+  }
+
+  .actividad-foto {
+    width: 100%;
+    height: auto;
+  }
+
+  .actividad-foto img {
+    height: auto;
+    max-height: 250px;
+  }
+
+  .filtros-actividades {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .filtros-actividades select {
+    width: 100%;
+    max-width: 300px;
+  }
+}
+
+/* 🔹 Mensajes dinámicos */
+.mensaje {
+  margin: 10px 0 20px 0;
+  padding: 12px;
+  border-radius: 6px;
+  font-weight: 500;
+  display: flex;                /* Flexbox */
+  justify-content: space-between; /* texto izquierda, botón derecha */
+  align-items: center;
+}
+
+.mensaje.success {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.mensaje.error {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+.mensaje-texto {
+  flex: 1; /* ocupa todo el espacio disponible */
+}
+
+.btn-link {
+  margin-left: 12px;
+  padding: 6px 12px;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  white-space: nowrap; /* 🔹 evita que se corte en varias líneas */
+  font-size: 13px;
+}
+
+.btn-link:hover {
+  background: #0056b3;
+}

@@ -1,0 +1,25 @@
+# Dependencies and build output
+node_modules/
+**/node_modules/
+dist/
+**/dist/
+
+# Environment variables and local secrets
+.env
+.env.*
+!.env.example
+**/.env
+**/.env.*
+!**/.env.example
+
+# Runtime logs and uploaded user files
+*.log
+Backend/uploads/*
+!Backend/uploads/.gitkeep
+Backend/datos-buyer.txt
+
+# Editor and operating system files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

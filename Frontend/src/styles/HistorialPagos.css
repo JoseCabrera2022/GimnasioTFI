@@ -1,0 +1,74 @@
+.historial-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.historial-empty {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.historial-empty p {
+  background: #fdecea;
+  color: #b00020;
+  border: 1px solid #f5c2c7;
+  padding: 10px;
+  margin-bottom: 20px;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+.historial-btn-link {
+  margin-top: 12px;
+  padding: 8px 16px;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 20px;
+}
+
+.historial-btn-link:hover {
+  background: #0056b3;
+}
+
+.historial-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.historial-table th,
+.historial-table td {
+  border: 1px solid #ccc;
+  padding: 10px;
+  text-align: center;
+}
+
+.historial-table th {
+  background-color: #f0f8ff;
+}
+
+.estado-badge {
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-weight: bold;
+}
+
+.estado-badge.approved {
+  background-color: #28a745;
+  color: #fff;
+}
+
+.estado-badge.rejected {
+  background-color: #dc3545;
+  color: #fff;
+}
+
+.estado-badge.pending {
+  background-color: #ffc107;
+  color: #333;
+}

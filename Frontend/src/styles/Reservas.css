@@ -1,0 +1,116 @@
+.reservas-container {
+  max-width: 800px;
+  margin: 30px auto;
+  padding: 20px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.reservas-container h2 {
+  text-align: center;
+  color: #0077cc;
+  margin-bottom: 20px;
+}
+
+.reservas-empty {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.reservas-empty p {
+  background: #fdecea;
+  color: #b00020;
+  border: 1px solid #f5c2c7;
+  padding: 10px;
+  margin-bottom: 20px;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+.reservas-btn-link {
+  margin-top: 12px;
+  padding: 8px 16px;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 20px;
+}
+
+.reservas-btn-link:hover {
+  background: #0056b3;
+}
+
+.reservas-list {
+  list-style: none;
+  padding: 0;
+}
+
+.reservas-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f8f9fa;
+  border: 1px solid #ddd;
+  padding: 10px 14px;
+  border-radius: 6px;
+  margin-bottom: 10px;
+}
+
+.estado-badge {
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-weight: bold;
+  font-size: 0.85rem;
+  margin-left: 10px;
+}
+
+.estado-badge.confirmada { background-color: #28a745; color: #fff; }
+.estado-badge.pendiente { background-color: #ffc107; color: #333; }
+.estado-badge.cancelada { background-color: #dc3545; color: #fff; }
+
+.btn-cancelar {
+  padding: 6px 12px;
+  background-color: #dc3545;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.btn-cancelar:hover { background-color: #b02a37; }
+
+.mensaje {
+  margin: 10px 0;
+  padding: 12px;
+  border-radius: 6px;
+  font-weight: 500;
+  text-align: center;
+}
+
+.mensaje.success {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.mensaje.error {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+.btn-link {
+  margin-top: 8px;
+  padding: 6px 12px;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn-link:hover {
+  background: #0056b3;
+}

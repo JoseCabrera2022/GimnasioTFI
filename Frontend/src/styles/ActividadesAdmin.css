@@ -1,0 +1,146 @@
+.actividades-admin {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+h1, h2 {
+  margin-bottom: 16px;
+  color: #111827;
+}
+
+.mensaje {
+  padding: 10px 12px;
+  border-radius: 6px;
+  margin-bottom: 12px;
+  font-size: 14px;
+}
+.mensaje.success {
+  background: #e6ffed;
+  color: #1a7f37;
+  border: 1px solid #a7f3d0;
+}
+.mensaje.error {
+  background: #fff1f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+
+.actividad-form,
+.turno-form,
+.turno-edit-form {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.actividad-form input,
+.actividad-form textarea,
+.actividad-form select,
+.turno-form input,
+.turno-edit-form input {
+  padding: 8px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 60px;
+}
+
+.form-actions {
+  display: flex;
+  gap: 10px;
+}
+
+button {
+  cursor: pointer;
+  font-size: 14px;
+  border-radius: 6px;
+  padding: 8px 12px;
+}
+
+.btn-primary {
+  background: #2563eb;
+  color: white;
+  border: none;
+}
+.btn-secondary {
+  background: #f3f4f6;
+  color: #111827;
+  border: 1px solid #e5e7eb;
+}
+.btn-danger {
+  background: #ef4444;
+  color: white;
+  border: none;
+}
+
+.actividades-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 16px;
+}
+.actividades-table th,
+.actividades-table td {
+  border-bottom: 1px solid #e5e7eb;
+  padding: 10px;
+  text-align: left;
+  font-size: 14px;
+}
+.actividades-table th {
+  background: #f9fafb;
+  font-weight: 600;
+}
+.actividades-table img {
+  display: block;
+  border-radius: 6px;
+  object-fit: cover;
+}
+
+.turnos-section {
+  margin-top: 24px;
+  padding: 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #f9fafb;
+}
+
+.turnos-list {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.turno-item {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 12px;
+  background: #fff;
+}
+
+.turno-view p {
+  margin: 4px 0;
+}
+
+.turno-view .item-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.col {
+  display: grid;
+  gap: 6px;
+}

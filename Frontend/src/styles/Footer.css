@@ -1,0 +1,142 @@
+.footer {
+  background: #222;
+  color: #fff;
+  padding: 16px 20px;   /* 🔹 menos padding vertical */
+  margin: 0;
+  font-size: 0.9rem;    /* 🔹 tipografía más compacta */
+  z-index: 10;
+}
+
+.footer-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;  /* 🔹 centra verticalmente */
+  flex-wrap: wrap;
+  max-width: 1200px;
+  margin: 0 auto;
+  gap: 20px;            /* 🔹 separación moderada */
+}
+
+.footer-brand h3 {
+  margin: 0;
+  color: #3498db;
+  font-size: 1.1rem;    /* 🔹 más pequeño */
+}
+
+.footer-brand p {
+  margin: 4px 0 0 0;
+  font-size: 0.8rem;
+  color: #aaa;
+}
+
+.footer-links {
+  display: flex;
+  gap: 12px;
+}
+
+.footer-links a {
+  color: #ddd;
+  text-decoration: none;
+  font-size: 1rem;
+  transition: color 0.3s ease;
+}
+
+.footer-links a:hover {
+  color: #3498db;
+}
+
+.footer-contact {
+  font-size: 0.85rem;
+  color: #3498db;
+  display: flex;
+  flex-direction: column;
+  gap: 6px; /* 🔹 separación uniforme entre líneas */
+}
+
+.footer-contact p {
+  margin: 0;
+  display: flex;              /* 🔹 ícono + texto en fila */
+  align-items: center;        /* 🔹 centra verticalmente */
+  gap: 8px;                   /* 🔹 espacio entre ícono y texto */
+}
+
+.footer-contact i {
+  font-size: 1rem;
+  min-width: 18px;            /* 🔹 asegura alineación vertical */
+  text-align: center;
+}
+
+.footer-social {
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+}
+
+.footer-social a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  color: #222;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #ddd;
+  font-size: 16px;
+  transition: all 0.3s ease;
+}
+
+.footer-social a:hover {
+  color: #3498db;
+  transform: scale(1.1);
+}
+
+/* 🔹 Hover con colores específicos */
+.footer-social a:hover {
+  transform: scale(1.1);
+}
+
+.footer-social a .fa-facebook-f:hover {
+  color: #1877f2;
+}
+
+.footer-social a .fa-instagram:hover {
+  color: #e4405f;
+}
+
+.footer-social a .fa-twitter:hover {
+  color: #1da1f2;
+}
+
+.footer-social a .fa-youtube:hover {
+  color: #ff0000;
+}
+
+.footer-social a .fa-linkedin-in:hover {
+  color: #0077b5;
+}
+
+.footer-social a .fa-tiktok:hover {
+  color: #000000;
+}
+
+.footer-social a .fa-whatsapp:hover {
+  color: #25d366;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .footer-content {
+    flex-direction: column;
+    text-align: center;
+    gap: 12px;
+  }
+
+  .footer-links {
+    justify-content: center;
+  }
+
+  .footer-social {
+    justify-content: center;
+  }
+}
