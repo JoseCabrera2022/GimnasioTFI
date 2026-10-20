@@ -19,7 +19,7 @@
 
 .footer-brand h3 {
   margin: 0;
-  color: #3498db;
+  color: #935dcf;
   font-size: 1.1rem;    /* 🔹 más pequeño */
 }
 
@@ -42,12 +42,12 @@
 }
 
 .footer-links a:hover {
-  color: #3498db;
+  color: #a00ee3;
 }
 
 .footer-contact {
   font-size: 0.85rem;
-  color: #3498db;
+  color: #935dcf;
   display: flex;
   flex-direction: column;
   gap: 6px; /* 🔹 separación uniforme entre líneas */
