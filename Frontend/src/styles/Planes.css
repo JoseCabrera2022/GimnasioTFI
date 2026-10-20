@@ -82,7 +82,7 @@
   top: 0;
   bottom: 0;
   width: 33.3333%;
-  background-color: #0077cc;
+  background-color: #a00ee3;
   border-radius: 8px;
   transition: left 0.3s ease;
   z-index: 1;
@@ -103,7 +103,7 @@
   display: block;
   margin: 40px auto 20px auto;
   padding: 10px 20px;
-  background-color: #0077cc;
+  background-color: #935dcf;
   color: white;
   border: none;
   border-radius: 8px;
