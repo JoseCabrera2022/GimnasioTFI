@@ -5,10 +5,11 @@ import path from 'path';
 // Listar todos los usuarios
 export const getUsuarios = async (req, res) => {
   try {
-    const incluirEliminados = req.query.incluirEliminados === 'true';
+    const soloInactivos = req.query.soloInactivos === 'true';
     const [rows] = await db.query(
       `SELECT id, nombre, correo_electronico, rol, estado, telefono, ubicacion_id, creado_en, actualizado_en, eliminado
-       FROM usuarios${incluirEliminados ? '' : ' WHERE eliminado = 0'}`
+       FROM usuarios WHERE eliminado = ?`,
+      [soloInactivos ? 1 : 0]
     );
     res.json(rows);
   } catch (error) {
@@ -156,22 +157,19 @@ export const deleteUsuario = async (req, res) => {
   }
 };
 
-// Borrado físico definitivo
-export const deleteUsuarioDefinitivo = async (req, res) => {
+export const activarUsuario = async (req, res) => {
   try {
     const { id } = req.params;
-    const [result] = await db.query('DELETE FROM usuarios WHERE id=?', [id]);
+    const [result] = await db.query(
+      'UPDATE usuarios SET eliminado=0 WHERE id=? AND eliminado=1',
+      [id]
+    );
     if (result.affectedRows === 0) {
-      return res.status(404).json({ error: 'Usuario no encontrado' });
+      return res.status(404).json({ error: 'Usuario no encontrado o ya activo' });
     }
-    res.json({ mensaje: 'Usuario borrado definitivamente' });
+    res.json({ mensaje: 'Usuario activado con éxito' });
   } catch (error) {
-    if (error.code === 'ER_ROW_IS_REFERENCED_2') {
-      return res.status(409).json({
-        error: 'No se pudo completar el borrado en cascada por registros relacionados'
-      });
-    }
-    console.error('Error al borrar definitivamente el usuario:', error);
-    res.status(500).json({ error: 'No se pudo borrar definitivamente el usuario' });
+    console.error('Error al activar usuario:', error);
+    res.status(500).json({ error: 'No se pudo activar el usuario' });
   }
 };

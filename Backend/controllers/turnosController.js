@@ -8,6 +8,8 @@ export const getTurnosByActividad = async (req, res) => {
       `SELECT t.id, t.actividad_id, t.fecha, t.cupo_maximo,
               (t.cupo_maximo - COUNT(r.id)) AS cupo_disponible
        FROM turnos t
+       JOIN actividades a ON a.id = t.actividad_id AND a.eliminado = 0
+       JOIN ubicaciones u ON u.id = a.ubicacion_id AND u.eliminado = 0
        LEFT JOIN reservas r ON r.turno_id = t.id AND r.estado="confirmada"
        WHERE t.actividad_id=?
        GROUP BY t.id
@@ -27,6 +29,16 @@ export const createTurno = async (req, res) => {
     const { actividad_id, fecha, cupo_maximo } = req.body;
     if (!actividad_id || !fecha || !cupo_maximo) {
       return res.status(400).json({ error: 'Actividad, fecha y cupo máximo son obligatorios' });
+    }
+
+    const [actividades] = await db.query(
+      `SELECT a.id FROM actividades a
+       JOIN ubicaciones u ON u.id = a.ubicacion_id AND u.eliminado = 0
+       WHERE a.id=? AND a.eliminado=0`,
+      [actividad_id]
+    );
+    if (actividades.length === 0) {
+      return res.status(400).json({ error: 'La actividad no existe o está eliminada' });
     }
 
     const [result] = await db.query(

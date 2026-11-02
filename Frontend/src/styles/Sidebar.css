@@ -40,6 +40,32 @@
   color: #4caf50;
 }
 
+.sidebar-links button {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #ddd;
+  font: inherit;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+}
+
+.sidebar-links button:hover:not(:disabled) {
+  color: #4caf50;
+}
+
+.sidebar-links button:disabled {
+  color: #999;
+  cursor: wait;
+}
+
+.sidebar-report-error {
+  margin: 0;
+  color: #ff9b9b;
+  font-size: 12px;
+}
+
 /* Footer con botón logout */
 .sidebar-footer {
   padding: 10px;

@@ -1,6 +1,6 @@
 import express from 'express';
 import { verificarToken } from '../middlewares/verificarToken.js';
-import { getUsuarios, createUsuario, updateUsuario, deleteUsuario, deleteUsuarioDefinitivo, getUsuarioById } from '../controllers/usuarioController.js';
+import { getUsuarios, createUsuario, updateUsuario, deleteUsuario, activarUsuario, getUsuarioById } from '../controllers/usuarioController.js';
 import { upload } from '../configs/multer.js';
 
 const router = express.Router();
@@ -17,7 +17,7 @@ router.get('/api/usuarios', verificarToken, getUsuarios);
 router.get('/api/usuarios/:id', verificarToken, getUsuarioById);
 router.post('/api/usuarios', verificarToken, createUsuario);
 router.put('/api/usuarios/:id', verificarToken, upload.single('foto'), updateUsuario);
-router.delete('/api/usuarios/:id/definitivo', verificarToken, soloAdmin, deleteUsuarioDefinitivo);
 router.delete('/api/usuarios/:id', verificarToken, soloAdmin, deleteUsuario);
+router.patch('/api/usuarios/:id/activar', verificarToken, soloAdmin, activarUsuario);
 
 export default router;

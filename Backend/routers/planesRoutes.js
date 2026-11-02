@@ -1,5 +1,5 @@
 import express from 'express';
-import { actualizarDuracion, actualizarPlan, crearDuracion, crearPlan, eliminarDuracion, eliminarPlan, obtenerPlanes } from '../controllers/planesController.js';
+import { activarPlan, actualizarDuracion, actualizarPlan, crearDuracion, crearPlan, eliminarDuracion, eliminarPlan, obtenerPlanes } from '../controllers/planesController.js';
 import { verificarToken } from '../middlewares/verificarToken.js';
 
 const router = express.Router();
@@ -11,6 +11,7 @@ router.get('/api/planes', obtenerPlanes);
 router.post('/api/planes', verificarToken, crearPlan);
 router.put('/api/planes/:id', verificarToken, actualizarPlan);
 router.delete('/api/planes/:id', verificarToken, eliminarPlan);
+router.patch('/api/planes/:id/activar', verificarToken, activarPlan);
 
 // CRUD duraciones
 router.post('/api/duraciones', verificarToken, crearDuracion);

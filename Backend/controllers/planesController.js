@@ -3,11 +3,17 @@ import db from '../configs/database.js';
 // Obtener todos los planes y duraciones
 export const obtenerPlanes = async (req, res) => {
   try {
-    const [planes] = await db.query('SELECT * FROM planes');
+    const soloInactivos = req.query.soloInactivos === 'true';
+    const [planes] = await db.query('SELECT * FROM planes WHERE eliminado = ?', [soloInactivos ? 1 : 0]);
     const [duraciones] = await db.query('SELECT * FROM duraciones');
     res.json({ planes, duraciones });
   } catch (error) {
     console.error('Error al obtener planes:', error);
+    if (error.code === 'ER_BAD_FIELD_ERROR' && error.message.includes('eliminado')) {
+      return res.status(500).json({
+        error: 'Falta aplicar la migración de borrado lógico en la base de datos. Ejecuta Backend/migrations/20261102_add_soft_delete_planes_ubicaciones_actividades.sql.'
+      });
+    }
     res.status(500).json({ error: 'No se pudieron obtener los planes.' });
   }
 };
@@ -47,6 +53,14 @@ export const actualizarPlan = async (req, res) => {
       return res.status(400).json({ error: 'El precio debe ser mayor a 0' });
     }
 
+    const [planes] = await db.query(
+      'SELECT id FROM planes WHERE id=? AND eliminado=0',
+      [id]
+    );
+    if (planes.length === 0) {
+      return res.status(404).json({ error: 'Plan no encontrado o eliminado' });
+    }
+
     await db.query(
       'UPDATE planes SET nombre=?, tipo=?, precio=?, descripcion=? WHERE id=?',
       [nombre.trim(), tipo.trim(), precio, descripcion?.trim() || null, id]
@@ -57,14 +71,38 @@ export const actualizarPlan = async (req, res) => {
   }
 };
 
-// Eliminar plan
+// Borrado lógico
 export const eliminarPlan = async (req, res) => {
   try {
     const { id } = req.params;
-    await db.query('DELETE FROM planes WHERE id=?', [id]);
-    res.json({ mensaje: 'Plan eliminado con éxito' });
+    const [result] = await db.query(
+      'UPDATE planes SET eliminado=1 WHERE id=? AND eliminado=0',
+      [id]
+    );
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Plan no encontrado o ya eliminado' });
+    }
+    res.json({ mensaje: 'Plan eliminado lógicamente con éxito' });
   } catch (error) {
+    console.error('Error al eliminar plan:', error);
     res.status(500).json({ error: 'No se pudo eliminar el plan' });
+  }
+};
+
+export const activarPlan = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const [result] = await db.query(
+      'UPDATE planes SET eliminado=0 WHERE id=? AND eliminado=1',
+      [id]
+    );
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Plan no encontrado o ya activo' });
+    }
+    res.json({ mensaje: 'Plan activado con éxito' });
+  } catch (error) {
+    console.error('Error al activar plan:', error);
+    res.status(500).json({ error: 'No se pudo activar el plan' });
   }
 };
 
@@ -129,4 +167,3 @@ export const eliminarDuracion = async (req, res) => {
     res.status(500).json({ error: 'No se pudo eliminar la duración' });
   }
 };
-

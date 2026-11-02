@@ -66,6 +66,43 @@
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
+.register-container .password-input-wrapper {
+  position: relative;
+}
+
+.register-container .password-input-wrapper input {
+  box-sizing: border-box;
+  width: 100%;
+  padding-right: 44px;
+}
+
+.register-container .password-input-wrapper .password-toggle {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  padding: 6px;
+  border: 0;
+  background: transparent;
+  color: #555;
+  cursor: pointer;
+  transform: translateY(-50%);
+}
+
+.register-container .password-input-wrapper .password-toggle:hover {
+  background: transparent;
+  transform: translateY(-50%);
+}
+
+.register-container .password-input-wrapper .password-toggle:focus-visible {
+  outline: 2px solid #0077cc;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
 .register-container select {
   width: 100%;
 }

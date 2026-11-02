@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuthStore } from '../store/useAuthStore';
 import { ENDPOINTS_LOCAL, API_LOCAL } from '../api/endpoints';
@@ -9,6 +9,8 @@ function ActividadesAdmin() {
   const { token } = useAuthStore();
   const [actividades, setActividades] = useState([]);
   const [ubicaciones, setUbicaciones] = useState([]);
+  const [mostrarInactivas, setMostrarInactivas] = useState(false);
+  const [actividadParaInactivar, setActividadParaInactivar] = useState(null);
 
   // Form actividad
   const [form, setForm] = useState({ nombre: '', descripcion: '', ubicacion_id: '' });
@@ -31,9 +33,11 @@ function ActividadesAdmin() {
   const [turnoEditForm, setTurnoEditForm] = useState({ fecha: '', cupo_maximo: '' });
 
   // Cargar actividades
-  const fetchActividades = async () => {
+  const fetchActividades = useCallback(async () => {
     try {
-      const res = await axios.get(ENDPOINTS_LOCAL.ACTIVIDADES_SIMPLE ?? `${ENDPOINTS_LOCAL.ACTIVIDADES}-simple`, {
+      const endpoint = ENDPOINTS_LOCAL.ACTIVIDADES_SIMPLE ?? `${ENDPOINTS_LOCAL.ACTIVIDADES}-simple`;
+      const url = `${endpoint}${mostrarInactivas ? '?soloInactivas=true' : ''}`;
+      const res = await axios.get(url, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setActividades(res.data);
@@ -41,22 +45,22 @@ function ActividadesAdmin() {
       setTipoMensaje('error');
       setMensaje(error.response?.data?.error || 'Error al cargar actividades');
     }
-  };
+  }, [token, mostrarInactivas]);
 
   // Cargar ubicaciones
-  const fetchUbicaciones = async () => {
+  const fetchUbicaciones = useCallback(async () => {
     try {
       const res = await axios.get(ENDPOINTS_LOCAL.UBICACIONES);
       setUbicaciones(res.data);
     } catch (error) {
       console.error('Error al cargar ubicaciones:', error);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchActividades();
     fetchUbicaciones();
-  }, []);
+  }, [fetchActividades, fetchUbicaciones]);
 
   // Crear o actualizar actividad
   const handleSubmitActividad = async (e) => {
@@ -120,7 +124,7 @@ function ActividadesAdmin() {
         headers: { Authorization: `Bearer ${token}` }
       });
       setTipoMensaje('success');
-      setMensaje('Actividad eliminada con éxito');
+      setMensaje('Actividad cambiada a inactiva; puedes consultarla en la lista de inactivas');
       // Si la actividad seleccionada fue eliminada, cerrar la sección de turnos
       if (actividadSeleccionada?.id === id) {
         setActividadSeleccionada(null);
@@ -130,6 +134,26 @@ function ActividadesAdmin() {
     } catch (error) {
       setTipoMensaje('error');
       setMensaje(error.response?.data?.error || 'Error al eliminar actividad');
+    }
+  };
+
+  const handleConfirmarInactividad = async () => {
+    if (!actividadParaInactivar) return;
+    await handleDeleteActividad(actividadParaInactivar.id);
+    setActividadParaInactivar(null);
+  };
+
+  const handleActivarActividad = async (id) => {
+    try {
+      await axios.patch(`${ENDPOINTS_LOCAL.ACTIVIDADES}/${id}/activar`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setTipoMensaje('success');
+      setMensaje('Actividad activada');
+      fetchActividades();
+    } catch (error) {
+      setTipoMensaje('error');
+      setMensaje(error.response?.data?.error || 'Error al activar actividad');
     }
   };
 
@@ -291,6 +315,14 @@ function ActividadesAdmin() {
       </form>
 
       {/* Tabla de actividades */}
+      <label>
+        <input
+          type="checkbox"
+          checked={mostrarInactivas}
+          onChange={(event) => setMostrarInactivas(event.target.checked)}
+        />
+        Mostrar actividades inactivas
+      </label>
       <table className="actividades-table">
         <thead>
           <tr>
@@ -298,6 +330,7 @@ function ActividadesAdmin() {
             <th>Descripción</th>
             <th>Sede</th>
             <th>Foto</th>
+            <th>Estado</th>
             <th>Acciones</th>
           </tr>
         </thead>
@@ -316,15 +349,49 @@ function ActividadesAdmin() {
                   style={{ objectFit: 'cover', borderRadius: 6 }}
                 />
               </td>
+              <td>{a.eliminado ? 'Inactiva' : 'Activa'}</td>
               <td>
-                <button onClick={() => handleEditActividad(a)}>Editar</button>
-                <button onClick={() => handleDeleteActividad(a.id)} className="btn-danger">Eliminar</button>
-                <button onClick={() => handleViewTurnos(a)} className="btn-primary">Ver Turnos</button>
+                {!a.eliminado && (
+                  <>
+                    <button onClick={() => handleEditActividad(a)}>Editar</button>
+                    <button onClick={() => setActividadParaInactivar(a)} className="btn-danger">Cambiar a inactivo</button>
+                    <button onClick={() => handleViewTurnos(a)} className="btn-primary">Ver Turnos</button>
+                  </>
+                )}
+                {a.eliminado && (
+                  <button onClick={() => handleActivarActividad(a.id)} className="btn-primary">
+                    Cambiar a activo
+                  </button>
+                )}
               </td>
             </tr>
           ))}
         </tbody>
       </table>
+
+      {actividadParaInactivar && (
+        <div className="actividad-modal-overlay" role="presentation">
+          <div
+            className="actividad-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="confirmar-inactividad-actividad"
+          >
+            <h2 id="confirmar-inactividad-actividad">Confirmar cambio a inactivo</h2>
+            <p>
+              ¿Cambiar la actividad «{actividadParaInactivar.nombre}» a inactiva? La actividad quedará oculta de la lista activa.
+            </p>
+            <div className="actividad-modal-actions">
+              <button onClick={handleConfirmarInactividad} className="btn-danger">
+                Sí, cambiar a inactivo
+              </button>
+              <button onClick={() => setActividadParaInactivar(null)} className="btn-secondary">
+                Cancelar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Turnos de actividad seleccionada */}
       {actividadSeleccionada && (

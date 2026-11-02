@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 import axios from 'axios';
 import { ENDPOINTS_LOCAL } from '../api/endpoints';
 import { useAuthStore } from '../store/useAuthStore';
@@ -8,6 +8,7 @@ function PlanesAdmin() {
   const { token } = useAuthStore();
   const [planes, setPlanes] = useState([]);
   const [duraciones, setDuraciones] = useState([]);
+  const [mostrarInactivos, setMostrarInactivos] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState(null);
   // Formularios
@@ -21,21 +22,22 @@ function PlanesAdmin() {
   const [mensajePlanes, setMensajePlanes] = useState('');
   const [mensajeDuraciones, setMensajeDuraciones] = useState('');
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
-      const res = await axios.get(ENDPOINTS_LOCAL.PLANES, {
+      const url = `${ENDPOINTS_LOCAL.PLANES}${mostrarInactivos ? '?soloInactivos=true' : ''}`;
+      const res = await axios.get(url, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setPlanes(res.data.planes);
       setDuraciones(res.data.duraciones);
     } catch (error) {
-      setMensajePlanes('Error al cargar planes/duraciones');
+      setMensajePlanes(error.response?.data?.error || 'Error al cargar planes/duraciones');
     }
-  };
+  }, [token, mostrarInactivos]);
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [fetchData]);
   const confirmDelete = (tipo, id) => {
   setDeleteTarget({ tipo, id });
   setShowModal(true);
@@ -48,7 +50,7 @@ function PlanesAdmin() {
         await axios.delete(`${ENDPOINTS_LOCAL.PLANES}/${deleteTarget.id}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
-        setMensajePlanes('Plan eliminado');
+        setMensajePlanes('Plan cambiado a inactivo; puedes consultarlo en la lista de inactivos');
       } else {
         await axios.delete(`${ENDPOINTS_LOCAL.DURACIONES}/${deleteTarget.id}`, {
           headers: { Authorization: `Bearer ${token}` }
@@ -56,13 +58,26 @@ function PlanesAdmin() {
         setMensajeDuraciones('Duración eliminada');
       }
       fetchData();
-    } catch (error) {
+    } catch {
       if (deleteTarget.tipo === 'plan') setMensajePlanes('Error al eliminar plan');
       else setMensajeDuraciones('Error al eliminar duración');
     }
     setShowModal(false);
     setDeleteTarget(null);
   };
+
+  const handleActivarPlan = async (id) => {
+    try {
+      await axios.patch(`${ENDPOINTS_LOCAL.PLANES}/${id}/activar`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setMensajePlanes('Plan activado');
+      fetchData();
+    } catch (error) {
+      setMensajePlanes(error.response?.data?.error || 'Error al activar plan');
+    }
+  };
+
   // CRUD Planes
   const handleSubmitPlan = async (e) => {
     e.preventDefault();
@@ -89,7 +104,7 @@ function PlanesAdmin() {
       setFormPlan({ nombre: '', tipo: '', precio: '', descripcion: '' });
       setEditPlanId(null);
       fetchData();
-    } catch (error) {
+    } catch {
       setMensajePlanes('Error al guardar plan');
     }
   };
@@ -105,17 +120,6 @@ function PlanesAdmin() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleDeletePlan = async (id) => {
-    try {
-      await axios.delete(`${ENDPOINTS_LOCAL.PLANES}/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setMensajePlanes('Plan eliminado');
-      fetchData();
-    } catch (error) {
-      setMensajePlanes('Error al eliminar plan');
-    }
-  };
 
   // CRUD Duraciones
   const handleSubmitDuracion = async (e) => {
@@ -147,7 +151,7 @@ function PlanesAdmin() {
       setFormDuracion({ nombre: '', dias: '', descuento: '' });
       setEditDuracionId(null);
       fetchData();
-    } catch (error) {
+    } catch {
       setMensajeDuraciones('Error al guardar duración');
     }
   };
@@ -161,17 +165,6 @@ function PlanesAdmin() {
     setEditDuracionId(duracion.id);
   };
 
-  const handleDeleteDuracion = async (id) => {
-    try {
-      await axios.delete(`${ENDPOINTS_LOCAL.DURACIONES}/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setMensajeDuraciones('Duración eliminada');
-      fetchData();
-    } catch (error) {
-      setMensajeDuraciones('Error al eliminar duración');
-    }
-  };
 
   return (
     <div className="planes-admin">
@@ -198,6 +191,14 @@ function PlanesAdmin() {
       {mensajePlanes && <p className="alerta">{mensajePlanes}</p>}
 
       {/* Tabla de Planes */}
+      <label>
+        <input
+          type="checkbox"
+          checked={mostrarInactivos}
+          onChange={(event) => setMostrarInactivos(event.target.checked)}
+        />
+        Mostrar planes inactivos
+      </label>
       <table className="planes-table">
         <thead>
           <tr>
@@ -205,6 +206,7 @@ function PlanesAdmin() {
             <th>Tipo</th>
             <th>Precio</th>
             <th>Descripción</th>
+            <th>Estado</th>
             <th>Acciones</th>
           </tr>
         </thead>
@@ -215,9 +217,19 @@ function PlanesAdmin() {
               <td>{p.tipo}</td>
               <td>{p.precio}</td>
               <td>{p.descripcion}</td>
+              <td>{p.eliminado ? 'Inactivo' : 'Activo'}</td>
               <td>
-                <button onClick={() => handleEditPlan(p)} className="btn-secondary">Editar</button>
-                <button onClick={() => confirmDelete('plan', p.id)} className="btn-danger">Eliminar</button>
+                {!p.eliminado && (
+                  <>
+                    <button onClick={() => handleEditPlan(p)} className="btn-secondary">Editar</button>
+                    <button onClick={() => confirmDelete('plan', p.id)} className="btn-danger">Cambiar a inactivo</button>
+                  </>
+                )}
+                {p.eliminado && (
+                  <button onClick={() => handleActivarPlan(p.id)} className="btn-primary">
+                    Cambiar a activo
+                  </button>
+                )}
               </td>
             </tr>
           ))}
@@ -297,7 +309,11 @@ function PlanesAdmin() {
       {showModal && (
       <div className="modal-overlay">
         <div className="modal">
-          <h3>¿Seguro que quieres eliminar este {deleteTarget?.tipo}?</h3>
+          <h3>
+            {deleteTarget?.tipo === 'plan'
+              ? '¿Seguro que quieres cambiar este plan a inactivo? Quedará oculto de la lista activa.'
+              : '¿Seguro que quieres eliminar esta duración?'}
+          </h3>
           <div className="modal-actions">
             <button onClick={handleConfirmDelete} className="btn-danger">Sí, eliminar</button>
             <button onClick={() => setShowModal(false)} className="btn-secondary">Cancelar</button>

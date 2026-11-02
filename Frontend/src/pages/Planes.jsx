@@ -35,7 +35,7 @@ function Planes() {
       }
     };
     fetchData();
-  }, []);
+  }, [token]);
 
   // 🔹 Actualizar hora en tiempo real
   useEffect(() => {

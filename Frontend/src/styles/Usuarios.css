@@ -215,16 +215,6 @@
   color: #fff;
 }
 
-.usuarios-table .btn-hard-delete {
-  width: auto;
-  background: #7a1520;
-  color: #fff;
-}
-
-.usuarios-table .btn-hard-delete:hover {
-  background: #560d15;
-}
-
 /* 🔹 Responsive */
 @media (max-width: 768px) {
   .usuario-form {
@@ -290,14 +280,6 @@
 
 .btn-confirm:hover {
   background: #c82333;
-}
-
-.btn-confirm-definitive {
-  background: #7a1520;
-}
-
-.btn-confirm-definitive:hover {
-  background: #560d15;
 }
 
 .btn-cancel {

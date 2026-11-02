@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { useAuthStore } from '../store/useAuthStore';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '../routers/routes';

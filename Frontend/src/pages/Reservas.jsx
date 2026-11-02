@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuthStore } from '../store/useAuthStore';
 import { ENDPOINTS_LOCAL } from '../api/endpoints';
@@ -13,7 +13,7 @@ function Reservas() {
   const [tipoMensaje, setTipoMensaje] = useState('');
   const navigate = useNavigate();
 
-  const fetchReservas = async () => {
+  const fetchReservas = useCallback(async () => {
     try {
       const res = await axios.get(ENDPOINTS_LOCAL.RESERVAS, {
         headers: { Authorization: `Bearer ${token}` }
@@ -23,11 +23,11 @@ function Reservas() {
       setTipoMensaje('error');
       setMensaje(error.response?.data?.error || 'Error al obtener reservas');
     }
-  };
+  }, [token]);
 
   useEffect(() => {
     if (token) fetchReservas();
-  }, [token]);
+  }, [token, fetchReservas]);
 
   const cancelarReserva = async (id) => {
     try {

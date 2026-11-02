@@ -3,7 +3,8 @@ import {
   getUbicaciones,
   crearUbicacion,
   actualizarUbicacion,
-  eliminarUbicacion
+  eliminarUbicacion,
+  activarUbicacion
 } from '../controllers/ubicacionesController.js';
 import { verificarToken } from '../middlewares/verificarToken.js';
 
@@ -16,5 +17,6 @@ router.get('/api/ubicaciones', getUbicaciones);
 router.post('/api/ubicaciones', verificarToken, crearUbicacion);
 router.put('/api/ubicaciones/:id', verificarToken, actualizarUbicacion);
 router.delete('/api/ubicaciones/:id', verificarToken, eliminarUbicacion);
+router.patch('/api/ubicaciones/:id/activar', verificarToken, activarUbicacion);
 
 export default router;

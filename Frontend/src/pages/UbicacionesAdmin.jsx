@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 import axios from 'axios';
 import { ENDPOINTS_LOCAL } from '../api/endpoints';
 import { useAuthStore } from '../store/useAuthStore';
@@ -20,25 +20,27 @@ function UbicacionesAdmin() {
   });
   const [editId, setEditId] = useState(null);
   const [mensaje, setMensaje] = useState('');
+  const [mostrarInactivas, setMostrarInactivas] = useState(false);
 
   // Modal de confirmación
   const [showModal, setShowModal] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
-      const res = await axios.get(ENDPOINTS_LOCAL.UBICACIONES, {
+      const url = `${ENDPOINTS_LOCAL.UBICACIONES}${mostrarInactivas ? '?soloInactivas=true' : ''}`;
+      const res = await axios.get(url, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setUbicaciones(res.data);
-    } catch (error) {
+    } catch {
       setMensaje('Error al cargar ubicaciones');
     }
-  };
+  }, [token, mostrarInactivas]);
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [fetchData]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -61,7 +63,7 @@ function UbicacionesAdmin() {
       setFormUbicacion({ nombre: '', direccion: '', ciudad: '', provincia: '', pais: '', telefono: '', email: '', lat: '', lng: '' });
       setEditId(null);
       fetchData();
-    } catch (error) {
+    } catch {
       setMensaje('Error al guardar ubicación');
     }
   };
@@ -92,13 +94,25 @@ function UbicacionesAdmin() {
       await axios.delete(`${ENDPOINTS_LOCAL.UBICACIONES}/${deleteId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      setMensaje('Ubicación eliminada');
+      setMensaje('Ubicación cambiada a inactiva; puedes consultarla en la lista de inactivas');
       fetchData();
-    } catch (error) {
+    } catch {
       setMensaje('Error al eliminar ubicación');
     }
     setShowModal(false);
     setDeleteId(null);
+  };
+
+  const handleActivar = async (id) => {
+    try {
+      await axios.patch(`${ENDPOINTS_LOCAL.UBICACIONES}/${id}/activar`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setMensaje('Ubicación activada');
+      fetchData();
+    } catch (error) {
+      setMensaje(error.response?.data?.error || 'Error al activar ubicación');
+    }
   };
 
   return (
@@ -139,6 +153,14 @@ function UbicacionesAdmin() {
       </form>
 
       {/* Tabla */}
+      <label>
+        <input
+          type="checkbox"
+          checked={mostrarInactivas}
+          onChange={(event) => setMostrarInactivas(event.target.checked)}
+        />
+        Mostrar ubicaciones inactivas
+      </label>
       <table className="ubicaciones-table">
         <thead>
           <tr>
@@ -151,6 +173,7 @@ function UbicacionesAdmin() {
             <th>Email</th>
             <th>Lat</th>
             <th>Lng</th>
+            <th>Estado</th>
             <th>Acciones</th>
           </tr>
         </thead>
@@ -166,9 +189,19 @@ function UbicacionesAdmin() {
               <td>{u.email}</td>
               <td>{u.lat}</td>
               <td>{u.lng}</td>
+              <td>{u.eliminado ? 'Inactiva' : 'Activa'}</td>
               <td>
-                <button onClick={() => handleEdit(u)} className="btn-secondary">Editar</button>
-                <button onClick={() => confirmDelete(u.id)} className="btn-danger">Eliminar</button>
+                {!u.eliminado && (
+                  <>
+                    <button onClick={() => handleEdit(u)} className="btn-secondary">Editar</button>
+                    <button onClick={() => confirmDelete(u.id)} className="btn-danger">Cambiar a inactivo</button>
+                  </>
+                )}
+                {u.eliminado && (
+                  <button onClick={() => handleActivar(u.id)} className="btn-primary">
+                    Cambiar a activo
+                  </button>
+                )}
               </td>
             </tr>
           ))}
@@ -179,9 +212,9 @@ function UbicacionesAdmin() {
       {showModal && (
         <div className="modal-overlay">
           <div className="modal">
-            <h3>¿Seguro que quieres eliminar esta ubicación?</h3>
+            <h3>¿Seguro que quieres cambiar esta ubicación a inactiva? Quedará oculta de la lista activa.</h3>
             <div className="modal-actions">
-              <button onClick={handleDelete} className="btn-danger">Sí, eliminar</button>
+              <button onClick={handleDelete} className="btn-danger">Sí, cambiar a inactivo</button>
               <button onClick={() => setShowModal(false)} className="btn-secondary">Cancelar</button>
             </div>
           </div>

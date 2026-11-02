@@ -18,6 +18,7 @@ export const ENDPOINTS = {
   USUARIOS: `${API_PUBLICA}/api/usuarios`,
   TURNOS: `${API_PUBLICA}/api/turnos`,
   DURACIONES: `${API_PUBLICA}/api/duraciones`,
+  REPORTE_ADMIN: `${API_PUBLICA}/api/reportes/admin`,
 };
 
 export const ENDPOINTS_LOCAL = {
@@ -37,4 +38,5 @@ export const ENDPOINTS_LOCAL = {
   USUARIOS: `${API_LOCAL}/api/usuarios`,
   TURNOS: `${API_LOCAL}/api/turnos`,
   DURACIONES: `${API_LOCAL}/api/duraciones`,
+  REPORTE_ADMIN: `${API_LOCAL}/api/reportes/admin`,
 };

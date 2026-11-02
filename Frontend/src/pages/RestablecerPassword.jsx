@@ -9,6 +9,8 @@ function RestablecerPassword() {
   const [searchParams] = useSearchParams();
   const [password, setPassword] = useState('');
   const [confirmacion, setConfirmacion] = useState('');
+  const [mostrarPassword, setMostrarPassword] = useState(false);
+  const [mostrarConfirmacion, setMostrarConfirmacion] = useState(false);
   const [mensaje, setMensaje] = useState('');
   const [error, setError] = useState('');
 
@@ -45,23 +47,45 @@ function RestablecerPassword() {
       <form onSubmit={handleSubmit} className="login-form">
         <div className="login-field">
           <label htmlFor="nueva-password">Nueva contraseña</label>
-          <input
-            id="nueva-password"
-            type="password"
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            required
-          />
+          <div className="password-input-wrapper">
+            <input
+              id="nueva-password"
+              type={mostrarPassword ? 'text' : 'password'}
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              required
+            />
+            <button
+              type="button"
+              className="password-toggle"
+              aria-label={mostrarPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+              aria-pressed={mostrarPassword}
+              onClick={() => setMostrarPassword(!mostrarPassword)}
+            >
+              <i className={`fa-solid ${mostrarPassword ? 'fa-eye' : 'fa-eye-slash'}`} aria-hidden="true" />
+            </button>
+          </div>
         </div>
         <div className="login-field">
           <label htmlFor="confirmar-password">Repetir contraseña</label>
-          <input
-            id="confirmar-password"
-            type="password"
-            value={confirmacion}
-            onChange={(event) => setConfirmacion(event.target.value)}
-            required
-          />
+          <div className="password-input-wrapper">
+            <input
+              id="confirmar-password"
+              type={mostrarConfirmacion ? 'text' : 'password'}
+              value={confirmacion}
+              onChange={(event) => setConfirmacion(event.target.value)}
+              required
+            />
+            <button
+              type="button"
+              className="password-toggle"
+              aria-label={mostrarConfirmacion ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+              aria-pressed={mostrarConfirmacion}
+              onClick={() => setMostrarConfirmacion(!mostrarConfirmacion)}
+            >
+              <i className={`fa-solid ${mostrarConfirmacion ? 'fa-eye' : 'fa-eye-slash'}`} aria-hidden="true" />
+            </button>
+          </div>
         </div>
         <button type="submit" className="login-button">Cambiar contraseña</button>
         {mensaje && <p className="login-message">{mensaje}</p>}

@@ -1,5 +1,5 @@
 import express from 'express';
-import { createActividad, deleteActividad, getActividadById, getActividades, getActividadesConTurnos, updateActividad } from '../controllers/actividadesController.js';
+import { activarActividad, createActividad, deleteActividad, getActividadById, getActividades, getActividadesConTurnos, updateActividad } from '../controllers/actividadesController.js';
 import { verificarToken } from '../middlewares/verificarToken.js';
 import { upload } from '../configs/multer.js';
 
@@ -11,5 +11,6 @@ router.get('/api/actividades/:id', verificarToken, getActividadById);
 router.post('/api/actividades', verificarToken, upload.single('foto'), createActividad);
 router.put('/api/actividades/:id', verificarToken, upload.single('foto'), updateActividad);
 router.delete('/api/actividades/:id', verificarToken, deleteActividad);
+router.patch('/api/actividades/:id/activar', verificarToken, activarActividad);
 
 export default router;

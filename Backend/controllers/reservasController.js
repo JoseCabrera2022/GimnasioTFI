@@ -18,7 +18,10 @@ export const crearReserva = async (req, res) => {
 
     // 1. Obtener cupo máximo del turno
     const [[turno]] = await db.query(
-      'SELECT cupo_maximo FROM turnos WHERE id = ?',
+      `SELECT t.cupo_maximo FROM turnos t
+       JOIN actividades a ON a.id = t.actividad_id AND a.eliminado = 0
+       JOIN ubicaciones u ON u.id = a.ubicacion_id AND u.eliminado = 0
+       WHERE t.id = ?`,
       [turno_id]
     );
     if (!turno) return res.status(404).json({ error: 'Turno no encontrado' });

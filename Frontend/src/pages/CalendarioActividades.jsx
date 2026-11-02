@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuthStore } from '../store/useAuthStore';
 import { ENDPOINTS_LOCAL } from '../api/endpoints';
@@ -29,7 +29,7 @@ function CalendarioActividades() {
     return d;
   }
 
-  const fetchActividades = async () => {
+  const fetchActividades = useCallback(async () => {
     try {
       const res = await axios.get(ENDPOINTS_LOCAL.ACTIVIDADES, {
         headers: { Authorization: `Bearer ${token}` }
@@ -39,11 +39,11 @@ function CalendarioActividades() {
       setTipoMensaje('error');
       setMensaje(error.response?.data?.error || 'Error al obtener actividades');
     }
-  };
+  }, [token]);
 
   useEffect(() => {
     if (token) fetchActividades();
-  }, [token]);
+  }, [token, fetchActividades]);
 
   const crearReserva = async (turnoId) => {
     try {

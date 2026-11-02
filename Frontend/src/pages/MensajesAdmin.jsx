@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useCallback, useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { ENDPOINTS_LOCAL } from '../api/endpoints';
 import { useAuthStore } from '../store/useAuthStore';
@@ -16,20 +16,20 @@ function MensajesAdmin() {
   // 🔹 Ref para el formulario de respuesta
   const respuestaRef = useRef(null);
 
-  const fetchMensajes = async () => {
+  const fetchMensajes = useCallback(async () => {
     try {
       const res = await axios.get(ENDPOINTS_LOCAL.CONTACTO, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setMensajes(res.data);
-    } catch (error) {
+    } catch {
       setAlerta('Error al cargar mensajes');
     }
-  };
+  }, [token]);
 
   useEffect(() => {
     fetchMensajes();
-  }, []);
+  }, [fetchMensajes]);
 
   const handleResponder = async (id) => {
     try {
@@ -40,7 +40,7 @@ function MensajesAdmin() {
       setRespuesta('');
       setMensajeSeleccionado(null);
       fetchMensajes();
-    } catch (error) {
+    } catch {
       setAlerta('Error al responder');
     }
   };
@@ -59,7 +59,7 @@ function MensajesAdmin() {
       setModalVisible(false);
       setMensajeAEliminar(null);
       fetchMensajes();
-    } catch (error) {
+    } catch {
       setAlerta('Error al eliminar');
     }
   };
@@ -78,7 +78,7 @@ function MensajesAdmin() {
       setModalVisible(false);
       setMensajeAEliminar(null);
       fetchMensajes();
-    } catch (error) {
+    } catch {
       setAlerta('Error al limpiar bandeja');
     }
   };

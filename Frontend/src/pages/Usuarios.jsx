@@ -23,16 +23,16 @@ function Usuarios() {
   const [mensaje, setMensaje] = useState('');
   const [errors, setErrors] = useState({});
   const [confirmDelete, setConfirmDelete] = useState(null);
-  const [mostrarEliminados, setMostrarEliminados] = useState(false);
+  const [mostrarInactivos, setMostrarInactivos] = useState(false);
   const [perfilSeleccionado, setPerfilSeleccionado] = useState(null);
   const [preview, setPreview] = useState(null)
   const [editMode, setEditMode] = useState(false);
   const [fileName, setFileName] = useState('Ningún archivo seleccionado');
 
   // Cargar usuarios
-  const fetchUsuarios = useCallback(async (incluirEliminados = mostrarEliminados) => {
+  const fetchUsuarios = useCallback(async () => {
     try {
-      const url = `${ENDPOINTS_LOCAL.USUARIOS}${incluirEliminados ? '?incluirEliminados=true' : ''}`;
+      const url = `${ENDPOINTS_LOCAL.USUARIOS}${mostrarInactivos ? '?soloInactivos=true' : ''}`;
       const res = await axios.get(url, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -40,7 +40,7 @@ function Usuarios() {
     } catch (error) {
       setMensaje(error.response?.data?.error || 'Error al cargar usuarios');
     }
-  }, [mostrarEliminados, token]);
+  }, [mostrarInactivos, token]);
 
   const handleView = async (id) => {
     try {
@@ -162,33 +162,40 @@ function Usuarios() {
     }
   };
 
-  // Abrir confirmación de borrado lógico o físico
-  const handleDeleteClick = (usuario, definitivo = false) => {
-    setConfirmDelete({ id: usuario.id, nombre: usuario.nombre, definitivo });
+  // Abrir confirmación para cambiar al usuario a inactivo
+  const handleDeleteClick = (usuario) => {
+    setConfirmDelete({ id: usuario.id, nombre: usuario.nombre });
   };
 
   const handleConfirmDelete = async () => {
     if (!confirmDelete) return;
     try {
-      const url = confirmDelete.definitivo
-        ? `${ENDPOINTS_LOCAL.USUARIOS}/${confirmDelete.id}/definitivo`
-        : `${ENDPOINTS_LOCAL.USUARIOS}/${confirmDelete.id}`;
-      await axios.delete(url, {
+      await axios.delete(`${ENDPOINTS_LOCAL.USUARIOS}/${confirmDelete.id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      setMensaje(confirmDelete.definitivo
-        ? 'Usuario borrado definitivamente'
-        : 'Usuario eliminado; puedes encontrarlo en la lista de eliminados');
+      setMensaje('Usuario cambiado a inactivo; puedes consultarlo en la lista de inactivos');
       setConfirmDelete(null);
       fetchUsuarios();
     } catch (error) {
-      setMensaje(error.response?.data?.error || 'Error al eliminar usuario');
+      setMensaje(error.response?.data?.error || 'Error al cambiar usuario a inactivo');
       setConfirmDelete(null);
     }
   };
 
   const handleCancelDelete = () => {
     setConfirmDelete(null);
+  };
+
+  const handleActivarUsuario = async (id) => {
+    try {
+      await axios.patch(`${ENDPOINTS_LOCAL.USUARIOS}/${id}/activar`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setMensaje('Usuario activado');
+      fetchUsuarios();
+    } catch (error) {
+      setMensaje(error.response?.data?.error || 'Error al activar usuario');
+    }
   };
 
   return (
@@ -198,12 +205,12 @@ function Usuarios() {
       <label className="usuarios-toggle-eliminados">
         <input
           type="checkbox"
-          checked={mostrarEliminados}
+          checked={mostrarInactivos}
           onChange={(event) => {
-            setMostrarEliminados(event.target.checked);
+            setMostrarInactivos(event.target.checked);
           }}
         />
-        Mostrar usuarios eliminados
+        Mostrar usuarios inactivos
       </label>
 
       <form onSubmit={handleSubmit} className="usuario-form">
@@ -320,7 +327,7 @@ function Usuarios() {
                 <td>{u.correo_electronico}</td>
                 <td>{u.telefono}</td>
                 <td>{u.rol}</td>
-                <td>{u.eliminado ? 'Eliminado' : u.estado}</td>
+                <td>{u.eliminado ? 'Inactivo' : u.estado}</td>
                 <td>{u.ubicacion_id}</td>
                 <td>
                   {!u.eliminado && (
@@ -328,16 +335,15 @@ function Usuarios() {
                       <button onClick={() => handleEdit(u)}>Editar</button>
                       <button onClick={() => handleView(u.id)}>Ver perfil</button>
                       <button className="btn-soft-delete" onClick={() => handleDeleteClick(u)}>
-                        Eliminar
+                        Cambiar a inactivo
                       </button>
                     </>
                   )}
-                  <button
-                    className="btn-hard-delete"
-                    onClick={() => handleDeleteClick(u, true)}
-                  >
-                    Borrado definitivo
-                  </button>
+                  {u.eliminado && (
+                    <button className="btn-confirm" onClick={() => handleActivarUsuario(u.id)}>
+                      Cambiar a activo
+                    </button>
+                  )}
                 </td>
               </tr>
             ))}
@@ -424,18 +430,13 @@ function Usuarios() {
       {confirmDelete && (
         <div className="modal-overlay">
           <div className="modal-content">
-            <h2>{confirmDelete.definitivo ? 'Confirmar borrado definitivo' : 'Confirmar eliminación'}</h2>
+            <h2>Confirmar cambio a inactivo</h2>
             <p>
-              {confirmDelete.definitivo
-                ? `¿Eliminar físicamente a ${confirmDelete.nombre}? También se borrarán permanentemente sus membresías, pagos y reservas. Esta acción no se puede deshacer.`
-                : `¿Eliminar a ${confirmDelete.nombre}? El usuario quedará oculto de la lista activa, pero podrás borrarlo definitivamente después.`}
+              ¿Cambiar a inactivo a {confirmDelete.nombre}? Quedará oculto de la lista activa y podrás consultarlo en la lista de inactivos.
             </p>
             <div className="modal-actions">
-              <button
-                className={`btn-confirm${confirmDelete.definitivo ? ' btn-confirm-definitive' : ''}`}
-                onClick={handleConfirmDelete}
-              >
-                {confirmDelete.definitivo ? 'Sí, borrar definitivamente' : 'Sí, eliminar'}
+              <button className="btn-confirm" onClick={handleConfirmDelete}>
+                Sí, cambiar a inactivo
               </button>
               <button className="btn-cancel" onClick={handleCancelDelete}>
                 Cancelar

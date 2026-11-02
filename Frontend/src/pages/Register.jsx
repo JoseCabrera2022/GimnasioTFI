@@ -13,6 +13,7 @@ function Register() {
   const [correo, setCorreo] = useState('');
   const [telefono, setTelefono] = useState('');
   const [password, setPassword] = useState('');
+  const [mostrarPassword, setMostrarPassword] = useState(false);
   const [ubicacionId, setUbicacionId] = useState(null);
   const [errors, setErrors] = useState({});
   const [serverMessage, setServerMessage] = useState('');
@@ -76,7 +77,22 @@ function Register() {
 
         <div className="form-group">
           <label>Contraseña</label>
-          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+          <div className="password-input-wrapper">
+            <input
+              type={mostrarPassword ? 'text' : 'password'}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <button
+              type="button"
+              className="password-toggle"
+              aria-label={mostrarPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+              aria-pressed={mostrarPassword}
+              onClick={() => setMostrarPassword(!mostrarPassword)}
+            >
+              <i className={`fa-solid ${mostrarPassword ? 'fa-eye' : 'fa-eye-slash'}`} aria-hidden="true" />
+            </button>
+          </div>
           {errors.password && <span className="error">{errors.password}</span>}
         </div>
 

@@ -15,6 +15,7 @@ import actividadesRoutes from './routers/actividadesRoutes.js'
 import ubicacionesRoutes from './routers/ubicacionesRoutes.js';
 import usuarioRoutes from './routers/usuarioRoutes.js'
 import turnosRoutes from './routers/turnosRoutes.js'
+import reportesRoutes from './routers/reportesRoutes.js'
 
 const app = express();
 
@@ -35,6 +36,7 @@ app.use('/', actividadesRoutes);
 app.use('/', ubicacionesRoutes);
 app.use('/', usuarioRoutes);
 app.use('/', turnosRoutes);
+app.use('/', reportesRoutes);
 
 // Para servir las imágenes subidas
 app.use('/uploads', express.static('uploads'));

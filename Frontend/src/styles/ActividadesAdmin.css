@@ -79,6 +79,32 @@ button {
   border: none;
 }
 
+.actividad-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.actividad-modal {
+  width: min(100%, 420px);
+  padding: 20px;
+  border-radius: 8px;
+  background: white;
+  text-align: center;
+}
+
+.actividad-modal-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 20px;
+}
+
 .actividades-table {
   width: 100%;
   border-collapse: collapse;
