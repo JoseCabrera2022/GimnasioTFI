@@ -1,5 +1,5 @@
 .footer {
-  background: #222;
+  background: #090a18;
   color: #fff;
   padding: 16px 20px;   /* 🔹 menos padding vertical */
   margin: 0;
@@ -19,7 +19,7 @@
 
 .footer-brand h3 {
   margin: 0;
-  color: #3498db;
+  color: #7770ee;
   font-size: 1.1rem;    /* 🔹 más pequeño */
 }
 

@@ -1,125 +1,103 @@
 .navbar {
+  height: 104px;
+  box-sizing: border-box;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #222;
-  padding: 12px 24px;
+  padding: 0 32px;
   position: sticky;
   top: 0;
   z-index: 1000;
+  background: rgba(8, 9, 24, 0.96);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  backdrop-filter: blur(14px);
   color: #fff;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
 }
 
 .navbar-logo {
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-weight: bold;
-  font-size: 1.2rem;
+  gap: 12px;
   color: #fff;
   text-decoration: none;
-  position: relative; /* necesario para el pseudo-elemento */
-  transition: color 0.3s ease, transform 0.3s ease;
+  font-size: 1.15rem;
+  font-weight: 800;
 }
 
-.navbar-logo::after {
-  content: '';
-  position: absolute;
-  bottom: -4px;
-  left: 0;
-  width: 0%;
-  height: 2px;
-  background: #3498db; /* color moderno */
-  transition: width 0.3s ease;
+.gym-logo-right {
+  width: 54px;
+  height: 54px;
+  display: block;
+  border-radius: 8px;
+  object-fit: contain;
+  background: #fff;
+  border: 1px solid rgba(255,255,255,0.85);
 }
 
-.navbar-logo:hover {
-  color: #3498db;          /* cambia el color del texto */
-  transform: scale(1.05);  /* efecto de zoom suave */
+.navbar-brand-icon {
+  display: flex;
+  align-items: center;
+  margin-left: 2px;
 }
 
-.navbar-logo:hover::after {
-  width: 100%;             /* subrayado animado */
-}
-
-
-.gym-logo {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;      /* circular */
-  object-fit: cover;       /* recorte correcto */
-  background-color: #fff;
+.navbar-brand-icon a {
+  display: flex;
 }
 
 .navbar-links {
-  list-style: none;
   display: flex;
-  gap: 24px;
+  align-items: center;
+  gap: 26px;
   margin: 0;
   padding: 0;
+  list-style: none;
 }
 
-.navbar-links li {
-  display: flex;
-  align-items: center;
-}
-
-/* Enlaces generales */
 .navbar-links a {
+  color: #d9dae6;
   text-decoration: none;
-  color: #ddd;
-  font-weight: 500;
-  transition: color 0.3s ease;
+  font-size: 0.92rem;
+  font-weight: 600;
+  transition: color 0.2s ease;
 }
 
-.navbar-links a:hover {
-  color: #fff;
-}
+.navbar-links a:hover { color: #9b94ff; }
 
-/* Usuario logueado */
-.navbar-user {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-/* 🔹 más específico que .navbar-links a */
+.navbar-user { display: flex; align-items: center; }
 .navbar-links li .navbar-user-link {
   display: flex;
   align-items: center;
-  gap: 6px;
-  text-decoration: none;
-  color: #4caf50; /* verde visible */
-  font-weight: 600;
-  transition: color 0.3s ease;
+  gap: 8px;
+  color: #9b94ff;
 }
 
-.navbar-links li .navbar-user-link:hover {
-  color: #2e7d32; /* verde más oscuro al hover */
-}
-
-/* Botón de cerrar sesión */
 .navbar-button {
-  background: #e74c3c;
-  border: none;
-  padding: 6px 14px;
+  border: 0;
+  border-radius: 999px;
+  padding: 9px 16px;
+  background: linear-gradient(135deg, #6a60e8, #8c82ff);
   color: #fff;
   cursor: pointer;
-  border-radius: 4px;
-  font-weight: 500;
-  transition: background 0.3s ease, transform 0.2s ease;
-}
-
-.navbar-button:hover {
-  background: #c0392b;
-  transform: scale(1.05);
+  font-weight: 700;
 }
 
 .user-avatar {
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;   /* opcional: hace la imagen circular */
-  object-fit: cover;    /* asegura que la imagen se recorte bien */
-  border: 2px solid #4caf50; /* opcional: borde verde para destacar */
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #7770ee;
+}
+
+@media (max-width: 900px) {
+  .navbar { height: auto; min-height: 78px; padding: 12px 20px; }
+  .navbar-links { gap: 12px; flex-wrap: wrap; justify-content: flex-end; }
+  .gym-logo-right { width: 46px; height: 46px; }
+}
+
+@media (max-width: 650px) {
+  .navbar { align-items: flex-start; }
+  .navbar-links { max-width: 270px; }
+  .navbar-links li:nth-child(3),
+  .navbar-links li:nth-child(4) { display: none; }
 }

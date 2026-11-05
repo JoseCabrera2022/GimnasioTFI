@@ -2,9 +2,8 @@ import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ROUTES } from '../routers/routes';
 import { useAuthStore } from '../store/useAuthStore';
-import defaultAvatar from '../assets/default-avatar.png';
 import '../styles/Navbar.css';
-import { API_LOCAL, ENDPOINTS_LOCAL } from '../api/endpoints';
+import { ENDPOINTS_LOCAL } from '../api/endpoints';
 import http from '../utils/axiosConfig';
 
 function Navbar() {
@@ -28,11 +27,6 @@ function Navbar() {
   return (
     <nav className="navbar">
       <Link to={ROUTES.HOME} className="navbar-logo">
-        <img 
-          src="/assets/fuerzavitalgym2.png" 
-          alt="Fuerza Vital Gym Logo" 
-          className="gym-logo"
-        />
         <span>GymManager Pro</span>
       </Link>
 
@@ -46,34 +40,26 @@ function Navbar() {
           <>
             <li><Link to={ROUTES.LOGIN}>Login</Link></li>
             <li><Link to={ROUTES.REGISTER}>Registro</Link></li>
-            <li className="navbar-user">
-              <Link to={ROUTES.PERFIL} className="navbar-user-link">
-                <img src={defaultAvatar} alt="avatar" className="user-avatar" />
-                <span>Perfil</span>
-              </Link>
-            </li>
           </>
         )}
 
         {usuario && (
-          <>
-            <li>
-              <button className="navbar-button" onClick={logout}>
-                Cerrar sesión
-              </button>
-            </li>
-            <li className="navbar-user">
-              <Link to={ROUTES.PERFIL} className="navbar-user-link">
-                <img
-                  src={usuario.foto ? `${API_LOCAL}${usuario.foto}` : defaultAvatar}
-                  alt="avatar"
-                  className="user-avatar"
-                />
-                <span>{usuario.nombre}</span>
-              </Link>
-            </li>
-          </>
+          <li>
+            <button className="navbar-button" onClick={logout}>
+              Cerrar sesión
+            </button>
+          </li>
         )}
+
+        <li className="navbar-brand-icon">
+          <Link to={ROUTES.HOME} aria-label="Ir al inicio de GymManager Pro">
+            <img
+              src="/assets/fuerzavitalgym2.png"
+              alt="Logo de GymManager Pro"
+              className="gym-logo-right"
+            />
+          </Link>
+        </li>
       </ul>
     </nav>
   );

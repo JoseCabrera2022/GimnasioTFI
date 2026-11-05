@@ -13,17 +13,21 @@ function Home() {
       {/* 🔹 Hero Banner */}
       <section className="hero-banner">
         <div className="hero-overlay">
-          <h1>GymManager Pro 🏋️‍♂️</h1>
-          <p>"Tu esfuerzo, nuestra guía. Juntos alcanzamos tus metas 💪"</p>
+          <span className="hero-eyebrow">Tu fuerza empieza aquí</span>
+          <h1>Transformá tu cuerpo.<br /><strong>Superá tus límites.</strong></h1>
+          <p>Entrenamientos pensados para vos, instalaciones modernas y un equipo que te acompaña en cada objetivo.</p>
           <button onClick={() => navigate(ROUTES.LOGIN)} className="hero-button">
-            Comenzar ahora
+            Comenzar ahora <i className="fas fa-arrow-right"></i>
           </button>
         </div>
       </section>
 
       {/* 🔹 Instalaciones */}
       <section className="home-section instalaciones">
-        <h2>Nuestras instalaciones</h2>
+        <div className="section-heading">
+          <span className="section-kicker">Nuestras instalaciones</span>
+          <h2>Espacios para todos tus objetivos</h2>
+        </div>
         <div className="gallery">
           <img src="/assets/gym.jpg" alt="Sala de pesas" />
           <img src="/assets/gym2.jpg" alt="Zona cardio" />
@@ -33,8 +37,11 @@ function Home() {
       </section>
 
       {/* 🔹 Entrenadores */}
-      <section className="home-section entrenadores">
-        <h2>Conoce a nuestros entrenadores</h2>
+      <section className="home-section entrenadores dark-section">
+        <div className="section-heading section-heading-light">
+          <span className="section-kicker">Nuestro equipo</span>
+          <h2>Conocé a nuestros entrenadores</h2>
+        </div>
         <div className="carousel">
           <div className="carousel-item">
             <img src="/assets/trainer1.jpg" alt="Entrenador 1" />
@@ -52,23 +59,32 @@ function Home() {
       </section>
 
       {/* 🔹 Planes */}
-      <section className="home-section">
-        <h2>Planes de entrenamiento</h2>
-        <p>Descubre nuestros planes y elige el que mejor se adapte a ti.</p>
+      <section className="home-section planes-section">
+        <div className="section-heading">
+          <span className="section-kicker">Planes</span>
+          <h2>Elegí tu entrenamiento</h2>
+          <p>Encontrá el plan que mejor se adapte a tus objetivos.</p>
+        </div>
         <Planes/>
       </section>
 
       {/* 🔹 Ubicaciones */}
-      <section className="home-section">
-        <h2>Nuestras sedes</h2>
-        <p>Encuentra tu gimnasio más cercano y accede a todas nuestras instalaciones.</p>
+      <section className="home-section ubicaciones-section">
+        <div className="section-heading">
+          <span className="section-kicker">Nuestras sedes</span>
+          <h2>Entrená cerca de vos</h2>
+          <p>Encontrá tu gimnasio más cercano y accedé a todas nuestras instalaciones.</p>
+        </div>
         <Ubicaciones/>
       </section>
 
       {/* 🔹 Contacto */}
-      <section className="home-section">
-        <h2>Contacto</h2>
-        <p>¿Tienes dudas? Escríbenos y te ayudaremos en lo que necesites.</p>
+      <section className="home-section contacto-section">
+        <div className="section-heading">
+          <span className="section-kicker">Contacto</span>
+          <h2>¿Tenés alguna consulta?</h2>
+          <p>Escribinos y te ayudaremos en lo que necesites.</p>
+        </div>
         <Contacto/>
       </section>
     </div>
