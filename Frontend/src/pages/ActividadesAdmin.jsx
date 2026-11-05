@@ -1,15 +1,19 @@
-import { useCallback, useState, useEffect } from 'react';
+import { useCallback, useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
 import { useAuthStore } from '../store/useAuthStore';
 import { ENDPOINTS_LOCAL, API_LOCAL } from '../api/endpoints';
 import defaultImagen from '/assets/fuerzavitalgym.png';
 import '../styles/ActividadesAdmin.css';
+import TablePagination from '../components/TablePagination';
+import useTablePagination from '../hooks/useTablePagination';
 
 function ActividadesAdmin() {
   const { token } = useAuthStore();
   const [actividades, setActividades] = useState([]);
   const [ubicaciones, setUbicaciones] = useState([]);
-  const [mostrarInactivas, setMostrarInactivas] = useState(false);
+  const [busqueda, setBusqueda] = useState('');
+  const [filtroEstado, setFiltroEstado] = useState('activas');
+  const [filtroUbicacion, setFiltroUbicacion] = useState('');
   const [actividadParaInactivar, setActividadParaInactivar] = useState(null);
 
   // Form actividad
@@ -32,11 +36,38 @@ function ActividadesAdmin() {
   const [turnoEditMode, setTurnoEditMode] = useState(null); // turno id que se edita
   const [turnoEditForm, setTurnoEditForm] = useState({ fecha: '', cupo_maximo: '' });
 
+  const actividadesFiltradas = useMemo(() => {
+    const termino = busqueda.trim().toLocaleLowerCase();
+    return actividades.filter((actividad) => {
+      const coincideNombre = !termino || actividad.nombre?.toLocaleLowerCase().includes(termino);
+      const coincideUbicacion = !filtroUbicacion
+        || String(actividad.ubicacion_id) === filtroUbicacion;
+      return coincideNombre && coincideUbicacion;
+    });
+  }, [actividades, busqueda, filtroUbicacion]);
+  const { pageItems: actividadesPagina, ...paginacionActividades } = useTablePagination(
+    actividadesFiltradas,
+    `${filtroEstado}-${filtroUbicacion}-${busqueda}`
+  );
+  const ubicacionesFiltro = useMemo(() => {
+    const ubicacionesPorId = new Map();
+    actividades.forEach((actividad) => {
+      if (actividad.ubicacion_id != null) {
+        ubicacionesPorId.set(String(actividad.ubicacion_id), {
+          id: actividad.ubicacion_id,
+          nombre: actividad.ubicacion_nombre,
+          ciudad: actividad.ubicacion_ciudad,
+        });
+      }
+    });
+    return Array.from(ubicacionesPorId.values());
+  }, [actividades]);
+
   // Cargar actividades
   const fetchActividades = useCallback(async () => {
     try {
       const endpoint = ENDPOINTS_LOCAL.ACTIVIDADES_SIMPLE ?? `${ENDPOINTS_LOCAL.ACTIVIDADES}-simple`;
-      const url = `${endpoint}${mostrarInactivas ? '?soloInactivas=true' : ''}`;
+      const url = `${endpoint}?estado=${filtroEstado}`;
       const res = await axios.get(url, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -45,7 +76,7 @@ function ActividadesAdmin() {
       setTipoMensaje('error');
       setMensaje(error.response?.data?.error || 'Error al cargar actividades');
     }
-  }, [token, mostrarInactivas]);
+  }, [token, filtroEstado]);
 
   // Cargar ubicaciones
   const fetchUbicaciones = useCallback(async () => {
@@ -315,14 +346,50 @@ function ActividadesAdmin() {
       </form>
 
       {/* Tabla de actividades */}
-      <label>
+      <section className="actividades-filtros" aria-label="Buscar y filtrar actividades">
         <input
-          type="checkbox"
-          checked={mostrarInactivas}
-          onChange={(event) => setMostrarInactivas(event.target.checked)}
+          type="search"
+          value={busqueda}
+          onChange={(event) => setBusqueda(event.target.value)}
+          placeholder="Buscar por nombre"
+          aria-label="Buscar actividades por nombre"
         />
-        Mostrar actividades inactivas
-      </label>
+        <select
+          value={filtroUbicacion}
+          onChange={(event) => setFiltroUbicacion(event.target.value)}
+          aria-label="Filtrar por sede"
+        >
+          <option value="">Todas las sedes</option>
+          {ubicacionesFiltro.map((ubicacion) => (
+            <option key={ubicacion.id} value={ubicacion.id}>
+              {[ubicacion.nombre, ubicacion.ciudad].filter(Boolean).join(' - ')}
+            </option>
+          ))}
+        </select>
+        <select
+          value={filtroEstado}
+          onChange={(event) => setFiltroEstado(event.target.value)}
+          aria-label="Filtrar por estado"
+        >
+          <option value="activas">Activas</option>
+          <option value="inactivas">Inactivas</option>
+          <option value="todas">Todas</option>
+        </select>
+        <button
+          type="button"
+          className="actividades-filtros-limpiar"
+          onClick={() => {
+            setBusqueda('');
+            setFiltroUbicacion('');
+            setFiltroEstado('activas');
+          }}
+        >
+          Limpiar filtros
+        </button>
+        <span className="actividades-resultados">
+          {actividadesFiltradas.length} actividades
+        </span>
+      </section>
       <table className="actividades-table">
         <thead>
           <tr>
@@ -335,11 +402,15 @@ function ActividadesAdmin() {
           </tr>
         </thead>
         <tbody>
-          {actividades.map(a => (
+          {actividadesPagina.map(a => (
             <tr key={a.id}>
               <td>{a.nombre}</td>
               <td>{a.descripcion}</td>
-              <td>{a.ubicacion_id}</td>
+              <td>
+                {a.ubicacion_nombre
+                  ? [a.ubicacion_nombre, a.ubicacion_ciudad].filter(Boolean).join(' - ')
+                  : 'Sin sede'}
+              </td>
               <td>
                 <img
                   src={a.foto ? `${API_LOCAL}${a.foto}` : defaultImagen}
@@ -358,16 +429,24 @@ function ActividadesAdmin() {
                     <button onClick={() => handleViewTurnos(a)} className="btn-primary">Ver Turnos</button>
                   </>
                 )}
-                {a.eliminado && (
+                {a.eliminado ? (
                   <button onClick={() => handleActivarActividad(a.id)} className="btn-primary">
                     Cambiar a activo
                   </button>
-                )}
+                ) : null}
               </td>
             </tr>
           ))}
+          {actividadesFiltradas.length === 0 && (
+            <tr>
+              <td colSpan="6" className="actividades-sin-resultados">
+                No se encontraron actividades con esos criterios.
+              </td>
+            </tr>
+          )}
         </tbody>
       </table>
+      <TablePagination {...paginacionActividades} />
 
       {actividadParaInactivar && (
         <div className="actividad-modal-overlay" role="presentation">

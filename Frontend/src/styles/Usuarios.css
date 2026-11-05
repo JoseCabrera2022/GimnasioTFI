@@ -210,6 +210,95 @@
   width: auto;
 }
 
+.usuarios-filtros {
+  display: grid;
+  grid-template-columns: minmax(220px, 2fr) repeat(3, minmax(150px, 1fr)) auto;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.usuarios-filtros input,
+.usuarios-filtros select {
+  min-width: 0;
+  padding: 9px 10px;
+  color: #333;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+
+.usuarios-filtros-limpiar {
+  padding: 9px 12px;
+  color: #fff;
+  background: #6c757d;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.usuarios-filtros-limpiar:hover {
+  background: #5a6268;
+}
+
+.usuarios-resultados {
+  grid-column: 1 / -1;
+  color: #555;
+  font-size: 0.9rem;
+}
+
+.usuarios-sin-resultados {
+  padding: 18px !important;
+  color: #666;
+  text-align: center !important;
+}
+
+.usuarios-paginacion {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 14px;
+  color: #444;
+  font-size: 0.9rem;
+}
+
+.usuarios-tamano-pagina {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.usuarios-tamano-pagina select {
+  padding: 6px 8px;
+  color: #333;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.usuarios-paginacion-botones {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.usuarios-paginacion-botones button {
+  padding: 7px 10px;
+  color: #fff;
+  background: #0077cc;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.usuarios-paginacion-botones button:disabled {
+  background: #aab4bd;
+  cursor: not-allowed;
+}
+
 .usuarios-table .btn-soft-delete {
   background: #dc3545;
   color: #fff;
@@ -219,6 +308,23 @@
 @media (max-width: 768px) {
   .usuario-form {
     grid-template-columns: 1fr;
+  }
+
+  .usuarios-filtros {
+    grid-template-columns: 1fr;
+  }
+
+  .usuarios-resultados {
+    grid-column: auto;
+  }
+
+  .usuarios-paginacion {
+    flex-wrap: wrap;
+  }
+
+  .usuarios-rango-pagina {
+    order: 1;
+    width: 100%;
   }
 
   .usuarios-table th,

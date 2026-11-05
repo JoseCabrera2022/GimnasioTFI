@@ -6,21 +6,31 @@ import '../styles/Ubicaciones.css';
 function Ubicaciones() {
   const [ubicaciones, setUbicaciones] = useState([]);
   const [selected, setSelected] = useState(null);
+  const [cargando, setCargando] = useState(true);
+  const [errorCarga, setErrorCarga] = useState('');
 
   useEffect(() => {
     const fetchUbicaciones = async () => {
       try {
         const res = await axios.get(ENDPOINTS_LOCAL.UBICACIONES);
+        if (!Array.isArray(res.data)) {
+          throw new Error('La respuesta del servidor no contiene una lista de ubicaciones.');
+        }
         setUbicaciones(res.data);
         if (res.data.length > 0) setSelected(res.data[0]); // por defecto la primera
       } catch (error) {
         console.error('Error al cargar ubicaciones:', error);
+        setErrorCarga(error.response?.data?.error || 'No se pudieron cargar las ubicaciones.');
+      } finally {
+        setCargando(false);
       }
     };
     fetchUbicaciones();
   }, []);
 
-  if (!selected) return <p>Cargando ubicación...</p>;
+  if (cargando) return <p>Cargando ubicación...</p>;
+  if (errorCarga) return <p role="alert">{errorCarga}</p>;
+  if (!selected) return <p>No hay ubicaciones disponibles.</p>;
 
   return (
     <div className="ubicacion-container">

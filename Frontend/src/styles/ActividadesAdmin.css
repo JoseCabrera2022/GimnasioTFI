@@ -105,6 +105,47 @@ button {
   margin-top: 20px;
 }
 
+.actividades-filtros {
+  display: grid;
+  grid-template-columns: minmax(220px, 2fr) repeat(2, minmax(160px, 1fr)) auto;
+  align-items: center;
+  gap: 10px;
+  margin: 14px 0;
+}
+
+.actividades-filtros input,
+.actividades-filtros select {
+  min-width: 0;
+  padding: 9px 10px;
+  color: #333;
+  background: #fff;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+
+.actividades-filtros-limpiar {
+  padding: 9px 12px;
+  color: #fff;
+  background: #6b7280;
+  border: 0;
+  border-radius: 6px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.actividades-resultados {
+  grid-column: 1 / -1;
+  color: #555;
+  font-size: 0.9rem;
+}
+
+.actividades-sin-resultados {
+  padding: 18px !important;
+  color: #666;
+  text-align: center !important;
+}
+
 .actividades-table {
   width: 100%;
   border-collapse: collapse;
@@ -125,6 +166,16 @@ button {
   display: block;
   border-radius: 6px;
   object-fit: cover;
+}
+
+@media (max-width: 768px) {
+  .actividades-filtros {
+    grid-template-columns: 1fr;
+  }
+
+  .actividades-resultados {
+    grid-column: auto;
+  }
 }
 
 .turnos-section {

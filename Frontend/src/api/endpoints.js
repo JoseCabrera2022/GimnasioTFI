@@ -1,42 +1,27 @@
-export const API_PUBLICA =  "https://mazily-dioptral-jett.ngrok-free.dev";
-export const API_LOCAL = "http://localhost:8000"
+export const API_BASE_URL = (import.meta.env.VITE_API_URL || "http://localhost:8000").replace(/\/+$/, "");
+export const API_PUBLICA = API_BASE_URL;
+export const API_LOCAL = API_BASE_URL;
 
 export const ENDPOINTS = {
-  REGISTER: `${API_PUBLICA}/api/register`,
-  LOGIN: `${API_PUBLICA}/api/login`,
-  FORGOT_PASSWORD: `${API_PUBLICA}/api/forgot-password`,
-  RESET_PASSWORD: `${API_PUBLICA}/api/reset-password`,
-  MEMBRESIAS: `${API_PUBLICA}/api/membresias`,
-  PAGOS: `${API_PUBLICA}/api/pagos/mercadopago`,
-  HISTORIALPAGOS: `${API_PUBLICA}/api/pagos/historial`,
-  CONTACTO: `${API_PUBLICA}/api/contacto`,
-  PERFIL: `${API_PUBLICA}/api/perfil`,
-  PLANES: `${API_PUBLICA}/api/planes`,
-  RESERVAS: `${API_PUBLICA}/api/reservas`,
-  ACTIVIDADES: `${API_PUBLICA}/api/actividades`,
-  UBICACIONES: `${API_PUBLICA}/api/ubicaciones`,
-  USUARIOS: `${API_PUBLICA}/api/usuarios`,
-  TURNOS: `${API_PUBLICA}/api/turnos`,
-  DURACIONES: `${API_PUBLICA}/api/duraciones`,
-  REPORTE_ADMIN: `${API_PUBLICA}/api/reportes/admin`,
+  REGISTER: `${API_BASE_URL}/api/register`,
+  LOGIN: `${API_BASE_URL}/api/login`,
+  FORGOT_PASSWORD: `${API_BASE_URL}/api/forgot-password`,
+  RESET_PASSWORD: `${API_BASE_URL}/api/reset-password`,
+  MEMBRESIAS: `${API_BASE_URL}/api/membresias`,
+  PAGOS: `${API_BASE_URL}/api/pagos/mercadopago`,
+  VERIFICAR_PAGO: `${API_BASE_URL}/api/pagos/verificar`,
+  HISTORIALPAGOS: `${API_BASE_URL}/api/pagos/historial`,
+  CONTACTO: `${API_BASE_URL}/api/contacto`,
+  PERFIL: `${API_BASE_URL}/api/perfil`,
+  PLANES: `${API_BASE_URL}/api/planes`,
+  RESERVAS: `${API_BASE_URL}/api/reservas`,
+  ACTIVIDADES: `${API_BASE_URL}/api/actividades`,
+  UBICACIONES: `${API_BASE_URL}/api/ubicaciones`,
+  USUARIOS: `${API_BASE_URL}/api/usuarios`,
+  TURNOS: `${API_BASE_URL}/api/turnos`,
+  DURACIONES: `${API_BASE_URL}/api/duraciones`,
+  REPORTE_ADMIN: `${API_BASE_URL}/api/reportes/admin`,
+  DASHBOARD_ADMIN: `${API_BASE_URL}/api/reportes/dashboard`,
 };
 
-export const ENDPOINTS_LOCAL = {
-  REGISTER: `${API_LOCAL}/api/register`,
-  LOGIN: `${API_LOCAL}/api/login`,
-  FORGOT_PASSWORD: `${API_LOCAL}/api/forgot-password`,
-  RESET_PASSWORD: `${API_LOCAL}/api/reset-password`,
-  MEMBRESIAS: `${API_LOCAL}/api/membresias`,
-  PAGOS: `${API_LOCAL}/api/pagos/mercadopago`,
-  HISTORIALPAGOS: `${API_LOCAL}/api/pagos/historial`,
-  CONTACTO: `${API_LOCAL}/api/contacto`,
-  PERFIL: `${API_LOCAL}/api/perfil`,
-  PLANES: `${API_LOCAL}/api/planes`,
-  RESERVAS: `${API_LOCAL}/api/reservas`,
-  ACTIVIDADES: `${API_LOCAL}/api/actividades`,
-  UBICACIONES: `${API_LOCAL}/api/ubicaciones`,
-  USUARIOS: `${API_LOCAL}/api/usuarios`,
-  TURNOS: `${API_LOCAL}/api/turnos`,
-  DURACIONES: `${API_LOCAL}/api/duraciones`,
-  REPORTE_ADMIN: `${API_LOCAL}/api/reportes/admin`,
-};
+export const ENDPOINTS_LOCAL = ENDPOINTS;

@@ -14,6 +14,8 @@ function Planes() {
   const [mostrarComparacion, setMostrarComparacion] = useState(false);
   const [planes, setPlanes] = useState([]);
   const [duraciones, setDuraciones] = useState([]);
+  const [cargandoPlanes, setCargandoPlanes] = useState(true);
+  const [errorPlanes, setErrorPlanes] = useState('');
   const [mostrarBanner, setMostrarBanner] = useState(false);
   const [tieneMembresiaActiva, setTieneMembresiaActiva] = useState(false);
   const [fechaVencimiento, setFechaVencimiento] = useState(null);
@@ -28,10 +30,16 @@ function Planes() {
         const res = await axios.get(ENDPOINTS_LOCAL.PLANES, {
           headers: { Authorization: `Bearer ${token}` }
         });
+        if (!Array.isArray(res.data.planes) || !Array.isArray(res.data.duraciones)) {
+          throw new Error('La respuesta del servidor no contiene planes y duraciones.');
+        }
         setPlanes(res.data.planes);
         setDuraciones(res.data.duraciones);
       } catch (error) {
         console.error('Error al obtener planes:', error);
+        setErrorPlanes(error.response?.data?.error || 'No se pudieron cargar los planes.');
+      } finally {
+        setCargandoPlanes(false);
       }
     };
     fetchData();
@@ -190,6 +198,12 @@ function Planes() {
         ))}
         <div className={`duracion-slider ${duracion}`}></div>
       </div>
+
+      {cargandoPlanes && <p>Cargando planes...</p>}
+      {errorPlanes && <p role="alert">{errorPlanes}</p>}
+      {!cargandoPlanes && !errorPlanes && planes.length === 0 && (
+        <p>No hay planes disponibles.</p>
+      )}
 
       <div className="tarjetas-planes">
         {planes.map((plan) => (

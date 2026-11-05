@@ -7,8 +7,12 @@ export const getUsuarios = async (req, res) => {
   try {
     const soloInactivos = req.query.soloInactivos === 'true';
     const [rows] = await db.query(
-      `SELECT id, nombre, correo_electronico, rol, estado, telefono, ubicacion_id, creado_en, actualizado_en, eliminado
-       FROM usuarios WHERE eliminado = ?`,
+      `SELECT u.id, u.nombre, u.correo_electronico, u.rol, u.estado, u.telefono,
+              u.ubicacion_id, CONCAT_WS(' - ', ub.nombre, ub.ciudad) AS ubicacion_nombre,
+              u.creado_en, u.actualizado_en, u.eliminado
+       FROM usuarios u
+       LEFT JOIN ubicaciones ub ON ub.id = u.ubicacion_id
+       WHERE u.eliminado = ?`,
       [soloInactivos ? 1 : 0]
     );
     res.json(rows);
@@ -22,7 +26,11 @@ export const getUsuarioById = async (req, res) => {
   try {
     const { id } = req.params;
     const [rows] = await db.query(
-      'SELECT id, nombre, correo_electronico, telefono, rol, foto, ubicacion_id, estado FROM usuarios WHERE id=? AND eliminado=0',
+      `SELECT u.id, u.nombre, u.correo_electronico, u.telefono, u.rol, u.foto,
+              u.ubicacion_id, CONCAT_WS(' - ', ub.nombre, ub.ciudad) AS ubicacion_nombre, u.estado
+       FROM usuarios u
+       LEFT JOIN ubicaciones ub ON ub.id = u.ubicacion_id
+       WHERE u.id = ? AND u.eliminado = 0`,
       [id]
     );
     if (rows.length === 0) {

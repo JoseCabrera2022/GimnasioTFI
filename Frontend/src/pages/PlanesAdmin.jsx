@@ -225,17 +225,16 @@ function PlanesAdmin() {
                     <button onClick={() => confirmDelete('plan', p.id)} className="btn-danger">Cambiar a inactivo</button>
                   </>
                 )}
-                {p.eliminado && (
+                {p.eliminado ? (
                   <button onClick={() => handleActivarPlan(p.id)} className="btn-primary">
                     Cambiar a activo
                   </button>
-                )}
+                ) : null}
               </td>
             </tr>
           ))}
         </tbody>
       </table>
-
       {/* Formulario de Duraciones */}
       <form onSubmit={handleSubmitDuracion} className="duracion-form">
         <h2>{editDuracionId ? 'Editar Duración' : 'Crear Duración'}</h2>

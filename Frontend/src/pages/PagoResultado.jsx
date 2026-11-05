@@ -4,6 +4,7 @@ import axios from 'axios';
 import { generarPDF } from '../utils/pdfGenerator';
 import { QRCodeCanvas } from 'qrcode.react';
 import { traducirEstado, traducirMetodo } from '../utils/conversiones';
+import { ENDPOINTS } from '../api/endpoints';
 
 import '../styles/PagoResultado.css';
 
@@ -28,7 +29,9 @@ function PagoResultado() {
     if (!paymentId) return;
     const fetchPago = async () => {
       try {
-        const res = await axios.get(`http://localhost:8000/api/pagos/verificar?payment_id=${paymentId}`);
+        const res = await axios.get(ENDPOINTS.VERIFICAR_PAGO, {
+          params: { payment_id: paymentId },
+        });
         setDetallePago(res.data);
       } catch (err) {
         console.error('Error al verificar pago:', err);

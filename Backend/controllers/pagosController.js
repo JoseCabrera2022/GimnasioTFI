@@ -65,37 +65,42 @@ export const recibirWebhook = async (req, res) => {
   const paymentId = data?.id;
   if (!paymentId || isNaN(paymentId)) return res.sendStatus(200);
 
+  let resultado;
   try {
-    const resultado = await obtenerPago(paymentId);
-    if (resultado.status === 'approved') {
-      const { transaction_amount, payment_type_id, date_approved, metadata } = resultado;
-
-      // 🔽 IDEMPOTENCIA: evitar duplicados
-      const [existe] = await db.query('SELECT id FROM pagos WHERE id_pago_mp = ?', [paymentId]);
-      if (existe.length > 0) return res.sendStatus(200);
-
-      // 🔽 Insertar pago y obtener su id
-      const [insert] = await db.query(`
-        INSERT INTO pagos (id_pago_mp, usuario_id, monto, estado, fecha_aprobado, metodo_pago)
-        VALUES (?, ?, ?, ?, ?, ?)
-      `, [resultado.id, metadata.usuario_id, transaction_amount, 'approved', date_approved, payment_type_id]);
-
-      const pagoId = insert.insertId;
-
-      // 🔽 Activar membresía con pagoId
-      await activarMembresia(metadata, pagoId);
-
-      // 🔽 Enviar email
-      await enviarConfirmacionPago({
-        to: process.env.GMAIL_TO, //resultado.payer?.email,
-        fecha: new Date(resultado.date_approved).toLocaleString()
-      });
-    }
-    res.sendStatus(200);
+    resultado = await obtenerPago(paymentId);
   } catch (error) {
-    console.error('Error al consultar pago:', error.response?.data || error.message);
-    res.sendStatus(500);
+    console.error('Error al consultar pago en Mercado Pago:', error.response?.data || error.message);
+    return res.sendStatus(500);
   }
+
+  if (resultado.status !== 'approved') return res.sendStatus(200);
+
+  const { transaction_amount, payment_type_id, date_approved, metadata } = resultado;
+  try {
+    const [existe] = await db.query('SELECT id FROM pagos WHERE id_pago_mp = ?', [paymentId]);
+    if (existe.length > 0) return res.sendStatus(200);
+
+    const [insert] = await db.query(`
+      INSERT INTO pagos (id_pago_mp, usuario_id, monto, estado, fecha_aprobado, metodo_pago)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `, [resultado.id, metadata.usuario_id, transaction_amount, 'approved', date_approved, payment_type_id]);
+
+    await activarMembresia(metadata, insert.insertId);
+  } catch (error) {
+    console.error('Error al registrar el pago o activar la membresía:', error);
+    return res.sendStatus(500);
+  }
+
+  try {
+    await enviarConfirmacionPago({
+      to: process.env.GMAIL_TO, // resultado.payer?.email,
+      fecha: new Date(date_approved).toLocaleString()
+    });
+  } catch (error) {
+    console.error('Error al enviar el email de confirmación del pago:', error.response?.data || error.message);
+  }
+
+  return res.sendStatus(200);
 };
 
 

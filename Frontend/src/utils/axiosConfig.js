@@ -1,9 +1,12 @@
 import axios from 'axios';
 import { useAuthStore } from '../store/useAuthStore';
-import { API_LOCAL } from '../api/endpoints';
+import { API_BASE_URL } from '../api/endpoints';
 
 const http = axios.create({
-  baseURL: API_LOCAL,
+  baseURL: API_BASE_URL,
+  headers: {
+    'ngrok-skip-browser-warning': 'true',
+  },
 });
 
 http.interceptors.response.use(

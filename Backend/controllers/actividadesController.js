@@ -29,14 +29,17 @@ export const getActividadesConTurnos = async (req, res) => {
 // Listar todas las actividades
 export const getActividades = async (req, res) => {
   try {
-    const soloInactivas = req.query.soloInactivas === 'true';
+    const estado = req.query.estado;
+    const soloInactivas = estado === 'inactivas' || (!estado && req.query.soloInactivas === 'true');
+    const todas = estado === 'todas';
     const [rows] = await db.query(
-      `SELECT a.* FROM actividades a
+      `SELECT a.*, u.nombre AS ubicacion_nombre, u.ciudad AS ubicacion_ciudad
+       FROM actividades a
        LEFT JOIN ubicaciones u ON u.id = a.ubicacion_id
-       WHERE a.eliminado = ?
-       ${soloInactivas ? '' : 'AND (u.id IS NULL OR u.eliminado = 0)'}
+       WHERE (? = 1 OR a.eliminado = ?)
+       ${soloInactivas || todas ? '' : 'AND (u.id IS NULL OR u.eliminado = 0)'}
        ORDER BY a.id DESC`,
-      [soloInactivas ? 1 : 0]
+      [todas ? 1 : 0, soloInactivas ? 1 : 0]
     );
     res.json(rows);
   } catch (error) {

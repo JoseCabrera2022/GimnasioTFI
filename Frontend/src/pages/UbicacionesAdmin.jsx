@@ -197,17 +197,16 @@ function UbicacionesAdmin() {
                     <button onClick={() => confirmDelete(u.id)} className="btn-danger">Cambiar a inactivo</button>
                   </>
                 )}
-                {u.eliminado && (
+                {u.eliminado ? (
                   <button onClick={() => handleActivar(u.id)} className="btn-primary">
                     Cambiar a activo
                   </button>
-                )}
+                ) : null}
               </td>
             </tr>
           ))}
         </tbody>
       </table>
-
       {/* Modal de confirmación */}
       {showModal && (
         <div className="modal-overlay">

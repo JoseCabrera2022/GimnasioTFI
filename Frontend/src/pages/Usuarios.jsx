@@ -1,10 +1,12 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
 import { useAuthStore } from '../store/useAuthStore';
 import '../styles/Usuarios.css';
 import { API_LOCAL, ENDPOINTS_LOCAL } from '../api/endpoints';
 import defaultAvatar from '../assets/default-avatar.png';
 import SelectorUbicacion from '../components/SelectorUbicacion';
+
+const capitalizar = (valor) => valor ? valor.charAt(0).toUpperCase() + valor.slice(1) : '';
 
 function Usuarios() {
   const { token } = useAuthStore();
@@ -28,6 +30,43 @@ function Usuarios() {
   const [preview, setPreview] = useState(null)
   const [editMode, setEditMode] = useState(false);
   const [fileName, setFileName] = useState('Ningún archivo seleccionado');
+  const [busqueda, setBusqueda] = useState('');
+  const [filtroRol, setFiltroRol] = useState('');
+  const [filtroEstado, setFiltroEstado] = useState('');
+  const [filtroUbicacion, setFiltroUbicacion] = useState('');
+  const [paginaActual, setPaginaActual] = useState(1);
+  const [usuariosPorPagina, setUsuariosPorPagina] = useState(10);
+
+  const usuariosFiltrados = useMemo(() => {
+    const termino = busqueda.trim().toLocaleLowerCase();
+
+    return usuarios.filter((usuario) => {
+      const coincideBusqueda = !termino
+        || usuario.nombre?.toLocaleLowerCase().includes(termino)
+        || usuario.correo_electronico?.toLocaleLowerCase().includes(termino);
+      const coincideRol = !filtroRol || usuario.rol === filtroRol;
+      const estado = usuario.eliminado ? 'inactivo' : usuario.estado;
+      const coincideEstado = !filtroEstado || estado === filtroEstado;
+      const coincideUbicacion = !filtroUbicacion
+        || String(usuario.ubicacion_id) === filtroUbicacion;
+
+      return coincideBusqueda && coincideRol && coincideEstado && coincideUbicacion;
+    });
+  }, [usuarios, busqueda, filtroRol, filtroEstado, filtroUbicacion]);
+
+  const totalPaginas = Math.max(1, Math.ceil(usuariosFiltrados.length / usuariosPorPagina));
+  const usuariosPagina = useMemo(() => {
+    const inicio = (paginaActual - 1) * usuariosPorPagina;
+    return usuariosFiltrados.slice(inicio, inicio + usuariosPorPagina);
+  }, [usuariosFiltrados, paginaActual, usuariosPorPagina]);
+
+  useEffect(() => {
+    setPaginaActual(1);
+  }, [busqueda, filtroRol, filtroEstado, filtroUbicacion, usuariosPorPagina, mostrarInactivos]);
+
+  useEffect(() => {
+    if (paginaActual > totalPaginas) setPaginaActual(totalPaginas);
+  }, [paginaActual, totalPaginas]);
 
   // Cargar usuarios
   const fetchUsuarios = useCallback(async () => {
@@ -305,6 +344,62 @@ function Usuarios() {
         )}
       </form>
 
+      <section className="usuarios-filtros" aria-label="Buscar y filtrar usuarios">
+        <input
+          type="search"
+          value={busqueda}
+          onChange={(event) => setBusqueda(event.target.value)}
+          placeholder="Buscar por nombre o correo"
+          aria-label="Buscar usuarios por nombre o correo"
+        />
+        <select
+          value={filtroRol}
+          onChange={(event) => setFiltroRol(event.target.value)}
+          aria-label="Filtrar por rol"
+        >
+          <option value="">Todos los roles</option>
+          <option value="socio">Socio</option>
+          <option value="empleado">Empleado</option>
+          <option value="admin">Admin</option>
+        </select>
+        <select
+          value={filtroEstado}
+          onChange={(event) => setFiltroEstado(event.target.value)}
+          aria-label="Filtrar por estado"
+        >
+          <option value="">Todos los estados</option>
+          <option value="activo">Activo</option>
+          <option value="inactivo">Inactivo</option>
+        </select>
+        <select
+          value={filtroUbicacion}
+          onChange={(event) => setFiltroUbicacion(event.target.value)}
+          aria-label="Filtrar por ubicación"
+        >
+          <option value="">Todas las ubicaciones</option>
+          {ubicaciones.map((ubicacion) => (
+            <option key={ubicacion.id} value={ubicacion.id}>
+              {ubicacion.nombre} - {ubicacion.ciudad}
+            </option>
+          ))}
+        </select>
+        <button
+          type="button"
+          className="usuarios-filtros-limpiar"
+          onClick={() => {
+            setBusqueda('');
+            setFiltroRol('');
+            setFiltroEstado('');
+            setFiltroUbicacion('');
+          }}
+        >
+          Limpiar filtros
+        </button>
+        <span className="usuarios-resultados">
+          {usuariosFiltrados.length} de {usuarios.length} usuarios
+        </span>
+      </section>
+
       <div className="usuarios-table-container">
         <table className="usuarios-table">
           <thead>
@@ -320,15 +415,15 @@ function Usuarios() {
             </tr>
           </thead>
           <tbody>
-            {Array.isArray(usuarios) && usuarios.map((u) => (
+            {usuariosPagina.map((u) => (
               <tr key={u.id}>
                 <td>{u.id}</td>
                 <td>{u.nombre}</td>
                 <td>{u.correo_electronico}</td>
                 <td>{u.telefono}</td>
-                <td>{u.rol}</td>
-                <td>{u.eliminado ? 'Inactivo' : u.estado}</td>
-                <td>{u.ubicacion_id}</td>
+                <td>{capitalizar(u.rol)}</td>
+                <td>{capitalizar(u.eliminado ? 'inactivo' : u.estado)}</td>
+                <td>{u.ubicacion_nombre || 'Sin ubicación'}</td>
                 <td>
                   {!u.eliminado && (
                     <>
@@ -339,16 +434,60 @@ function Usuarios() {
                       </button>
                     </>
                   )}
-                  {u.eliminado && (
+                  {u.eliminado ? (
                     <button className="btn-confirm" onClick={() => handleActivarUsuario(u.id)}>
                       Cambiar a activo
                     </button>
-                  )}
+                  ) : null}
                 </td>
               </tr>
             ))}
+            {usuariosFiltrados.length === 0 && (
+              <tr>
+                <td colSpan="8" className="usuarios-sin-resultados">
+                  No se encontraron usuarios con esos criterios.
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
+      </div>
+      <div className="usuarios-paginacion">
+        <label className="usuarios-tamano-pagina">
+          Mostrar
+          <select
+            value={usuariosPorPagina}
+            onChange={(event) => setUsuariosPorPagina(Number(event.target.value))}
+            aria-label="Cantidad de usuarios por página"
+          >
+            <option value={5}>5</option>
+            <option value={10}>10</option>
+            <option value={20}>20</option>
+          </select>
+          por página
+        </label>
+        <span className="usuarios-rango-pagina">
+          {usuariosFiltrados.length === 0
+            ? '0 usuarios'
+            : `${(paginaActual - 1) * usuariosPorPagina + 1}-${Math.min(paginaActual * usuariosPorPagina, usuariosFiltrados.length)} de ${usuariosFiltrados.length}`}
+        </span>
+        <div className="usuarios-paginacion-botones">
+          <button
+            type="button"
+            onClick={() => setPaginaActual((pagina) => Math.max(1, pagina - 1))}
+            disabled={paginaActual === 1}
+          >
+            Anterior
+          </button>
+          <span>Página {paginaActual} de {totalPaginas}</span>
+          <button
+            type="button"
+            onClick={() => setPaginaActual((pagina) => Math.min(totalPaginas, pagina + 1))}
+            disabled={paginaActual === totalPaginas}
+          >
+            Siguiente
+          </button>
+        </div>
       </div>
       {perfilSeleccionado && (
         <div className="modal-overlay">
@@ -368,7 +507,7 @@ function Usuarios() {
                   {perfilSeleccionado.telefono && <p><strong>Teléfono:</strong> {perfilSeleccionado.telefono}</p>}
                   {perfilSeleccionado.rol && <p><strong>Rol:</strong> {perfilSeleccionado.rol}</p>}
                   {perfilSeleccionado.ubicacion_id && (
-                    <p><strong>Sede:</strong> {perfilSeleccionado.ubicacion_id}</p>
+                    <p><strong>Sede:</strong> {perfilSeleccionado.ubicacion_nombre || 'Sin ubicación'}</p>
                   )}
                   <div style={{ display: 'flex', gap: 12 }}>
                     <button onClick={() => setEditMode(true)} className="perfil-button">Editar</button>
