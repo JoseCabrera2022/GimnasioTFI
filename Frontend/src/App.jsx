@@ -1,4 +1,5 @@
 import './App.css'
+import './styles/Consistency.css'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import PagoResultado from './pages/PagoResultado';
 import { ROUTES } from './routers/routes';

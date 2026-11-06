@@ -1,0 +1,366 @@
+:root {
+  --gym-bg: #f7f7fb;
+  --gym-surface: #ffffff;
+  --gym-surface-soft: #f3f3f9;
+  --gym-ink: #171827;
+  --gym-muted: #686a79;
+  --gym-dark: #090a18;
+  --gym-dark-soft: #11132b;
+  --gym-violet: #7770ee;
+  --gym-violet-dark: #6258d8;
+  --gym-border: #e6e6ef;
+}
+
+body {
+  background: var(--gym-bg);
+  color: var(--gym-ink);
+}
+
+.layout-body,
+.layout-main {
+  background:
+    radial-gradient(circle at 100% 0%, rgba(119, 112, 238, 0.05), transparent 280px),
+    var(--gym-bg);
+}
+
+.layout-main {
+  width: 100%;
+  max-width: none;
+  padding: 0;
+}
+
+.login-box,
+.register-container,
+.contact-box,
+.perfil-container,
+.actividades-container,
+.historial-container,
+.reservas-container,
+.calendario-container,
+.ubicacion-container,
+.membresias-container,
+.usuarios-page,
+.actividades-admin,
+.planes-admin,
+.ubicaciones-admin,
+.mensajes-admin,
+.modal-comparacion {
+  color: var(--gym-ink);
+  border: 1px solid var(--gym-border);
+  border-radius: 16px;
+  background: var(--gym-surface);
+  box-shadow: 0 14px 36px rgba(23, 24, 39, 0.08);
+}
+
+.login-box,
+.register-container,
+.contact-box {
+  margin-top: 48px;
+  margin-bottom: 48px;
+}
+
+.login-title,
+.register-container h2,
+.contact-title,
+.perfil-container h2,
+.actividades-container h2,
+.historial-container h2,
+.reservas-container h2,
+.calendario-container h2,
+.ubicacion-container h2,
+.membresias-container h2,
+.usuarios-page h1,
+.actividades-admin h1,
+.planes-admin h1,
+.ubicaciones-admin h1,
+.mensajes-admin h1 {
+  color: var(--gym-ink);
+}
+
+.login-title::after,
+.register-container h2::after,
+.contact-title::after {
+  background: var(--gym-violet);
+}
+
+.login-field input,
+.form-group input,
+.register-container select,
+.contact-field input,
+.contact-field textarea,
+.contact-field select,
+.perfil-info input,
+.perfil-info select,
+.actividades-admin input,
+.actividades-admin select,
+.actividades-admin textarea,
+.planes-admin input,
+.planes-admin select,
+.planes-admin textarea,
+.ubicaciones-admin input,
+.ubicaciones-admin select,
+.ubicaciones-admin textarea,
+.mensajes-admin input,
+.mensajes-admin select,
+.mensajes-admin textarea,
+.reservas-container input,
+.reservas-container select,
+.reservas-container textarea {
+  border: 1px solid var(--gym-border);
+  border-radius: 9px;
+  background: var(--gym-surface);
+  color: var(--gym-ink);
+}
+
+.login-field input:focus,
+.form-group input:focus,
+.register-container select:focus,
+.contact-field input:focus,
+.contact-field textarea:focus,
+.contact-field select:focus,
+.perfil-info input:focus,
+.perfil-info select:focus {
+  border-color: var(--gym-violet);
+  box-shadow: 0 0 0 3px rgba(119, 112, 238, 0.14);
+}
+
+.login-button,
+.register-container > form > button,
+.register-container button[type="submit"],
+.contact-button,
+.btn-primary,
+.perfil-button,
+.historial-btn-link,
+.membresia-btn-link,
+.btn-link,
+.reservas-container button:not(.btn-cancel-edit):not(.btn-cancel):not(.btn-danger),
+.actividades-admin button,
+.planes-admin button,
+.ubicaciones-admin button,
+.mensajes-admin button {
+  border: 0;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--gym-violet-dark), #8c82ff);
+  color: #fff;
+  font-weight: 800;
+  box-shadow: 0 8px 20px rgba(119, 112, 238, 0.22);
+}
+
+.login-button:hover,
+.register-container > form > button:hover,
+.register-container button[type="submit"]:hover,
+.contact-button:hover,
+.btn-primary:hover,
+.perfil-button:hover {
+  background: linear-gradient(135deg, #554bc7, var(--gym-violet));
+}
+
+.login-link,
+.server-message,
+.contact-message {
+  color: var(--gym-violet-dark);
+}
+
+.sidebar {
+  width: 180px;
+  height: calc(100vh - 104px);
+  top: 104px;
+  padding: 18px 14px;
+  border-right: 1px solid rgba(255,255,255,0.08);
+  background: linear-gradient(180deg, var(--gym-dark), var(--gym-dark-soft));
+  box-shadow: 12px 0 30px rgba(9, 10, 24, 0.08);
+}
+
+.sidebar-header {
+  padding: 4px 8px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.sidebar-links {
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.sidebar-links a,
+.sidebar-links button {
+  min-height: 42px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 9px;
+  color: #d9dae6;
+}
+
+.sidebar-links a:hover,
+.sidebar-links button:hover:not(:disabled) {
+  color: #fff;
+  background: rgba(119, 112, 238, 0.16);
+}
+
+.sidebar-footer {
+  margin-top: 0;
+  padding: 14px 0 0;
+}
+
+.btn-logout {
+  margin-bottom: 0;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--gym-violet-dark), #8c82ff);
+}
+
+.admin-dashboard {
+  padding-top: 4px;
+}
+
+.dashboard-header h1,
+.dashboard-metric-card strong,
+.dashboard-secondary-metrics strong {
+  color: var(--gym-ink);
+}
+
+.dashboard-metric-card,
+.dashboard-secondary-metrics > div,
+.dashboard-chart-card,
+.dashboard-panel,
+.dashboard-table-card {
+  border: 1px solid var(--gym-border);
+  border-radius: 14px;
+  box-shadow: 0 10px 28px rgba(23, 24, 39, 0.05);
+}
+
+.dashboard-button-primary,
+.dashboard-button-light {
+  border-radius: 999px;
+}
+
+.dashboard-button-primary {
+  background: linear-gradient(135deg, var(--gym-violet-dark), #8c82ff);
+}
+
+table,
+.usuarios-table-container,
+.actividades-admin table,
+.planes-admin table,
+.ubicaciones-admin table,
+.mensajes-admin table,
+.historial-table,
+.membresias-table {
+  border-color: var(--gym-border);
+}
+
+th {
+  background: #f5f4fb;
+  color: var(--gym-ink);
+}
+
+tr:hover td {
+  background: rgba(119, 112, 238, 0.035);
+}
+
+.modal-overlay {
+  background: rgba(9, 10, 24, 0.72);
+  backdrop-filter: blur(8px);
+}
+
+.modal-comparacion,
+.perfil-container,
+.actividades-container,
+.reservas-container,
+.calendario-container,
+.historial-container,
+.membresias-container,
+.usuarios-page,
+.actividades-admin,
+.planes-admin,
+.ubicaciones-admin,
+.mensajes-admin {
+  padding: 24px;
+}
+
+.perfil-avatar {
+  border-color: var(--gym-violet);
+}
+
+.cancel-button,
+.logout-button,
+.btn-cancel-edit,
+.btn-cancel,
+.btn-danger {
+  border: 0;
+  border-radius: 999px;
+  color: #fff;
+}
+
+.logout-button,
+.btn-danger,
+.btn-cancel-edit,
+.btn-cancel {
+  background: #d84f5f;
+}
+
+.cancel-button {
+  background: #74758a;
+}
+
+.file-label {
+  border-radius: 999px;
+  background: var(--gym-violet);
+}
+
+.actividad-card,
+.reserva-card,
+.actividades-admin .actividad-card,
+.turno-view {
+  border: 1px solid var(--gym-border);
+  border-radius: 12px;
+  background: var(--gym-surface);
+}
+
+.table-pagination button,
+.table-pagination-size select {
+  border: 1px solid var(--gym-border);
+  border-radius: 8px;
+  background: var(--gym-surface);
+  color: var(--gym-ink);
+}
+
+.table-pagination button.active {
+  border-color: var(--gym-violet);
+  background: var(--gym-violet);
+  color: #fff;
+}
+
+@media (max-width: 900px) {
+  .layout-main { padding: 0; }
+  .sidebar {
+    position: sticky;
+    width: 100%;
+    height: auto;
+    top: 78px;
+    border-right: 0;
+  }
+  .layout-main.with-sidebar { margin-left: 0; }
+}
+
+@media (max-width: 650px) {
+  .layout-main { padding: 0; }
+  .login-box,
+  .register-container,
+  .contact-box,
+  .perfil-container,
+  .actividades-container,
+  .historial-container,
+  .reservas-container,
+  .calendario-container,
+  .ubicacion-container,
+  .membresias-container,
+  .usuarios-page,
+  .actividades-admin,
+  .planes-admin,
+  .ubicaciones-admin,
+  .mensajes-admin {
+    border-radius: 12px;
+    padding: 16px;
+  }
+}
