@@ -13,9 +13,7 @@ function Navbar() {
     const fetchPerfil = async () => {
       if (!token) return;
       try {
-        const res = await http.get(ENDPOINTS_LOCAL.PERFIL, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        const res = await http.get(ENDPOINTS_LOCAL.PERFIL);
         updateUsuario(res.data);
       } catch (error) {
         console.error("Error al refrescar perfil en Navbar:", error);
@@ -31,17 +29,11 @@ function Navbar() {
       </Link>
 
       <ul className="navbar-links">
-        <li><Link to={ROUTES.HOME}>Inicio</Link></li>
         <li><Link to={ROUTES.PLANES}>Planes</Link></li>
         <li><Link to={ROUTES.CONTACTO}>Contacto</Link></li>
         <li><Link to={ROUTES.UBICACIONES}>Ubicacion</Link></li>
 
-        {!usuario && (
-          <>
-            <li><Link to={ROUTES.LOGIN}>Login</Link></li>
-            <li><Link to={ROUTES.REGISTER}>Registro</Link></li>
-          </>
-        )}
+        {!usuario && null}
 
         {usuario && (
           <li>
@@ -52,7 +44,7 @@ function Navbar() {
         )}
 
         <li className="navbar-brand-icon">
-          <Link to={ROUTES.HOME} aria-label="Ir al inicio de GymManager Pro">
+          <Link to={usuario ? ROUTES.HOME : ROUTES.LOGIN} aria-label={usuario ? "Ir al inicio de GymManager Pro" : "Ir a iniciar sesión"}>
             <img
               src="/assets/fuerzavitalgym2.png"
               alt="Logo de GymManager Pro"

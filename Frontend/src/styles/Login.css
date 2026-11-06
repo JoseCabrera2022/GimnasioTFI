@@ -128,19 +128,33 @@
 }
 
 .login-link {
+  width: 100%;
   display: block;
   border: 0;
-  padding: 0;
+  padding: 8px 12px;
   background: transparent;
-  color: #0077cc;
+  color: var(--gym-violet-dark, #6258d8);
   text-align: center;
   text-decoration: none;
   cursor: pointer;
   font: inherit;
+  font-weight: 700;
+  border-radius: 999px;
+  transition: color 0.2s ease, background-color 0.2s ease;
 }
 
 .login-link:hover {
-  text-decoration: underline;
+  color: var(--gym-violet, #7770ee);
+  background: rgba(119, 112, 238, 0.08);
+  text-decoration: none;
+}
+
+.login-register-link .login-register-question {
+  color: var(--gym-muted, #686a79);
+}
+
+.login-register-link:hover .login-register-question {
+  color: var(--gym-muted, #686a79);
 }
 
 .login-message {

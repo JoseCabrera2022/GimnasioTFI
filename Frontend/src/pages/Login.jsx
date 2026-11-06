@@ -94,9 +94,12 @@ function Login() {
           {errors.password && <span className="login-error">{errors.password}</span>}
         </div>
 
-        <button type="submit" className="login-button">Ingresar</button>
         <button type="button" className="login-link" onClick={() => navigate(ROUTES.FORGOT_PASSWORD)}>
           ¿Olvidaste tu contraseña?
+        </button>
+        <button type="submit" className="login-button">Ingresar</button>
+        <button type="button" className="login-link login-register-link" onClick={() => navigate(ROUTES.REGISTER)}>
+          <span className="login-register-question">¿No tenés cuenta?</span>{' '}<span>Registrate</span>
         </button>
         {serverMessage && <p className="login-message">{serverMessage}</p>}
       </form>
