@@ -53,7 +53,7 @@ function Register() {
   };
 
   return (
-    <div className="register-container">
+    <div className="register-container register-glass">
       <h2>Registro</h2>
       <form onSubmit={handleRegister} className="register-form">
         

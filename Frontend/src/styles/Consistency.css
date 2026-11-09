@@ -364,3 +364,74 @@ tr:hover td {
     padding: 16px;
   }
 }
+
+.register-container.register-glass,
+.contact-box.contact-glass,
+.ubicacion-container.ubicacion-glass {
+  color: #fff;
+  background: rgba(9, 10, 24, 0.62);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 20px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.42);
+  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(18px);
+}
+
+.register-glass h2,
+.contact-glass .contact-title,
+.ubicacion-container.ubicacion-glass h2,
+.register-glass .form-group label,
+.contact-glass .contact-field label,
+.register-glass .selector-ubicacion label {
+  color: #fff;
+}
+
+.register-glass .form-group input,
+.register-glass select,
+.contact-glass .contact-field input,
+.contact-glass .contact-field textarea,
+.contact-glass select,
+.ubicacion-glass select,
+.register-glass .selector-ubicacion select {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.register-glass .form-group input:focus,
+.register-glass select:focus,
+.contact-glass .contact-field input:focus,
+.contact-glass .contact-field textarea:focus,
+.contact-glass select:focus,
+.ubicacion-glass select:focus,
+.register-glass .selector-ubicacion select:focus {
+  border-color: rgba(174, 166, 255, 0.9);
+  box-shadow: 0 0 0 3px rgba(140, 130, 255, 0.25);
+}
+
+.register-glass select option,
+.contact-glass select option,
+.ubicacion-glass select option {
+  color: #171827;
+  background: #fff;
+}
+
+.register-glass .password-toggle {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.contact-glass .contact-button,
+.register-glass form > button[type="submit"] {
+  background: linear-gradient(135deg, #6258d8, #8c82ff);
+  box-shadow: 0 10px 24px rgba(98, 88, 216, 0.3);
+}
+
+.contact-glass .contact-button:hover,
+.register-glass form > button[type="submit"]:hover {
+  background: linear-gradient(135deg, #554bc7, #7770ee);
+}
+
+.ubicacion-glass .ubicacion-info p,
+.ubicacion-glass .ubicacion-info strong {
+  color: rgba(255, 255, 255, 0.9);
+}

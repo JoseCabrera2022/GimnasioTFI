@@ -45,7 +45,7 @@ function Contacto() {
   };
 
   return (
-    <div className="contact-box">
+    <div className="contact-box contact-glass">
       <h1 className="contact-title">Contacto</h1>
       <form className="contact-form" onSubmit={handleSubmit}>
         <div className="contact-field">

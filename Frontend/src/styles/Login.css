@@ -176,6 +176,49 @@
   animation: fadeInLogin 0.5s ease;
 }
 
+.login-box.login-glass {
+  color: #fff;
+  background: rgba(9, 10, 24, 0.62);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 20px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.42);
+  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(18px);
+}
+
+.login-glass .login-title,
+.login-glass .login-field label {
+  color: #fff;
+}
+
+.login-glass .login-field input {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.login-glass .login-field input::placeholder {
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.login-glass .login-field input:focus {
+  border-color: rgba(174, 166, 255, 0.9);
+  box-shadow: 0 0 0 3px rgba(140, 130, 255, 0.25);
+}
+
+.login-glass .password-toggle {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.login-glass .login-button {
+  background: linear-gradient(135deg, #6258d8, #8c82ff);
+  box-shadow: 0 10px 24px rgba(98, 88, 216, 0.3);
+}
+
+.login-glass .login-button:hover {
+  background: linear-gradient(135deg, #554bc7, #7770ee);
+}
+
 /* Animaciones */
 @keyframes fadeInLogin {
   from { opacity: 0; transform: translateY(6px); }
