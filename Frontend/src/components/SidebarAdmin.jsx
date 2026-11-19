@@ -1,49 +1,38 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import { ROUTES } from '../routers/routes';
 import { useAuthStore } from '../store/useAuthStore';
-import { descargarReporteAdministrativo } from '../utils/reporteAdminPdf';
 import '../styles/Sidebar.css';
 
 function SidebarAdmin() {
-  const { usuario, token, logout } = useAuthStore();
-  const [generandoReporte, setGenerandoReporte] = useState(false);
-  const [errorReporte, setErrorReporte] = useState('');
+  const { usuario } = useAuthStore();
 
-  if (!usuario) return null; // solo mostrar si hay admin logueado
+  if (!usuario) return null;
 
-  const handleDescargarReporte = async () => {
-    setGenerandoReporte(true);
-    setErrorReporte('');
-    try {
-      await descargarReporteAdministrativo(token);
-    } catch (error) {
-      setErrorReporte(error.response?.data?.error || 'No se pudo generar el reporte.');
-    } finally {
-      setGenerandoReporte(false);
-    }
-  };
+  const navClassName = ({ isActive }) =>
+    `sidebar-admin-link${isActive ? ' active' : ''}`;
 
   return (
-    <aside className="sidebar">
+    <aside className="sidebar sidebar-admin">
       <div className="sidebar-header">
-        <h3>Admin</h3>
+        <h3>Administración</h3>
       </div>
-      <nav className="sidebar-links">
-        <Link to={ROUTES.ADMIN}>📊 Dashboard</Link>
-        <Link to={ROUTES.PLANESADMIN}>📋 Gestionar Planes</Link>
-        <Link to={ROUTES.ACTIVIDADESADMIN}>🎯 Gestionar Actividades</Link>
-        <Link to={ROUTES.UBICACIONESADMIN}>📍 Gestionar Ubicaciones</Link>
-        <Link to={ROUTES.USUARIOS}>👥 Gestionar Usuarios</Link>
-        <Link to={ROUTES.MENSAJES}>✉️ Mensajes de Contacto</Link>
-        <button type="button" onClick={handleDescargarReporte} disabled={generandoReporte}>
-          {generandoReporte ? 'Generando reporte...' : '📄 Reporte'}
-        </button>
-        {errorReporte && <p className="sidebar-report-error" role="alert">{errorReporte}</p>}
+      <nav className="sidebar-links sidebar-admin-links" aria-label="Navegación administrativa">
+        <div className="sidebar-nav-group">
+          <span className="sidebar-section-title">RESUMEN</span>
+          <NavLink to={ROUTES.ADMIN} end className={navClassName}>📊 Dashboard</NavLink>
+        </div>
+        <div className="sidebar-nav-group">
+          <span className="sidebar-section-title">GESTIÓN DEL GIMNASIO</span>
+          <NavLink to={ROUTES.USUARIOS} className={navClassName}>👥 Usuarios</NavLink>
+          <NavLink to={ROUTES.PLANESADMIN} className={navClassName}>📋 Planes</NavLink>
+          <NavLink to={ROUTES.ACTIVIDADESADMIN} className={navClassName}>🎯 Actividades</NavLink>
+          <NavLink to={ROUTES.UBICACIONESADMIN} className={navClassName}>📍 Ubicaciones</NavLink>
+        </div>
+        <div className="sidebar-nav-group">
+          <span className="sidebar-section-title">ATENCIÓN</span>
+          <NavLink to={ROUTES.MENSAJES} className={navClassName}>✉️ Mensajes de contacto</NavLink>
+        </div>
       </nav>
-      <div className="sidebar-footer">
-        <button className="btn-logout" onClick={logout}>🚪 Cerrar sesión</button>
-      </div>
     </aside>
   );
 }

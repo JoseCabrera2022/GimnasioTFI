@@ -87,7 +87,7 @@ function MensajesAdmin() {
     <div className="mensajes-admin">
       <h1>Buzón de Mensajes</h1>
       {alerta && <p className="alerta">{alerta}</p>}
-      <button onClick={handleLimpiar} className="btn-danger">Vaciar bandeja</button>
+      <button onClick={handleLimpiar} className="btn-danger mensajes-clear-button">Vaciar bandeja</button>
 
       <ul className="mensajes-list">
         {mensajes.map(m => (
@@ -96,12 +96,28 @@ function MensajesAdmin() {
             <p><strong>Mensaje:</strong> {m.mensaje}</p>
             {m.respuesta && <p><strong>Respuesta:</strong> {m.respuesta}</p>}
             <div className="acciones">
-              <button onClick={() => {
-                setMensajeSeleccionado(m);
-                // 🔹 Scroll automático al formulario
-                setTimeout(() => respuestaRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
-              }}>Responder</button>
-              <button onClick={() => confirmarEliminar(m.id)} className="btn-danger">Eliminar</button>
+              <button
+                type="button"
+                className="mensaje-action-button mensaje-action-reply"
+                onClick={() => {
+                  setMensajeSeleccionado(m);
+                  // 🔹 Scroll automático al formulario
+                  setTimeout(() => respuestaRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
+                }}
+                title={`Responder mensaje de ${m.nombre}`}
+                aria-label={`Responder mensaje de ${m.nombre}`}
+              >
+                <i className="fa-solid fa-reply" aria-hidden="true"></i>
+              </button>
+              <button
+                type="button"
+                className="mensaje-action-button mensaje-action-delete"
+                onClick={() => confirmarEliminar(m.id)}
+                title={`Eliminar mensaje de ${m.nombre}`}
+                aria-label={`Eliminar mensaje de ${m.nombre}`}
+              >
+                <i className="fa-solid fa-trash" aria-hidden="true"></i>
+              </button>
             </div>
           </li>
         ))}

@@ -142,7 +142,10 @@ function Perfil() {
             <span className="file-name">{fileName}</span>
 
             <div style={{ display: 'flex', gap: 12 }}>
-              <button type="submit" className="perfil-button">Guardar cambios</button>
+              <button type="submit" className="perfil-button">
+                <i className="fa-solid fa-floppy-disk" aria-hidden="true"></i>
+                Guardar cambios
+              </button>
               <button
                 type="button"
                 onClick={() => { setEditMode(false); setPreview(null); }}

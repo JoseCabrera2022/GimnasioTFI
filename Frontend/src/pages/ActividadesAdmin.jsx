@@ -1,4 +1,4 @@
-import { useCallback, useState, useEffect, useMemo } from 'react';
+import { useCallback, useState, useEffect, useMemo, useRef } from 'react';
 import axios from 'axios';
 import { useAuthStore } from '../store/useAuthStore';
 import { ENDPOINTS_LOCAL, API_LOCAL } from '../api/endpoints';
@@ -6,6 +6,7 @@ import defaultImagen from '/assets/fuerzavitalgym.png';
 import '../styles/ActividadesAdmin.css';
 import TablePagination from '../components/TablePagination';
 import useTablePagination from '../hooks/useTablePagination';
+import AdminFormModal from '../components/AdminFormModal';
 
 function ActividadesAdmin() {
   const { token } = useAuthStore();
@@ -19,7 +20,10 @@ function ActividadesAdmin() {
   // Form actividad
   const [form, setForm] = useState({ nombre: '', descripcion: '', ubicacion_id: '' });
   const [foto, setFoto] = useState(null);
+  const [nombreFoto, setNombreFoto] = useState('Ningún archivo seleccionado');
+  const fotoInputRef = useRef(null);
   const [editingId, setEditingId] = useState(null);
+  const [actividadFormOpen, setActividadFormOpen] = useState(false);
 
   // Mensajes
   const [mensaje, setMensaje] = useState('');
@@ -93,6 +97,12 @@ function ActividadesAdmin() {
     fetchUbicaciones();
   }, [fetchActividades, fetchUbicaciones]);
 
+  const resetFoto = () => {
+    setFoto(null);
+    setNombreFoto('Ningún archivo seleccionado');
+    if (fotoInputRef.current) fotoInputRef.current.value = '';
+  };
+
   // Crear o actualizar actividad
   const handleSubmitActividad = async (e) => {
     e.preventDefault();
@@ -121,8 +131,9 @@ function ActividadesAdmin() {
       }
 
       setForm({ nombre: '', descripcion: '', ubicacion_id: '' });
-      setFoto(null);
+      resetFoto();
       setEditingId(null);
+      setActividadFormOpen(false);
       fetchActividades();
     } catch (error) {
       setTipoMensaje('error');
@@ -132,20 +143,31 @@ function ActividadesAdmin() {
 
   // Editar actividad
   const handleEditActividad = (actividad) => {
+    resetFoto();
     setForm({
       nombre: actividad.nombre,
       descripcion: actividad.descripcion,
       ubicacion_id: actividad.ubicacion_id
     });
     setEditingId(actividad.id);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setMensaje('');
+    setActividadFormOpen(true);
+  };
+
+  const handleCreateActividad = () => {
+    setForm({ nombre: '', descripcion: '', ubicacion_id: '' });
+    resetFoto();
+    setEditingId(null);
+    setMensaje('');
+    setActividadFormOpen(true);
   };
 
   // Cancelar edición actividad
   const handleCancelEditActividad = () => {
     setForm({ nombre: '', descripcion: '', ubicacion_id: '' });
-    setFoto(null);
+    resetFoto();
     setEditingId(null);
+    setActividadFormOpen(false);
   };
 
   // Eliminar actividad
@@ -306,44 +328,97 @@ function ActividadesAdmin() {
 
   return (
     <div className="actividades-admin">
-      <h1>Gestión de Actividades y Turnos</h1>
+      <header className="actividades-admin-header">
+        <h1>Gestión de Actividades y Turnos</h1>
+        <button type="button" className="actividad-open-form-button" onClick={handleCreateActividad}>
+          <i className="fa-solid fa-circle-plus" aria-hidden="true"></i>
+          Crear actividad
+        </button>
+      </header>
 
-      {mensaje && <p className={`mensaje ${tipoMensaje}`}>{mensaje}</p>}
+      {mensaje && !actividadFormOpen && <p className={`mensaje ${tipoMensaje}`}>{mensaje}</p>}
 
-      {/* Formulario de actividad */}
-      <form onSubmit={handleSubmitActividad} className="actividad-form">
-        <input
-          type="text"
-          placeholder="Nombre"
-          value={form.nombre}
-          onChange={(e) => setForm({ ...form, nombre: e.target.value })}
-        />
-        <textarea
-          placeholder="Descripción"
-          value={form.descripcion}
-          onChange={(e) => setForm({ ...form, descripcion: e.target.value })}
-        ></textarea>
-        <select
-          value={form.ubicacion_id}
-          onChange={(e) => setForm({ ...form, ubicacion_id: e.target.value })}
+      {actividadFormOpen && (
+        <AdminFormModal
+          title={editingId ? 'Editar actividad' : 'Crear actividad'}
+          description={editingId
+            ? 'Actualiza los datos de la actividad seleccionada.'
+            : 'Completa los datos para agregar una nueva actividad.'}
+          onClose={handleCancelEditActividad}
         >
-          <option value="">Selecciona sede</option>
-          {ubicaciones.map(u => (
-            <option key={u.id} value={u.id}>
-              {u.nombre} - {u.ciudad}
-            </option>
-          ))}
-        </select>
-        <input type="file" onChange={(e) => setFoto(e.target.files[0])} />
-        <div className="form-actions">
-          <button type="submit">{editingId ? 'Actualizar' : 'Crear'} Actividad</button>
-          {editingId && (
-            <button type="button" className="btn-secondary" onClick={handleCancelEditActividad}>
-              Cancelar edición
-            </button>
-          )}
-        </div>
-      </form>
+          {mensaje && <p className={`mensaje ${tipoMensaje} modal-form-feedback`}>{mensaje}</p>}
+          <form onSubmit={handleSubmitActividad} className="actividad-form">
+            <label className="actividad-field" htmlFor="actividad-nombre">
+              <span>Nombre</span>
+              <input
+                id="actividad-nombre"
+                type="text"
+                placeholder="Nombre de la actividad"
+                value={form.nombre}
+                onChange={(e) => setForm({ ...form, nombre: e.target.value })}
+              />
+            </label>
+            <label className="actividad-field actividad-description-field" htmlFor="actividad-descripcion">
+              <span>Descripción</span>
+              <textarea
+                id="actividad-descripcion"
+                placeholder="Describe la actividad"
+                value={form.descripcion}
+                onChange={(e) => setForm({ ...form, descripcion: e.target.value })}
+              ></textarea>
+            </label>
+            <label className="actividad-field" htmlFor="actividad-ubicacion">
+              <span>Sede</span>
+              <select
+                id="actividad-ubicacion"
+                value={form.ubicacion_id}
+                onChange={(e) => setForm({ ...form, ubicacion_id: e.target.value })}
+              >
+                <option value="">Selecciona sede</option>
+                {ubicaciones.map(u => (
+                  <option key={u.id} value={u.id}>
+                    {u.nombre} - {u.ciudad}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <div className="actividad-upload-field">
+              <span className="actividad-upload-title">Foto de actividad</span>
+              <input
+                ref={fotoInputRef}
+                id="actividad-foto"
+                name="foto"
+                type="file"
+                className="actividad-file-input"
+                onChange={(e) => {
+                  const archivo = e.target.files?.[0] || null;
+                  setFoto(archivo);
+                  setNombreFoto(archivo?.name || 'Ningún archivo seleccionado');
+                }}
+              />
+              <label htmlFor="actividad-foto" className="actividad-file-label">
+                <i className="fa-solid fa-arrow-up-from-bracket" aria-hidden="true"></i>
+                Seleccionar foto
+              </label>
+              <span className="actividad-file-name">{nombreFoto}</span>
+              <span className="actividad-upload-hint">
+                {editingId
+                  ? 'Si no eliges otra imagen, se conservará la foto actual.'
+                  : 'Elige una imagen para identificar esta actividad.'}
+              </span>
+            </div>
+            <div className="form-actions">
+              <button type="submit" className="btn-primary">
+                {editingId && <i className="fa-solid fa-floppy-disk form-save-icon" aria-hidden="true"></i>}
+                {editingId ? 'Guardar cambios' : 'Crear actividad'}
+              </button>
+              <button type="button" className="btn-secondary" onClick={handleCancelEditActividad}>
+                Cancelar
+              </button>
+            </div>
+          </form>
+        </AdminFormModal>
+      )}
 
       {/* Tabla de actividades */}
       <section className="actividades-filtros" aria-label="Buscar y filtrar actividades">
@@ -390,62 +465,94 @@ function ActividadesAdmin() {
           {actividadesFiltradas.length} actividades
         </span>
       </section>
-      <table className="actividades-table">
-        <thead>
-          <tr>
-            <th>Nombre</th>
-            <th>Descripción</th>
-            <th>Sede</th>
-            <th>Foto</th>
-            <th>Estado</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {actividadesPagina.map(a => (
-            <tr key={a.id}>
-              <td>{a.nombre}</td>
-              <td>{a.descripcion}</td>
-              <td>
-                {a.ubicacion_nombre
-                  ? [a.ubicacion_nombre, a.ubicacion_ciudad].filter(Boolean).join(' - ')
-                  : 'Sin sede'}
-              </td>
-              <td>
-                <img
-                  src={a.foto ? `${API_LOCAL}${a.foto}` : defaultImagen}
-                  alt={a.nombre}
-                  width="60"
-                  height="60"
-                  style={{ objectFit: 'cover', borderRadius: 6 }}
-                />
-              </td>
-              <td>{a.eliminado ? 'Inactiva' : 'Activa'}</td>
-              <td>
-                {!a.eliminado && (
-                  <>
-                    <button onClick={() => handleEditActividad(a)}>Editar</button>
-                    <button onClick={() => setActividadParaInactivar(a)} className="btn-danger">Cambiar a inactivo</button>
-                    <button onClick={() => handleViewTurnos(a)} className="btn-primary">Ver Turnos</button>
-                  </>
-                )}
-                {a.eliminado ? (
-                  <button onClick={() => handleActivarActividad(a.id)} className="btn-primary">
-                    Cambiar a activo
-                  </button>
-                ) : null}
-              </td>
-            </tr>
-          ))}
-          {actividadesFiltradas.length === 0 && (
+      <div className="actividades-table-container">
+        <table className="actividades-table">
+          <thead>
             <tr>
-              <td colSpan="6" className="actividades-sin-resultados">
-                No se encontraron actividades con esos criterios.
-              </td>
+              <th>Nombre</th>
+              <th>Descripción</th>
+              <th>Sede</th>
+              <th>Foto</th>
+              <th>Estado</th>
+              <th>Acciones</th>
             </tr>
-          )}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {actividadesPagina.map(a => (
+              <tr key={a.id}>
+                <td>{a.nombre}</td>
+                <td>{a.descripcion}</td>
+                <td>
+                  {a.ubicacion_nombre
+                    ? [a.ubicacion_nombre, a.ubicacion_ciudad].filter(Boolean).join(' - ')
+                    : 'Sin sede'}
+                </td>
+                <td>
+                  <img
+                    src={a.foto ? `${API_LOCAL}${a.foto}` : defaultImagen}
+                    alt={a.nombre}
+                    width="60"
+                    height="60"
+                    style={{ objectFit: 'cover', borderRadius: 6 }}
+                  />
+                </td>
+                <td>{a.eliminado ? 'Inactiva' : 'Activa'}</td>
+                <td>
+                  {!a.eliminado && (
+                    <>
+                      <button
+                        type="button"
+                        className="actividad-action-button actividad-action-edit"
+                        onClick={() => handleEditActividad(a)}
+                        title={`Editar actividad ${a.nombre}`}
+                        aria-label={`Editar actividad ${a.nombre}`}
+                      >
+                        <i className="fa-solid fa-pen-to-square" aria-hidden="true"></i>
+                      </button>
+                      <button
+                        type="button"
+                        className="actividad-action-button actividad-action-disable"
+                        onClick={() => setActividadParaInactivar(a)}
+                        title={`Cambiar a inactiva la actividad ${a.nombre}`}
+                        aria-label={`Cambiar a inactiva la actividad ${a.nombre}`}
+                      >
+                        <i className="fa-solid fa-ban" aria-hidden="true"></i>
+                      </button>
+                      <button
+                        type="button"
+                        className="actividad-action-button actividad-action-view"
+                        onClick={() => handleViewTurnos(a)}
+                        title={`Ver turnos de ${a.nombre}`}
+                        aria-label={`Ver turnos de ${a.nombre}`}
+                      >
+                        <i className="fa-solid fa-calendar-days" aria-hidden="true"></i>
+                      </button>
+                    </>
+                  )}
+                  {a.eliminado ? (
+                    <button
+                      type="button"
+                      className="actividad-action-button actividad-action-enable"
+                      onClick={() => handleActivarActividad(a.id)}
+                      title={`Activar actividad ${a.nombre}`}
+                      aria-label={`Activar actividad ${a.nombre}`}
+                    >
+                      <i className="fa-solid fa-circle-check" aria-hidden="true"></i>
+                    </button>
+                  ) : null}
+                </td>
+              </tr>
+            ))}
+            {actividadesFiltradas.length === 0 && (
+              <tr>
+                <td colSpan="6" className="actividades-sin-resultados">
+                  No se encontraron actividades con esos criterios.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
       <TablePagination {...paginacionActividades} />
 
       {actividadParaInactivar && (
@@ -512,8 +619,24 @@ function ActividadesAdmin() {
                       <p><strong>Fecha:</strong> {new Date(t.fecha).toLocaleString()}</p>
                       <p><strong>Cupo:</strong> {t.cupo_disponible} / {t.cupo_maximo}</p>
                       <div className="item-actions">
-                        <button onClick={() => startEditTurno(t)}>Editar</button>
-                        <button onClick={() => handleDeleteTurno(t.id)} className="btn-danger">Eliminar</button>
+                        <button
+                          type="button"
+                          className="actividad-action-button actividad-action-edit"
+                          onClick={() => startEditTurno(t)}
+                          title="Editar turno"
+                          aria-label="Editar turno"
+                        >
+                          <i className="fa-solid fa-pen-to-square" aria-hidden="true"></i>
+                        </button>
+                        <button
+                          type="button"
+                          className="actividad-action-button actividad-action-delete"
+                          onClick={() => handleDeleteTurno(t.id)}
+                          title="Eliminar turno"
+                          aria-label="Eliminar turno"
+                        >
+                          <i className="fa-solid fa-trash" aria-hidden="true"></i>
+                        </button>
                       </div>
                     </div>
                   ) : (

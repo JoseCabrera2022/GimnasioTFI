@@ -21,6 +21,12 @@
   margin-left: 180px;
 }
 
+.layout-main.with-admin-sidebar {
+  margin-left: 224px;
+}
+
 @media (max-width: 900px) {
   .layout-main.with-sidebar { margin-left: 0; }
+  .layout-body-admin { flex-direction: column; }
+  .layout-main.with-admin-sidebar { margin-left: 0; }
 }

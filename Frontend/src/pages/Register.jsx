@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import axios from 'axios';
-import { ENDPOINTS, ENDPOINTS_LOCAL } from '../api/endpoints';
+import { ENDPOINTS_LOCAL } from '../api/endpoints';
 import { useAuthStore } from '../store/useAuthStore';
 import { useNavigate } from 'react-router-dom';
 import '../styles/Register.css';
+import '../styles/Login.css';
 import { ROUTES } from '../routers/routes';
 
 import SelectorUbicacion from '../components/SelectorUbicacion';
@@ -53,29 +54,30 @@ function Register() {
   };
 
   return (
-    <div className="register-container">
-      <h2>Registro</h2>
-      <form onSubmit={handleRegister} className="register-form">
+    <div className="register-container login-box">
+      <h2 className="login-title">Crear cuenta</h2>
+      <p className="register-subtitle">Completá tus datos para unirte a Fuerza Vital.</p>
+      <form onSubmit={handleRegister} className="login-form">
         
-        <div className="form-group">
+        <div className="login-field">
           <label>Nombre</label>
           <input type="text" value={nombre} onChange={(e) => setNombre(e.target.value)} />
-          {errors.nombre && <span className="error">{errors.nombre}</span>}
+          {errors.nombre && <span className="login-error">{errors.nombre}</span>}
         </div>
 
-        <div className="form-group">
+        <div className="login-field">
           <label>Correo electrónico</label>
           <input type="email" value={correo} onChange={(e) => setCorreo(e.target.value)} />
-          {errors.correo && <span className="error">{errors.correo}</span>}
+          {errors.correo && <span className="login-error">{errors.correo}</span>}
         </div>
 
-        <div className="form-group">
+        <div className="login-field">
           <label>Teléfono</label>
           <input type="text" value={telefono} onChange={(e) => setTelefono(e.target.value)} />
-          {errors.telefono && <span className="error">{errors.telefono}</span>}
+          {errors.telefono && <span className="login-error">{errors.telefono}</span>}
         </div>
 
-        <div className="form-group">
+        <div className="login-field">
           <label>Contraseña</label>
           <div className="password-input-wrapper">
             <input
@@ -93,16 +95,19 @@ function Register() {
               <i className={`fa-solid ${mostrarPassword ? 'fa-eye' : 'fa-eye-slash'}`} aria-hidden="true" />
             </button>
           </div>
-          {errors.password && <span className="error">{errors.password}</span>}
+          {errors.password && <span className="login-error">{errors.password}</span>}
         </div>
 
-        <div className="form-group">
+        <div className="login-field register-location-field">
           <SelectorUbicacion selectedUbicacion={ubicacionId} setSelectedUbicacion={setUbicacionId} />
-          {errors.ubicacion && <span className="error">{errors.ubicacion}</span>}
+          {errors.ubicacion && <span className="login-error">{errors.ubicacion}</span>}
         </div>
 
-        <button type="submit">Registrarse</button>
-        {serverMessage && <p className="server-message">{serverMessage}</p>}
+        <button type="submit" className="login-button">Crear cuenta</button>
+        <button type="button" className="login-link" onClick={() => navigate(ROUTES.LOGIN)}>
+          ¿Ya tienes una cuenta? Inicia sesión
+        </button>
+        {serverMessage && <p className="login-message">{serverMessage}</p>}
       </form>
     </div>
   );

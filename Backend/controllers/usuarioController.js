@@ -6,14 +6,17 @@ import path from 'path';
 export const getUsuarios = async (req, res) => {
   try {
     const soloInactivos = req.query.soloInactivos === 'true';
+    const condicionEstado = soloInactivos
+      ? '(u.eliminado = 1 OR u.estado = ?)'
+      : 'u.eliminado = ?';
     const [rows] = await db.query(
       `SELECT u.id, u.nombre, u.correo_electronico, u.rol, u.estado, u.telefono,
               u.ubicacion_id, CONCAT_WS(' - ', ub.nombre, ub.ciudad) AS ubicacion_nombre,
               u.creado_en, u.actualizado_en, u.eliminado
        FROM usuarios u
        LEFT JOIN ubicaciones ub ON ub.id = u.ubicacion_id
-       WHERE u.eliminado = ?`,
-      [soloInactivos ? 1 : 0]
+       WHERE ${condicionEstado}`,
+      [soloInactivos ? 'inactivo' : 0]
     );
     res.json(rows);
   } catch (error) {

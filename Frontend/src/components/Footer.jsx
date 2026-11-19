@@ -1,8 +1,23 @@
 import { Link } from 'react-router-dom';
 import { ROUTES } from '../routers/routes';
+import { useAuthStore } from '../store/useAuthStore';
 import '../styles/Footer.css';
 
 function Footer() {
+  const usuario = useAuthStore((state) => state.usuario);
+  const esAdmin = usuario?.rol === 'admin';
+
+  if (esAdmin) {
+    return (
+      <footer className="footer footer-admin">
+        <div className="footer-content footer-admin-content">
+          <p>Fuerza Vital</p>
+          <p>© {new Date().getFullYear()} Todos los derechos reservados.</p>
+        </div>
+      </footer>
+    );
+  }
+
   return (
     <footer className="footer">
       <div className="footer-content">

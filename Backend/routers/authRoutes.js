@@ -6,6 +6,7 @@ import {
   solicitarRecuperacionPassword,
   restablecerPassword
 } from '../controllers/authController.js';
+import { verificarToken } from '../middlewares/verificarToken.js';
 
 const router = express.Router();
 
@@ -22,6 +23,7 @@ router.get('/auth', (req, res) => {
 // Rutas de autenticación de usuarios
 router.post('/api/register', registrarUsuario);
 router.post('/api/login', loginUsuario);
+router.post('/api/auth/refresh', verificarToken, (req, res) => res.status(204).end());
 router.post('/api/forgot-password', solicitarRecuperacionPassword);
 router.post('/api/reset-password', restablecerPassword);
 

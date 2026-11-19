@@ -5,6 +5,7 @@ import { ENDPOINTS_LOCAL } from '../api/endpoints';
 import { ROUTES } from '../routers/routes';
 import { useAuthStore } from '../store/useAuthStore';
 import { descargarReporteAdministrativo } from '../utils/reporteAdminPdf';
+import { traducirEstado, traducirMetodo } from '../utils/conversiones';
 import '../styles/AdminDashboard.css';
 
 const moneda = (valor) => new Intl.NumberFormat('es-AR', {
@@ -25,12 +26,6 @@ const fechaHora = (valor) => {
   if (!valor) return 'Sin fecha';
   const fecha = new Date(valor);
   return Number.isNaN(fecha.getTime()) ? 'Sin fecha' : fecha.toLocaleString('es-AR');
-};
-
-const estadoPago = {
-  approved: 'Aprobado',
-  pending: 'Pendiente',
-  rejected: 'Rechazado',
 };
 
 function AdminDashboard() {
@@ -102,7 +97,16 @@ function AdminDashboard() {
           <h1>Hola, {usuario?.nombre || 'Admin'}</h1>
           <p className="dashboard-subtitle">
             Resumen de lo que está pasando en tu gimnasio.
-            {actualizado && <span> Actualizado {actualizado.toLocaleTimeString('es-AR')}</span>}
+            {actualizado && (
+              <span>
+                {' '}Actualizado {actualizado.toLocaleTimeString('es-AR', {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                  second: '2-digit',
+                  hourCycle: 'h23',
+                })}
+              </span>
+            )}
           </p>
         </div>
         <div className="dashboard-header-actions">
@@ -235,8 +239,8 @@ function AdminDashboard() {
                     <tr key={pago.id}>
                       <td>{pago.socio || 'Usuario eliminado'}</td>
                       <td>{fechaHora(pago.fecha)}</td>
-                      <td>{pago.metodo_pago || '—'}</td>
-                      <td><span className={`dashboard-payment-status status-${pago.estado}`}>{estadoPago[pago.estado] || pago.estado}</span></td>
+                      <td>{pago.metodo_pago ? traducirMetodo(pago.metodo_pago) : '—'}</td>
+                      <td><span className={`dashboard-payment-status status-${pago.estado}`}>{traducirEstado(pago.estado)}</span></td>
                       <td>{moneda(pago.monto)}</td>
                     </tr>
                   ))}
@@ -247,22 +251,6 @@ function AdminDashboard() {
             <p className="dashboard-empty">Todavía no hay pagos registrados.</p>
           )}
         </article>
-      </section>
-
-      <section className="dashboard-shortcuts">
-        <div className="dashboard-shortcuts-heading">
-          <div>
-            <h2>Accesos rápidos</h2>
-            <p>Gestioná las áreas principales desde acá.</p>
-          </div>
-        </div>
-        <div className="dashboard-shortcut-grid">
-          <Link to={ROUTES.USUARIOS}><i className="fa-solid fa-users" aria-hidden="true"></i><span><strong>Usuarios</strong><small>Socios y personal</small></span><i className="fa-solid fa-arrow-right" aria-hidden="true"></i></Link>
-          <Link to={ROUTES.PLANESADMIN}><i className="fa-solid fa-dumbbell" aria-hidden="true"></i><span><strong>Planes</strong><small>Planes y duraciones</small></span><i className="fa-solid fa-arrow-right" aria-hidden="true"></i></Link>
-          <Link to={ROUTES.ACTIVIDADESADMIN}><i className="fa-solid fa-person-running" aria-hidden="true"></i><span><strong>Actividades</strong><small>Clases y turnos</small></span><i className="fa-solid fa-arrow-right" aria-hidden="true"></i></Link>
-          <Link to={ROUTES.UBICACIONESADMIN}><i className="fa-solid fa-location-dot" aria-hidden="true"></i><span><strong>Ubicaciones</strong><small>Sedes del gimnasio</small></span><i className="fa-solid fa-arrow-right" aria-hidden="true"></i></Link>
-          <Link to={ROUTES.MENSAJES}><i className="fa-solid fa-envelope" aria-hidden="true"></i><span><strong>Mensajes</strong><small>Consultas de contacto</small></span><i className="fa-solid fa-arrow-right" aria-hidden="true"></i></Link>
-        </div>
       </section>
     </div>
   );

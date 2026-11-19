@@ -1,96 +1,387 @@
 .planes-admin {
-  max-width: 960px;
+  max-width: 1440px;
   margin: 0 auto;
-  padding: 20px;
-  font-family: Arial, sans-serif;
+  padding: 8px 8px 32px;
+  color: #172033;
 }
 
-.alerta {
-  padding: 10px;
-  border-radius: 6px;
-  margin-bottom: 12px;
-  background: #fef3c7;
-  color: #92400e;
-  border: 1px solid #fcd34d;
+.planes-admin h1,
+.planes-admin h2 {
+  color: #172033;
 }
 
-.plan-form {
-  display: grid;
-  gap: 12px;
-  margin-bottom: 20px;
-}
-
-.plan-form input,
-.plan-form textarea {
-  padding: 8px;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-}
-
-.form-actions {
+.planes-admin-header,
+.duraciones-admin-header {
   display: flex;
-  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
 }
 
-.btn-primary {
-  background: #2563eb;
-  color: white;
-  border: none;
-  padding: 8px 12px;
-  border-radius: 6px;
-}
-.btn-secondary {
-  background: #f3f4f6;
-  border: 1px solid #e5e7eb;
-  padding: 8px 12px;
-  border-radius: 6px;
-}
-.btn-danger {
-  background: #ef4444;
-  color: white;
-  border: none;
-  padding: 8px 12px;
-  border-radius: 6px;
+.planes-admin-header {
+  margin-bottom: 22px;
 }
 
-.planes-table,
-.duraciones-table {
+.planes-admin-header h1 {
+  margin: 0;
+  font-size: clamp(1.6rem, 2.5vw, 2rem);
+  font-weight: 700;
+  letter-spacing: -0.035em;
+}
+
+.planes-admin .plan-open-form-button {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-height: 42px;
+  padding: 9px 14px;
+  border-color: #1769d2;
+  background: #1769d2;
+  color: #fff;
+}
+
+.planes-admin .plan-open-form-button:hover {
+  background: #1056b2;
+}
+
+.planes-admin h2 {
+  margin: 0;
+  font-size: 1.08rem;
+  font-weight: 650;
+}
+
+.planes-admin input,
+.planes-admin select,
+.planes-admin textarea {
   width: 100%;
-  border-collapse: collapse;
-  margin-top: 16px;
-}
-.planes-table th,
-.planes-table td,
-.duraciones-table th,
-.duraciones-table td {
-  border-bottom: 1px solid #e5e7eb;
-  padding: 10px;
-  text-align: left;
-}
-.planes-table th,
-.duraciones-table th {
-  background: #f9fafb;
-  font-weight: 600;
+  min-width: 0;
+  min-height: 42px;
+  padding: 10px 12px;
+  border: 1px solid #dce3ed;
+  border-radius: 9px;
+  background: #fff;
+  color: #172033;
+  font: inherit;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
 }
 
-.modal-overlay {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(0,0,0,0.5);
-  display: flex; align-items: center; justify-content: center;
+.planes-admin input:focus,
+.planes-admin select:focus,
+.planes-admin textarea:focus {
+  border-color: #4384e8;
+  outline: 0;
+  box-shadow: 0 0 0 3px rgb(49 119 224 / 14%);
 }
 
-.modal {
-  background: white;
-  padding: 20px;
+.planes-admin button {
+  min-height: 38px;
+  padding: 8px 12px;
+  border: 1px solid transparent;
   border-radius: 8px;
-  max-width: 400px;
-  text-align: center;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease;
 }
 
-.modal-actions {
+.planes-admin button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.planes-admin .btn-primary {
+  background: #1769d2;
+  color: #fff;
+}
+
+.planes-admin .btn-primary:hover:not(:disabled) {
+  background: #1056b2;
+}
+
+.planes-admin .btn-secondary {
+  border-color: #dce3ed;
+  background: #f5f7fa;
+  color: #344054;
+}
+
+.planes-admin .btn-secondary:hover:not(:disabled) {
+  border-color: #c5d0df;
+  background: #eaf0f7;
+}
+
+.planes-admin .btn-danger {
+  background: #c63d4d;
+  color: #fff;
+}
+
+.planes-admin .btn-danger:hover:not(:disabled) {
+  background: #a92c3b;
+}
+
+.planes-admin .plan-form,
+.planes-admin .duracion-form,
+.planes-admin .planes-table-container,
+.planes-admin .duraciones-table-container {
+  border: 1px solid #e6ebf2;
+  border-radius: 13px;
+  background: #fff;
+  box-shadow: 0 4px 16px rgb(19 37 63 / 5%);
+}
+
+.planes-admin .plan-form,
+.planes-admin .duracion-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+  padding: 18px;
+}
+
+.planes-admin .admin-form-modal .plan-form,
+.planes-admin .admin-form-modal .duracion-form {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.planes-admin .admin-form-modal .duracion-form {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.planes-admin .plan-field {
   display: flex;
-  justify-content: space-around;
+  min-width: 0;
+  flex-direction: column;
+  gap: 7px;
+  color: #475569;
+  font-size: 0.84rem;
+  font-weight: 650;
+}
+
+.planes-admin .plan-description-field {
+  grid-column: 1 / -1;
+}
+
+.planes-admin .admin-form-modal .modal-form-feedback {
+  margin: 0 0 16px;
+}
+
+.planes-admin .duraciones-admin-header {
+  margin: 6px 0 14px;
+}
+
+.planes-admin .duraciones-admin-header h2 {
+  margin: 0;
+}
+
+.planes-admin .duraciones-admin-header p {
+  margin: 5px 0 0;
+  color: #68758a;
+  font-size: 0.9rem;
+}
+
+.planes-admin .plan-form h2,
+.planes-admin .duracion-form h2,
+.planes-admin .plan-form .form-actions,
+.planes-admin .duracion-form .form-actions {
+  grid-column: 1 / -1;
+}
+
+.planes-admin .plan-form textarea {
+  grid-column: 1 / -1;
+  min-height: 90px;
+  resize: vertical;
+}
+
+.planes-admin .form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+
+.planes-admin .alerta {
+  margin: 0 0 16px;
+  padding: 12px 14px;
+  border: 1px solid #f1dfaa;
+  border-radius: 9px;
+  background: #fff9e9;
+  color: #785b16;
+}
+
+.planes-admin .planes-inactive-toggle {
+  display: flex;
+  width: fit-content;
+  align-items: center;
+  gap: 9px;
+  margin: 0 0 12px;
+  color: #475569;
+  font-size: 0.92rem;
+  font-weight: 550;
+  cursor: pointer;
+}
+
+.planes-admin .planes-inactive-toggle input {
+  width: 17px;
+  min-height: 17px;
+  margin: 0;
+  accent-color: #1769d2;
+}
+
+.planes-admin .planes-table-container,
+.planes-admin .duraciones-table-container {
+  overflow-x: auto;
+  margin-bottom: 24px;
+}
+
+.planes-admin .planes-table,
+.planes-admin .duraciones-table {
+  width: 100%;
+  min-width: 760px;
+  border-collapse: collapse;
+}
+
+.planes-admin .planes-table th,
+.planes-admin .planes-table td,
+.planes-admin .duraciones-table th,
+.planes-admin .duraciones-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid #edf0f5;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.planes-admin .planes-table th,
+.planes-admin .duraciones-table th {
+  background: #f7f9fc;
+  color: #647187;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.055em;
+  text-transform: uppercase;
+}
+
+.planes-admin .planes-table tbody tr:hover,
+.planes-admin .duraciones-table tbody tr:hover {
+  background: #fafcff;
+}
+
+.planes-admin .planes-table td:last-child,
+.planes-admin .duraciones-table td:last-child {
+  min-width: 210px;
+}
+
+.planes-admin .planes-table td:last-child button,
+.planes-admin .duraciones-table td:last-child button {
+  margin: 2px;
+}
+
+.planes-admin .plan-action-button {
+  display: inline-grid;
+  width: 36px;
+  height: 36px;
+  min-height: 36px;
+  place-items: center;
+  margin: 2px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  font-size: 0.9rem;
+  transition: background-color 0.16s ease, border-color 0.16s ease, transform 0.16s ease;
+}
+
+.planes-admin .plan-action-button:hover {
+  transform: translateY(-1px);
+}
+
+.planes-admin .plan-action-button:focus-visible {
+  outline: 2px solid #8c82ff;
+  outline-offset: 2px;
+}
+
+.planes-admin .plan-action-edit {
+  background: #eaf2ff;
+  color: #185adb;
+}
+
+.planes-admin .plan-action-edit:hover {
+  background: #dbeafe;
+}
+
+.planes-admin .plan-action-disable,
+.planes-admin .plan-action-delete {
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+.planes-admin .plan-action-disable:hover,
+.planes-admin .plan-action-delete:hover {
+  background: #fee2e2;
+}
+
+.planes-admin .plan-action-enable {
+  background: #ecfdf3;
+  color: #166534;
+}
+
+.planes-admin .plan-action-enable:hover {
+  background: #dcfce7;
+}
+
+.planes-admin .modal-overlay {
+  position: fixed;
+  z-index: 1000;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgb(15 23 42 / 54%);
+}
+
+.planes-admin .modal {
+  width: min(100%, 460px);
+  padding: 22px;
+  border: 1px solid #e6ebf2;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 20px 55px rgb(15 23 42 / 22%);
+}
+
+.planes-admin .modal h3 {
+  margin: 0 0 10px;
+  color: #172033;
+}
+
+.planes-admin .modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 9px;
   margin-top: 20px;
+}
+
+@media (max-width: 640px) {
+  .planes-admin-header,
+  .duraciones-admin-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .planes-admin .plan-open-form-button {
+    width: 100%;
+  }
+
+  .planes-admin .admin-form-modal .plan-form,
+  .planes-admin .admin-form-modal .duracion-form {
+    grid-template-columns: 1fr;
+  }
+
+  .planes-admin .plan-form,
+  .planes-admin .duracion-form {
+    grid-template-columns: 1fr;
+  }
 }

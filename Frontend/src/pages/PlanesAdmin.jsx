@@ -3,6 +3,7 @@ import axios from 'axios';
 import { ENDPOINTS_LOCAL } from '../api/endpoints';
 import { useAuthStore } from '../store/useAuthStore';
 import '../styles/PlanesAdmin.css';
+import AdminFormModal from '../components/AdminFormModal';
 
 function PlanesAdmin() {
   const { token } = useAuthStore();
@@ -14,9 +15,11 @@ function PlanesAdmin() {
   // Formularios
   const [formPlan, setFormPlan] = useState({ nombre: '', tipo: '', precio: '', descripcion: '' });
   const [editPlanId, setEditPlanId] = useState(null);
+  const [planFormOpen, setPlanFormOpen] = useState(false);
 
   const [formDuracion, setFormDuracion] = useState({ nombre: '', dias: '', descuento: '' });
   const [editDuracionId, setEditDuracionId] = useState(null);
+  const [duracionFormOpen, setDuracionFormOpen] = useState(false);
 
   // Mensajes separados
   const [mensajePlanes, setMensajePlanes] = useState('');
@@ -38,6 +41,41 @@ function PlanesAdmin() {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
+  const resetPlanForm = () => {
+    setFormPlan({ nombre: '', tipo: '', precio: '', descripcion: '' });
+  };
+
+  const handleCreatePlan = () => {
+    resetPlanForm();
+    setEditPlanId(null);
+    setMensajePlanes('');
+    setPlanFormOpen(true);
+  };
+
+  const handleClosePlanForm = () => {
+    resetPlanForm();
+    setEditPlanId(null);
+    setPlanFormOpen(false);
+  };
+
+  const resetDuracionForm = () => {
+    setFormDuracion({ nombre: '', dias: '', descuento: '' });
+  };
+
+  const handleCreateDuracion = () => {
+    resetDuracionForm();
+    setEditDuracionId(null);
+    setMensajeDuraciones('');
+    setDuracionFormOpen(true);
+  };
+
+  const handleCloseDuracionForm = () => {
+    resetDuracionForm();
+    setEditDuracionId(null);
+    setDuracionFormOpen(false);
+  };
+
   const confirmDelete = (tipo, id) => {
   setDeleteTarget({ tipo, id });
   setShowModal(true);
@@ -101,8 +139,9 @@ function PlanesAdmin() {
         });
         setMensajePlanes('Plan creado');
       }
-      setFormPlan({ nombre: '', tipo: '', precio: '', descripcion: '' });
+      resetPlanForm();
       setEditPlanId(null);
+      setPlanFormOpen(false);
       fetchData();
     } catch {
       setMensajePlanes('Error al guardar plan');
@@ -117,7 +156,8 @@ function PlanesAdmin() {
       descripcion: plan.descripcion
     });
     setEditPlanId(plan.id);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setMensajePlanes('');
+    setPlanFormOpen(true);
   };
 
 
@@ -148,8 +188,9 @@ function PlanesAdmin() {
         });
         setMensajeDuraciones('Duración creada');
       }
-      setFormDuracion({ nombre: '', dias: '', descuento: '' });
+      resetDuracionForm();
       setEditDuracionId(null);
+      setDuracionFormOpen(false);
       fetchData();
     } catch {
       setMensajeDuraciones('Error al guardar duración');
@@ -163,35 +204,68 @@ function PlanesAdmin() {
       descuento: duracion.descuento
     });
     setEditDuracionId(duracion.id);
+    setMensajeDuraciones('');
+    setDuracionFormOpen(true);
   };
 
 
   return (
     <div className="planes-admin">
-      <h1>Gestión de Planes y Duraciones</h1>
+      <header className="planes-admin-header">
+        <h1>Gestión de Planes y Duraciones</h1>
+        <button type="button" className="plan-open-form-button" onClick={handleCreatePlan}>
+          <i className="fa-solid fa-circle-plus" aria-hidden="true"></i>
+          Crear plan
+        </button>
+      </header>
 
-      {/* Formulario de Planes */}
-      <form onSubmit={handleSubmitPlan} className="plan-form">
-        <h2>{editPlanId ? 'Editar Plan' : 'Crear Plan'}</h2>
-        <input type="text" placeholder="Nombre" value={formPlan.nombre}
-          onChange={(e) => setFormPlan({ ...formPlan, nombre: e.target.value })} />
-        <input type="text" placeholder="Tipo" value={formPlan.tipo}
-          onChange={(e) => setFormPlan({ ...formPlan, tipo: e.target.value })} />
-        <input type="number" placeholder="Precio" value={formPlan.precio}
-          onChange={(e) => setFormPlan({ ...formPlan, precio: e.target.value })} />
-        <textarea placeholder="Descripción" value={formPlan.descripcion}
-          onChange={(e) => setFormPlan({ ...formPlan, descripcion: e.target.value })}></textarea>
-        <div className="form-actions">
-          <button type="submit" className="btn-primary">{editPlanId ? 'Actualizar' : 'Crear'} Plan</button>
-          {editPlanId && <button type="button" className="btn-secondary" onClick={() => { setFormPlan({ nombre: '', tipo: '', precio: '', descripcion: '' }); setEditPlanId(null); }}>Cancelar</button>}
-        </div>
-      </form>
+      {mensajePlanes && !planFormOpen && <p className="alerta">{mensajePlanes}</p>}
 
-      {/* Mensaje de planes */}
-      {mensajePlanes && <p className="alerta">{mensajePlanes}</p>}
+      {planFormOpen && (
+        <AdminFormModal
+          title={editPlanId ? 'Editar plan' : 'Crear plan'}
+          description={editPlanId
+            ? 'Actualiza los datos y el precio de este plan.'
+            : 'Completa los datos para agregar una nueva opción de membresía.'}
+          onClose={handleClosePlanForm}
+        >
+          {mensajePlanes && <p className="alerta modal-form-feedback">{mensajePlanes}</p>}
+          <form onSubmit={handleSubmitPlan} className="plan-form">
+            <label className="plan-field">
+              <span>Nombre</span>
+              <input type="text" placeholder="Nombre del plan" value={formPlan.nombre}
+                onChange={(e) => setFormPlan({ ...formPlan, nombre: e.target.value })} />
+            </label>
+            <label className="plan-field">
+              <span>Tipo</span>
+              <input type="text" placeholder="Tipo de plan" value={formPlan.tipo}
+                onChange={(e) => setFormPlan({ ...formPlan, tipo: e.target.value })} />
+            </label>
+            <label className="plan-field">
+              <span>Precio</span>
+              <input type="number" placeholder="Precio" value={formPlan.precio}
+                onChange={(e) => setFormPlan({ ...formPlan, precio: e.target.value })} />
+            </label>
+            <label className="plan-field plan-description-field">
+              <span>Descripción</span>
+              <textarea placeholder="Descripción del plan" value={formPlan.descripcion}
+                onChange={(e) => setFormPlan({ ...formPlan, descripcion: e.target.value })}></textarea>
+            </label>
+            <div className="form-actions">
+              <button type="submit" className="btn-primary">
+                {editPlanId && <i className="fa-solid fa-floppy-disk form-save-icon" aria-hidden="true"></i>}
+                {editPlanId ? 'Guardar cambios' : 'Crear plan'}
+              </button>
+              <button type="button" className="btn-secondary" onClick={handleClosePlanForm}>
+                Cancelar
+              </button>
+            </div>
+          </form>
+        </AdminFormModal>
+      )}
 
       {/* Tabla de Planes */}
-      <label>
+      <label className="planes-inactive-toggle">
         <input
           type="checkbox"
           checked={mostrarInactivos}
@@ -199,112 +273,172 @@ function PlanesAdmin() {
         />
         Mostrar planes inactivos
       </label>
-      <table className="planes-table">
-        <thead>
-          <tr>
-            <th>Nombre</th>
-            <th>Tipo</th>
-            <th>Precio</th>
-            <th>Descripción</th>
-            <th>Estado</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {planes.map((p) => (
-            <tr key={p.id}>
-              <td>{p.nombre}</td>
-              <td>{p.tipo}</td>
-              <td>{p.precio}</td>
-              <td>{p.descripcion}</td>
-              <td>{p.eliminado ? 'Inactivo' : 'Activo'}</td>
-              <td>
-                {!p.eliminado && (
-                  <>
-                    <button onClick={() => handleEditPlan(p)} className="btn-secondary">Editar</button>
-                    <button onClick={() => confirmDelete('plan', p.id)} className="btn-danger">Cambiar a inactivo</button>
-                  </>
-                )}
-                {p.eliminado ? (
-                  <button onClick={() => handleActivarPlan(p.id)} className="btn-primary">
-                    Cambiar a activo
-                  </button>
-                ) : null}
-              </td>
+      <div className="planes-table-container">
+        <table className="planes-table">
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Tipo</th>
+              <th>Precio</th>
+              <th>Descripción</th>
+              <th>Estado</th>
+              <th>Acciones</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
-      {/* Formulario de Duraciones */}
-      <form onSubmit={handleSubmitDuracion} className="duracion-form">
-        <h2>{editDuracionId ? 'Editar Duración' : 'Crear Duración'}</h2>
-        <input
-          type="text"
-          placeholder="Nombre"
-          value={formDuracion.nombre}
-          onChange={(e) => setFormDuracion({ ...formDuracion, nombre: e.target.value })}
-        />
-        <input
-          type="number"
-          placeholder="Días"
-          value={formDuracion.dias}
-          onChange={(e) => setFormDuracion({ ...formDuracion, dias: e.target.value })}
-        />
-        <input
-          type="number"
-          step="0.01"
-          placeholder="Descuento (ej: 0.2 = 20%)"
-          value={formDuracion.descuento}
-          onChange={(e) => setFormDuracion({ ...formDuracion, descuento: e.target.value })}
-        />
-        <div className="form-actions">
-          <button type="submit" className="btn-primary">
-            {editDuracionId ? 'Actualizar' : 'Crear'} Duración
-          </button>
-          {editDuracionId && (
-            <button
-              type="button"
-              className="btn-secondary"
-              onClick={() => {
-                setFormDuracion({ nombre: '', dias: '', descuento: '' });
-                setEditDuracionId(null);
-              }}
-            >
-              Cancelar
-            </button>
-          )}
+          </thead>
+          <tbody>
+            {planes.map((p) => (
+              <tr key={p.id}>
+                <td>{p.nombre}</td>
+                <td>{p.tipo}</td>
+                <td>{p.precio}</td>
+                <td>{p.descripcion}</td>
+                <td>{p.eliminado ? 'Inactivo' : 'Activo'}</td>
+                <td>
+                  {!p.eliminado && (
+                    <>
+                      <button
+                        type="button"
+                        className="plan-action-button plan-action-edit"
+                        onClick={() => handleEditPlan(p)}
+                        title={`Editar plan ${p.nombre}`}
+                        aria-label={`Editar plan ${p.nombre}`}
+                      >
+                        <i className="fa-solid fa-pen-to-square" aria-hidden="true"></i>
+                      </button>
+                      <button
+                        type="button"
+                        className="plan-action-button plan-action-disable"
+                        onClick={() => confirmDelete('plan', p.id)}
+                        title={`Cambiar a inactivo el plan ${p.nombre}`}
+                        aria-label={`Cambiar a inactivo el plan ${p.nombre}`}
+                      >
+                        <i className="fa-solid fa-ban" aria-hidden="true"></i>
+                      </button>
+                    </>
+                  )}
+                  {p.eliminado ? (
+                    <button
+                      type="button"
+                      className="plan-action-button plan-action-enable"
+                      onClick={() => handleActivarPlan(p.id)}
+                      title={`Activar plan ${p.nombre}`}
+                      aria-label={`Activar plan ${p.nombre}`}
+                    >
+                      <i className="fa-solid fa-circle-check" aria-hidden="true"></i>
+                    </button>
+                  ) : null}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <header className="duraciones-admin-header">
+        <div>
+          <h2>Duraciones de planes</h2>
+          <p>Configura los plazos disponibles y sus descuentos.</p>
         </div>
-      </form>
+        <button type="button" className="plan-open-form-button" onClick={handleCreateDuracion}>
+          <i className="fa-solid fa-circle-plus" aria-hidden="true"></i>
+          Crear duración
+        </button>
+      </header>
 
-      {/* Mensaje de duraciones */}
-      {mensajeDuraciones && <p className="alerta">{mensajeDuraciones}</p>}
+      {mensajeDuraciones && !duracionFormOpen && <p className="alerta">{mensajeDuraciones}</p>}
+
+      {duracionFormOpen && (
+        <AdminFormModal
+          title={editDuracionId ? 'Editar duración' : 'Crear duración'}
+          description={editDuracionId
+            ? 'Actualiza el plazo y el descuento de esta duración.'
+            : 'Define el plazo en días y el descuento aplicable al plan.'}
+          onClose={handleCloseDuracionForm}
+        >
+          {mensajeDuraciones && <p className="alerta modal-form-feedback">{mensajeDuraciones}</p>}
+          <form onSubmit={handleSubmitDuracion} className="duracion-form">
+            <label className="plan-field">
+              <span>Nombre</span>
+              <input
+                type="text"
+                placeholder="Ej. Trimestral"
+                value={formDuracion.nombre}
+                onChange={(e) => setFormDuracion({ ...formDuracion, nombre: e.target.value })}
+              />
+            </label>
+            <label className="plan-field">
+              <span>Días</span>
+              <input
+                type="number"
+                placeholder="Cantidad de días"
+                value={formDuracion.dias}
+                onChange={(e) => setFormDuracion({ ...formDuracion, dias: e.target.value })}
+              />
+            </label>
+            <label className="plan-field">
+              <span>Descuento (0 a 1)</span>
+              <input
+                type="number"
+                step="0.01"
+                placeholder="Ej. 0.2 = 20%"
+                value={formDuracion.descuento}
+                onChange={(e) => setFormDuracion({ ...formDuracion, descuento: e.target.value })}
+              />
+            </label>
+            <div className="form-actions">
+              <button type="submit" className="btn-primary">
+                {editDuracionId && <i className="fa-solid fa-floppy-disk form-save-icon" aria-hidden="true"></i>}
+                {editDuracionId ? 'Guardar cambios' : 'Crear duración'}
+              </button>
+              <button type="button" className="btn-secondary" onClick={handleCloseDuracionForm}>
+                Cancelar
+              </button>
+            </div>
+          </form>
+        </AdminFormModal>
+      )}
 
       {/* Tabla de Duraciones */}
-      <table className="duraciones-table">
-        <thead>
-          <tr>
-            <th>Nombre</th>
-            <th>Días</th>
-            <th>Descuento</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {duraciones.map((d) => (
-            <tr key={d.id}>
-              <td>{d.nombre}</td>
-              <td>{d.dias}</td>
-              <td>{d.descuento ? `${d.descuento * 100}%` : '0%'}</td>
-              <td>
-                <button onClick={() => handleEditDuracion(d)} className="btn-secondary">
-                  Editar
-                </button>
-                <button onClick={() => confirmDelete('duracion', d.id)} className="btn-danger">Eliminar</button>
-              </td>
+      <div className="duraciones-table-container">
+        <table className="duraciones-table">
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Días</th>
+              <th>Descuento</th>
+              <th>Acciones</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {duraciones.map((d) => (
+              <tr key={d.id}>
+                <td>{d.nombre}</td>
+                <td>{d.dias}</td>
+                <td>{d.descuento ? `${d.descuento * 100}%` : '0%'}</td>
+                <td>
+                  <button
+                    type="button"
+                    className="plan-action-button plan-action-edit"
+                    onClick={() => handleEditDuracion(d)}
+                    title={`Editar duración ${d.nombre}`}
+                    aria-label={`Editar duración ${d.nombre}`}
+                  >
+                    <i className="fa-solid fa-pen-to-square" aria-hidden="true"></i>
+                  </button>
+                  <button
+                    type="button"
+                    className="plan-action-button plan-action-delete"
+                    onClick={() => confirmDelete('duracion', d.id)}
+                    title={`Eliminar duración ${d.nombre}`}
+                    aria-label={`Eliminar duración ${d.nombre}`}
+                  >
+                    <i className="fa-solid fa-trash" aria-hidden="true"></i>
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
       {showModal && (
       <div className="modal-overlay">
         <div className="modal">

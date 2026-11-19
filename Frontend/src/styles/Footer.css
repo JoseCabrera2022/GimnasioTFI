@@ -7,6 +7,23 @@
   z-index: 10;
 }
 
+.footer-admin {
+  margin-left: 224px;
+  padding: 14px 28px;
+  background: #101222;
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+
+.footer-admin-content {
+  max-width: none;
+  color: #a7a9bd;
+  font-size: 0.78rem;
+}
+
+.footer-admin-content p {
+  margin: 0;
+}
+
 .footer-content {
   display: flex;
   justify-content: space-between;
@@ -138,5 +155,18 @@
 
   .footer-social {
     justify-content: center;
+  }
+}
+
+@media (max-width: 900px) {
+  .footer-admin {
+    margin-left: 0;
+  }
+
+}
+
+@media (max-width: 600px) {
+  .footer-admin-content {
+    text-align: center;
   }
 }

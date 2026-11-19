@@ -2,6 +2,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import axios from 'axios'
 import './index.css'
+import './utils/axiosConfig';
 import App from './App.jsx'
 import '@fortawesome/fontawesome-free/css/all.min.css';
 

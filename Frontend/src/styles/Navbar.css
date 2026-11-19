@@ -24,6 +24,41 @@
   font-weight: 800;
 }
 
+.navbar-admin {
+  height: 88px;
+  padding: 0 28px;
+}
+
+.navbar-admin .navbar-logo {
+  min-width: 220px;
+}
+
+.navbar-admin-context {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  padding: 0 28px;
+}
+
+.navbar-admin-context span {
+  color: #9b94ff;
+  font-size: 0.67rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.navbar-admin-context strong {
+  overflow: hidden;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .gym-logo-right {
   width: 54px;
   height: 54px;
@@ -32,6 +67,21 @@
   object-fit: contain;
   background: #fff;
   border: 1px solid rgba(255,255,255,0.85);
+}
+
+.navbar-avatar {
+  width: 54px;
+  height: 54px;
+  display: block;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #7770ee;
+}
+
+.navbar-brand-icon a:focus-visible {
+  outline: 2px solid #9b94ff;
+  outline-offset: 4px;
+  border-radius: 50%;
 }
 
 .navbar-brand-icon {
@@ -63,6 +113,32 @@
 
 .navbar-links a:hover { color: #9b94ff; }
 
+.navbar-admin-identity {
+  display: flex;
+  flex-direction: column;
+  max-width: 160px;
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.navbar-admin-identity span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.navbar-admin-identity small {
+  color: #a7a9bd;
+  font-size: 0.7rem;
+  font-weight: 500;
+}
+
+.navbar-links-admin {
+  gap: 16px;
+}
+
 .navbar-user { display: flex; align-items: center; }
 .navbar-links li .navbar-user-link {
   display: flex;
@@ -92,7 +168,11 @@
 @media (max-width: 900px) {
   .navbar { height: auto; min-height: 78px; padding: 12px 20px; }
   .navbar-links { gap: 12px; flex-wrap: wrap; justify-content: flex-end; }
+  .navbar-admin { min-height: 78px; }
+  .navbar-admin .navbar-logo { min-width: auto; }
+  .navbar-admin-context { padding: 0 16px; }
   .gym-logo-right { width: 46px; height: 46px; }
+  .navbar-avatar { width: 46px; height: 46px; }
 }
 
 @media (max-width: 650px) {
@@ -100,4 +180,7 @@
   .navbar-links { max-width: 270px; }
   .navbar-links li:nth-child(3),
   .navbar-links li:nth-child(4) { display: none; }
+  .navbar-admin-context,
+  .navbar-admin-identity { display: none; }
+  .navbar-links-admin li.navbar-brand-icon { display: flex; }
 }

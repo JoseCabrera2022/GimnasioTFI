@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import db from '../configs/database.js';
 import { enviarEmailConGmailAPI } from '../services/gmail/gmailApiService.js';
+import { crearTokenSesion } from '../utils/sessionToken.js';
 
 const URL_FRONTEND = process.env.FRONTEND_URL || 'http://localhost:5173';
 
@@ -48,18 +49,14 @@ export const registrarUsuario = async (req, res) => {
     const [rows] = await db.query('SELECT id, nombre, correo_electronico, rol, telefono, ubicacion_id, estado FROM usuarios WHERE id=?', [result.insertId]);
     const nuevoUsuario = rows[0];
 
-    const token = jwt.sign(
-      {
-        id: nuevoUsuario.id,
-        correo_electronico: nuevoUsuario.correo_electronico,
-        rol: nuevoUsuario.rol,
-        telefono: nuevoUsuario.telefono,
-        ubicacion_id: nuevoUsuario.ubicacion_id,
-        estado: nuevoUsuario.estado
-      },
-      process.env.JWT_SECRET,
-      { expiresIn: '1h' }
-    );
+    const token = crearTokenSesion({
+      id: nuevoUsuario.id,
+      correo_electronico: nuevoUsuario.correo_electronico,
+      rol: nuevoUsuario.rol,
+      telefono: nuevoUsuario.telefono,
+      ubicacion_id: nuevoUsuario.ubicacion_id,
+      estado: nuevoUsuario.estado
+    });
 
     res.json({ usuario: nuevoUsuario, token });
 
@@ -95,17 +92,13 @@ export const loginUsuario = async (req, res) => {
     if (!valido) return res.status(401).json({ error: 'Contraseña incorrecta' });
 
     // 🔹 incluir ubicacion_id en el token
-    const token = jwt.sign(
-      { 
-        id: usuario.id, 
-        correo_electronico: usuario.correo_electronico, 
-        rol: usuario.rol, 
-        telefono: usuario.telefono,
-        ubicacion_id: usuario.ubicacion_id
-      },
-      process.env.JWT_SECRET,
-      { expiresIn: '1h' }
-    );
+    const token = crearTokenSesion({
+      id: usuario.id,
+      correo_electronico: usuario.correo_electronico,
+      rol: usuario.rol,
+      telefono: usuario.telefono,
+      ubicacion_id: usuario.ubicacion_id
+    });
 
     res.json({
       usuario: { 

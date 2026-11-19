@@ -5,6 +5,7 @@ import '../styles/Usuarios.css';
 import { API_LOCAL, ENDPOINTS_LOCAL } from '../api/endpoints';
 import defaultAvatar from '../assets/default-avatar.png';
 import SelectorUbicacion from '../components/SelectorUbicacion';
+import AdminFormModal from '../components/AdminFormModal';
 
 const capitalizar = (valor) => valor ? valor.charAt(0).toUpperCase() + valor.slice(1) : '';
 
@@ -22,17 +23,17 @@ function Usuarios() {
     password: ''
   });
   const [editingId, setEditingId] = useState(null);
+  const [usuarioFormOpen, setUsuarioFormOpen] = useState(false);
   const [mensaje, setMensaje] = useState('');
   const [errors, setErrors] = useState({});
   const [confirmDelete, setConfirmDelete] = useState(null);
-  const [mostrarInactivos, setMostrarInactivos] = useState(false);
   const [perfilSeleccionado, setPerfilSeleccionado] = useState(null);
   const [preview, setPreview] = useState(null)
   const [editMode, setEditMode] = useState(false);
   const [fileName, setFileName] = useState('Ningún archivo seleccionado');
   const [busqueda, setBusqueda] = useState('');
   const [filtroRol, setFiltroRol] = useState('');
-  const [filtroEstado, setFiltroEstado] = useState('');
+  const [filtroEstado, setFiltroEstado] = useState('activo');
   const [filtroUbicacion, setFiltroUbicacion] = useState('');
   const [paginaActual, setPaginaActual] = useState(1);
   const [usuariosPorPagina, setUsuariosPorPagina] = useState(10);
@@ -62,7 +63,7 @@ function Usuarios() {
 
   useEffect(() => {
     setPaginaActual(1);
-  }, [busqueda, filtroRol, filtroEstado, filtroUbicacion, usuariosPorPagina, mostrarInactivos]);
+  }, [busqueda, filtroRol, filtroEstado, filtroUbicacion, usuariosPorPagina]);
 
   useEffect(() => {
     if (paginaActual > totalPaginas) setPaginaActual(totalPaginas);
@@ -71,25 +72,35 @@ function Usuarios() {
   // Cargar usuarios
   const fetchUsuarios = useCallback(async () => {
     try {
-      const url = `${ENDPOINTS_LOCAL.USUARIOS}${mostrarInactivos ? '?soloInactivos=true' : ''}`;
-      const res = await axios.get(url, {
+      const parametroEstado = filtroEstado === 'inactivo' ? '?soloInactivos=true' : '';
+      const res = await axios.get(`${ENDPOINTS_LOCAL.USUARIOS}${parametroEstado}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setUsuarios(res.data);
     } catch (error) {
       setMensaje(error.response?.data?.error || 'Error al cargar usuarios');
     }
-  }, [mostrarInactivos, token]);
+  }, [filtroEstado, token]);
 
   const handleView = async (id) => {
     try {
       const res = await axios.get(`${ENDPOINTS_LOCAL.USUARIOS}/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
+      setEditMode(false);
+      setPreview(null);
+      setFileName('Ningún archivo seleccionado');
       setPerfilSeleccionado(res.data); // nuevo estado
     } catch (error) {
       setMensaje(error.response?.data?.error || 'Error al obtener perfil');
     }
+  };
+
+  const cerrarPerfil = () => {
+    setPerfilSeleccionado(null);
+    setEditMode(false);
+    setPreview(null);
+    setFileName('Ningún archivo seleccionado');
   };
 
   // Cargar ubicaciones
@@ -149,6 +160,8 @@ function Usuarios() {
         password: ''
       });
       setEditingId(null);
+      setErrors({});
+      setUsuarioFormOpen(false);
       fetchUsuarios();
     } catch (error) {
       setMensaje(error.response?.data?.error || 'Error al guardar usuario');
@@ -167,6 +180,40 @@ function Usuarios() {
       password: '' // no se muestra la contraseña
     });
     setEditingId(usuario.id);
+    setMensaje('');
+    setErrors({});
+    setUsuarioFormOpen(true);
+  };
+
+  const handleCreateUsuario = () => {
+    setForm({
+      nombre: '',
+      correo_electronico: '',
+      telefono: '',
+      rol: 'socio',
+      estado: 'activo',
+      ubicacion_id: '',
+      password: ''
+    });
+    setEditingId(null);
+    setErrors({});
+    setMensaje('');
+    setUsuarioFormOpen(true);
+  };
+
+  const handleCloseUsuarioForm = () => {
+    setForm({
+      nombre: '',
+      correo_electronico: '',
+      telefono: '',
+      rol: 'socio',
+      estado: 'activo',
+      ubicacion_id: '',
+      password: ''
+    });
+    setEditingId(null);
+    setErrors({});
+    setUsuarioFormOpen(false);
   };
 
   const handleUpdatePerfil = async (e) => {
@@ -239,110 +286,124 @@ function Usuarios() {
 
   return (
     <div className="usuarios-page">
-      <h1>Gestión de Usuarios</h1>
-      {mensaje && <p className="mensaje">{mensaje}</p>}
-      <label className="usuarios-toggle-eliminados">
-        <input
-          type="checkbox"
-          checked={mostrarInactivos}
-          onChange={(event) => {
-            setMostrarInactivos(event.target.checked);
-          }}
-        />
-        Mostrar usuarios inactivos
-      </label>
+      <header className="usuarios-page-header">
+        <h1>Gestión de Usuarios</h1>
+        <button type="button" className="usuarios-open-form-button" onClick={handleCreateUsuario}>
+          <i className="fa-solid fa-user-plus" aria-hidden="true"></i>
+          Crear usuario
+        </button>
+      </header>
+      {mensaje && !usuarioFormOpen && <p className="mensaje">{mensaje}</p>}
 
-      <form onSubmit={handleSubmit} className="usuario-form">
-        <input
-          type="text"
-          placeholder="Nombre"
-          value={form.nombre}
-          onChange={(e) => setForm({ ...form, nombre: e.target.value })}
-        />
-        {errors.nombre && <span className="error">{errors.nombre}</span>}
-
-        <input
-          type="email"
-          placeholder="Correo electrónico"
-          value={form.correo_electronico}
-          onChange={(e) => setForm({ ...form, correo_electronico: e.target.value })}
-        />
-        {errors.correo_electronico && <span className="error">{errors.correo_electronico}</span>}
-
-        <input
-          type="text"
-          placeholder="Teléfono"
-          value={form.telefono}
-          onChange={(e) => setForm({ ...form, telefono: e.target.value })}
-        />
-        {errors.telefono && <span className="error">{errors.telefono}</span>}
-
-        <select
-          value={form.rol}
-          onChange={(e) => setForm({ ...form, rol: e.target.value })}
+      {usuarioFormOpen && (
+        <AdminFormModal
+          title={editingId ? 'Editar usuario' : 'Crear usuario'}
+          description={editingId
+            ? 'Actualiza los datos y permisos de este usuario.'
+            : 'Completa los datos para agregar una persona al gimnasio.'}
+          onClose={handleCloseUsuarioForm}
         >
-          <option value="socio">Socio</option>
-          <option value="empleado">Empleado</option>
-          <option value="admin">Admin</option>
-        </select>
-        {errors.rol && <span className="error">{errors.rol}</span>}
+          {mensaje && <p className="mensaje modal-form-feedback">{mensaje}</p>}
+          <form onSubmit={handleSubmit} className="usuario-form">
+            <label className="usuario-field" htmlFor="usuario-nombre">
+              <span>Nombre</span>
+              <input
+                id="usuario-nombre"
+                type="text"
+                placeholder="Nombre completo"
+                value={form.nombre}
+                onChange={(e) => setForm({ ...form, nombre: e.target.value })}
+              />
+              {errors.nombre && <span className="error">{errors.nombre}</span>}
+            </label>
 
-        <select
-          value={form.estado}
-          onChange={(e) => setForm({ ...form, estado: e.target.value })}
-        >
-          <option value="activo">Activo</option>
-          <option value="inactivo">Inactivo</option>
-        </select>
-        {errors.estado && <span className="error">{errors.estado}</span>}
+            <label className="usuario-field" htmlFor="usuario-correo">
+              <span>Correo electrónico</span>
+              <input
+                id="usuario-correo"
+                type="email"
+                placeholder="nombre@correo.com"
+                value={form.correo_electronico}
+                onChange={(e) => setForm({ ...form, correo_electronico: e.target.value })}
+              />
+              {errors.correo_electronico && <span className="error">{errors.correo_electronico}</span>}
+            </label>
 
-        <select
-          className="usuarios-ubicacion-select"
-          value={form.ubicacion_id}
-          onChange={(e) => setForm({ ...form, ubicacion_id: e.target.value })}
-        >
-          <option value="">Selecciona una sede</option>
-          {ubicaciones.map((u) => (
-            <option key={u.id} value={u.id}>
-              {u.nombre} - {u.ciudad}
-            </option>
-          ))}
-        </select>
-        {errors.ubicacion_id && <span className="error">{errors.ubicacion_id}</span>}
+            <label className="usuario-field" htmlFor="usuario-telefono">
+              <span>Teléfono</span>
+              <input
+                id="usuario-telefono"
+                type="text"
+                placeholder="Teléfono"
+                value={form.telefono}
+                onChange={(e) => setForm({ ...form, telefono: e.target.value })}
+              />
+              {errors.telefono && <span className="error">{errors.telefono}</span>}
+            </label>
 
-        {!editingId && (
-          <input
-            type="password"
-            placeholder="Contraseña"
-            value={form.password}
-            onChange={(e) => setForm({ ...form, password: e.target.value })}
-          />
-        )}
-        {errors.password && <span className="error">{errors.password}</span>}
+            <label className="usuario-field" htmlFor="usuario-rol">
+              <span>Rol</span>
+              <select id="usuario-rol" value={form.rol} onChange={(e) => setForm({ ...form, rol: e.target.value })}>
+                <option value="socio">Socio</option>
+                <option value="empleado">Empleado</option>
+                <option value="admin">Admin</option>
+              </select>
+              {errors.rol && <span className="error">{errors.rol}</span>}
+            </label>
 
-        <button className="btn-crear-editar" type="submit">{editingId ? 'Actualizar' : 'Crear'} Usuario</button>
-        {editingId && (
-          <button
-            type="button"
-            className="btn-cancel-edit"
-            onClick={() => {
-              setForm({
-                nombre: '',
-                correo_electronico: '',
-                telefono: '',
-                rol: 'socio',
-                estado: 'activo',
-                ubicacion_id: '',
-                password: ''
-              });
-              setEditingId(null);
-              setErrors({});
-            }}
-          >
-            Cancelar edición
-          </button>
-        )}
-      </form>
+            <label className="usuario-field" htmlFor="usuario-estado">
+              <span>Estado</span>
+              <select id="usuario-estado" value={form.estado} onChange={(e) => setForm({ ...form, estado: e.target.value })}>
+                <option value="activo">Activo</option>
+                <option value="inactivo">Inactivo</option>
+              </select>
+              {errors.estado && <span className="error">{errors.estado}</span>}
+            </label>
+
+            <label className="usuario-field" htmlFor="usuario-ubicacion">
+              <span>Sede</span>
+              <select
+                id="usuario-ubicacion"
+                className="usuarios-ubicacion-select"
+                value={form.ubicacion_id}
+                onChange={(e) => setForm({ ...form, ubicacion_id: e.target.value })}
+              >
+                <option value="">Selecciona una sede</option>
+                {ubicaciones.map((u) => (
+                  <option key={u.id} value={u.id}>
+                    {u.nombre} - {u.ciudad}
+                  </option>
+                ))}
+              </select>
+              {errors.ubicacion_id && <span className="error">{errors.ubicacion_id}</span>}
+            </label>
+
+            {!editingId && (
+              <label className="usuario-field" htmlFor="usuario-password">
+                <span>Contraseña</span>
+                <input
+                  id="usuario-password"
+                  type="password"
+                  placeholder="Contraseña"
+                  value={form.password}
+                  onChange={(e) => setForm({ ...form, password: e.target.value })}
+                />
+                {errors.password && <span className="error">{errors.password}</span>}
+              </label>
+            )}
+
+            <div className="usuario-form-actions">
+              <button className="btn-crear-editar" type="submit">
+                {editingId && <i className="fa-solid fa-floppy-disk form-save-icon" aria-hidden="true"></i>}
+                {editingId ? 'Guardar cambios' : 'Crear usuario'}
+              </button>
+              <button type="button" className="btn-cancel-edit" onClick={handleCloseUsuarioForm}>
+                Cancelar
+              </button>
+            </div>
+          </form>
+        </AdminFormModal>
+      )}
 
       <section className="usuarios-filtros" aria-label="Buscar y filtrar usuarios">
         <input
@@ -367,7 +428,6 @@ function Usuarios() {
           onChange={(event) => setFiltroEstado(event.target.value)}
           aria-label="Filtrar por estado"
         >
-          <option value="">Todos los estados</option>
           <option value="activo">Activo</option>
           <option value="inactivo">Inactivo</option>
         </select>
@@ -389,7 +449,7 @@ function Usuarios() {
           onClick={() => {
             setBusqueda('');
             setFiltroRol('');
-            setFiltroEstado('');
+            setFiltroEstado('activo');
             setFiltroUbicacion('');
           }}
         >
@@ -427,16 +487,44 @@ function Usuarios() {
                 <td>
                   {!u.eliminado && (
                     <>
-                      <button onClick={() => handleEdit(u)}>Editar</button>
-                      <button onClick={() => handleView(u.id)}>Ver perfil</button>
-                      <button className="btn-soft-delete" onClick={() => handleDeleteClick(u)}>
-                        Cambiar a inactivo
+                      <button
+                        type="button"
+                        className="usuarios-action-button usuarios-action-edit"
+                        onClick={() => handleEdit(u)}
+                        title={`Editar usuario ${u.nombre}`}
+                        aria-label={`Editar usuario ${u.nombre}`}
+                      >
+                        <i className="fa-solid fa-pen-to-square" aria-hidden="true"></i>
+                      </button>
+                      <button
+                        type="button"
+                        className="usuarios-action-button usuarios-action-view"
+                        onClick={() => handleView(u.id)}
+                        title={`Ver perfil de ${u.nombre}`}
+                        aria-label={`Ver perfil de ${u.nombre}`}
+                      >
+                        <i className="fa-solid fa-eye" aria-hidden="true"></i>
+                      </button>
+                      <button
+                        type="button"
+                        className="usuarios-action-button usuarios-action-disable"
+                        onClick={() => handleDeleteClick(u)}
+                        title={`Cambiar a inactivo a ${u.nombre}`}
+                        aria-label={`Cambiar a inactivo a ${u.nombre}`}
+                      >
+                        <i className="fa-solid fa-user-slash" aria-hidden="true"></i>
                       </button>
                     </>
                   )}
                   {u.eliminado ? (
-                    <button className="btn-confirm" onClick={() => handleActivarUsuario(u.id)}>
-                      Cambiar a activo
+                    <button
+                      type="button"
+                      className="usuarios-action-button usuarios-action-enable"
+                      onClick={() => handleActivarUsuario(u.id)}
+                      title={`Activar usuario ${u.nombre}`}
+                      aria-label={`Activar usuario ${u.nombre}`}
+                    >
+                      <i className="fa-solid fa-user-check" aria-hidden="true"></i>
                     </button>
                   ) : null}
                 </td>
@@ -490,70 +578,178 @@ function Usuarios() {
         </div>
       </div>
       {perfilSeleccionado && (
-        <div className="modal-overlay">
-          <div className="modal-content perfil-modal">
-            <h2>Perfil de {perfilSeleccionado.nombre}</h2>
+        <div className="modal-overlay perfil-modal-overlay">
+          <section
+            className="modal-content perfil-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="perfil-modal-title"
+          >
+            <header className="perfil-modal-header">
+              <div>
+                <span className="perfil-eyebrow">
+                  {editMode ? 'Edición de usuario' : 'Información del usuario'}
+                </span>
+                <h2 id="perfil-modal-title">
+                  {editMode ? 'Editar perfil' : `Perfil de ${perfilSeleccionado.nombre}`}
+                </h2>
+                <p>
+                  {editMode
+                    ? 'Actualiza los datos personales y la foto del usuario.'
+                    : 'Consulta los datos y el estado de la cuenta.'}
+                </p>
+              </div>
+              <button
+                type="button"
+                className="perfil-close-button"
+                onClick={cerrarPerfil}
+                aria-label="Cerrar perfil"
+                title="Cerrar perfil"
+              >
+                <i className="fa-solid fa-xmark" aria-hidden="true"></i>
+              </button>
+            </header>
             <div className="perfil-card">
-              <img
-                src={preview ? preview : perfilSeleccionado.foto ? `${API_LOCAL}${perfilSeleccionado.foto}` : defaultAvatar}
-                alt="avatar"
-                className="perfil-avatar"
-              />
+              <div className="perfil-avatar-panel">
+                <img
+                  src={preview ? preview : perfilSeleccionado.foto ? `${API_LOCAL}${perfilSeleccionado.foto}` : defaultAvatar}
+                  alt={`Foto de perfil de ${perfilSeleccionado.nombre}`}
+                  className="perfil-avatar"
+                />
+                {!editMode && (
+                  <span
+                    className={`perfil-status ${
+                      perfilSeleccionado.eliminado || perfilSeleccionado.estado === 'inactivo'
+                        ? 'perfil-status-inactive'
+                        : 'perfil-status-active'
+                    }`}
+                  >
+                    {capitalizar(
+                      perfilSeleccionado.eliminado ? 'inactivo' : perfilSeleccionado.estado || 'activo'
+                    )}
+                  </span>
+                )}
+                <span className="perfil-avatar-caption">
+                  {preview ? 'Vista previa seleccionada' : editMode ? 'Foto actual del usuario' : 'Foto de perfil'}
+                </span>
+              </div>
 
               {!editMode ? (
                 <div className="perfil-info">
-                  <p><strong>Nombre:</strong> {perfilSeleccionado.nombre}</p>
-                  <p><strong>Correo:</strong> {perfilSeleccionado.correo_electronico}</p>
-                  {perfilSeleccionado.telefono && <p><strong>Teléfono:</strong> {perfilSeleccionado.telefono}</p>}
-                  {perfilSeleccionado.rol && <p><strong>Rol:</strong> {perfilSeleccionado.rol}</p>}
-                  {perfilSeleccionado.ubicacion_id && (
-                    <p><strong>Sede:</strong> {perfilSeleccionado.ubicacion_nombre || 'Sin ubicación'}</p>
-                  )}
-                  <div style={{ display: 'flex', gap: 12 }}>
-                    <button onClick={() => setEditMode(true)} className="perfil-button">Editar</button>
-                    <button onClick={() => setPerfilSeleccionado(null)} className="cancel-button">Cerrar</button>
+                  <div className="perfil-detail-grid">
+                    <div className="perfil-detail">
+                      <span>Correo electrónico</span>
+                      <strong>{perfilSeleccionado.correo_electronico || 'Sin correo'}</strong>
+                    </div>
+                    <div className="perfil-detail">
+                      <span>Teléfono</span>
+                      <strong>{perfilSeleccionado.telefono || 'Sin teléfono'}</strong>
+                    </div>
+                    <div className="perfil-detail">
+                      <span>Rol</span>
+                      <strong>{capitalizar(perfilSeleccionado.rol) || 'Sin rol'}</strong>
+                    </div>
+                    <div className="perfil-detail perfil-detail-location">
+                      <span>Sede</span>
+                      <strong>{perfilSeleccionado.ubicacion_nombre || 'Sin ubicación asignada'}</strong>
+                    </div>
+                  </div>
+                  <div className="perfil-actions">
+                    <button type="button" onClick={() => setEditMode(true)} className="perfil-button">
+                      <i className="fa-solid fa-pen-to-square" aria-hidden="true"></i>
+                      Editar perfil
+                    </button>
+                    <button type="button" onClick={cerrarPerfil} className="cancel-button">
+                      Cerrar
+                    </button>
                   </div>
                 </div>
               ) : (
-                <form onSubmit={handleUpdatePerfil} className="perfil-info">
-                  <input type="text" name="nombre" defaultValue={perfilSeleccionado.nombre} />
-                  {errors.nombre && <span className="error">{errors.nombre}</span>}
+                <form onSubmit={handleUpdatePerfil} className="perfil-info perfil-edit-form">
+                  <div className="perfil-fields-grid">
+                    <label className="perfil-field" htmlFor="perfil-nombre">
+                      <span>Nombre</span>
+                      <input
+                        id="perfil-nombre"
+                        type="text"
+                        name="nombre"
+                        defaultValue={perfilSeleccionado.nombre}
+                      />
+                      {errors.nombre && <span className="error">{errors.nombre}</span>}
+                    </label>
 
-                  <input type="email" name="correo_electronico" defaultValue={perfilSeleccionado.correo_electronico} />
-                  {errors.correo_electronico && <span className="error">{errors.correo_electronico}</span>}
+                    <label className="perfil-field" htmlFor="perfil-correo">
+                      <span>Correo electrónico</span>
+                      <input
+                        id="perfil-correo"
+                        type="email"
+                        name="correo_electronico"
+                        defaultValue={perfilSeleccionado.correo_electronico}
+                      />
+                      {errors.correo_electronico && <span className="error">{errors.correo_electronico}</span>}
+                    </label>
 
-                  <input type="text" name="telefono" defaultValue={perfilSeleccionado.telefono || ''} />
-                  {errors.telefono && <span className="error">{errors.telefono}</span>}
+                    <label className="perfil-field" htmlFor="perfil-telefono">
+                      <span>Teléfono</span>
+                      <input
+                        id="perfil-telefono"
+                        type="text"
+                        name="telefono"
+                        defaultValue={perfilSeleccionado.telefono || ''}
+                      />
+                      {errors.telefono && <span className="error">{errors.telefono}</span>}
+                    </label>
 
-                  <input type="file" id="foto" name="foto" className="file-input" onChange={handleFileChange} />
+                    <label className="perfil-field" htmlFor="perfil-rol">
+                      <span>Rol</span>
+                      <select id="perfil-rol" name="rol" defaultValue={perfilSeleccionado.rol}>
+                        <option value="socio">Socio</option>
+                        <option value="empleado">Empleado</option>
+                        <option value="admin">Admin</option>
+                      </select>
+                    </label>
 
-                  <SelectorUbicacion
-                    selectedUbicacion={perfilSeleccionado.ubicacion_id}
-                    setSelectedUbicacion={(id) => setPerfilSeleccionado({ ...perfilSeleccionado, ubicacion_id: id })}
-                  />
-                  {errors.ubicacion_id && <span className="error">{errors.ubicacion_id}</span>}
+                    <label className="perfil-field" htmlFor="perfil-estado">
+                      <span>Estado</span>
+                      <select id="perfil-estado" name="estado" defaultValue={perfilSeleccionado.estado}>
+                        <option value="activo">Activo</option>
+                        <option value="inactivo">Inactivo</option>
+                      </select>
+                    </label>
 
-                  {/* 🔹 Select para Rol */}
-                  <select name="rol" defaultValue={perfilSeleccionado.rol}>
-                    <option value="socio">Socio</option>
-                    <option value="empleado">Empleado</option>
-                    <option value="admin">Admin</option>
-                  </select>
+                    <div className="perfil-upload-field">
+                      <span className="perfil-field-label">Foto de perfil</span>
+                      <input
+                        type="file"
+                        id="foto"
+                        name="foto"
+                        className="file-input"
+                        accept="image/*"
+                        onChange={handleFileChange}
+                      />
+                      <label htmlFor="foto" className="file-label">
+                        <i className="fa-solid fa-arrow-up-from-bracket" aria-hidden="true"></i>
+                        Seleccionar foto
+                      </label>
+                      <span className="file-name">{fileName}</span>
+                    </div>
 
-                  {/* 🔹 Select para Estado */}
-                  <select name="estado" defaultValue={perfilSeleccionado.estado}>
-                    <option value="activo">Activo</option>
-                    <option value="inactivo">Inactivo</option>
-                  </select>
-
-                  <label htmlFor="foto" className="file-label">Seleccionar foto</label>
-                  <span className="file-name">{fileName}</span>
-
-                  <div style={{ display: 'flex', gap: 12 }}>
-                    <button type="submit" className="perfil-button">Guardar cambios</button>
+                    <div className="perfil-ubicacion-field">
+                      <SelectorUbicacion
+                        selectedUbicacion={perfilSeleccionado.ubicacion_id}
+                        setSelectedUbicacion={(id) => setPerfilSeleccionado({ ...perfilSeleccionado, ubicacion_id: id })}
+                      />
+                      {errors.ubicacion_id && <span className="error">{errors.ubicacion_id}</span>}
+                    </div>
+                  </div>
+                  <div className="perfil-actions">
+                    <button type="submit" className="perfil-button">
+                      <i className="fa-solid fa-floppy-disk" aria-hidden="true"></i>
+                      Guardar cambios
+                    </button>
                     <button
                       type="button"
-                      onClick={() => { setEditMode(false); setPreview(null); }}
+                      onClick={() => { setEditMode(false); setPreview(null); setFileName('Ningún archivo seleccionado'); }}
                       className="cancel-button"
                     >
                       Cancelar
@@ -562,7 +758,7 @@ function Usuarios() {
                 </form>
               )}
             </div>
-          </div>
+          </section>
         </div>
       )}
       {/* 🔹 Modal de confirmación */}

@@ -3,6 +3,7 @@ import axios from 'axios';
 import { ENDPOINTS_LOCAL } from '../api/endpoints';
 import { useAuthStore } from '../store/useAuthStore';
 import '../styles/UbicacionesAdmin.css';
+import AdminFormModal from '../components/AdminFormModal';
 
 function UbicacionesAdmin() {
   const { token } = useAuthStore();
@@ -19,6 +20,7 @@ function UbicacionesAdmin() {
     lng: ''
   });
   const [editId, setEditId] = useState(null);
+  const [formModalOpen, setFormModalOpen] = useState(false);
   const [mensaje, setMensaje] = useState('');
   const [mostrarInactivas, setMostrarInactivas] = useState(false);
 
@@ -42,6 +44,33 @@ function UbicacionesAdmin() {
     fetchData();
   }, [fetchData]);
 
+  const resetFormUbicacion = () => {
+    setFormUbicacion({
+      nombre: '',
+      direccion: '',
+      ciudad: '',
+      provincia: '',
+      pais: '',
+      telefono: '',
+      email: '',
+      lat: '',
+      lng: ''
+    });
+  };
+
+  const handleCreate = () => {
+    resetFormUbicacion();
+    setEditId(null);
+    setMensaje('');
+    setFormModalOpen(true);
+  };
+
+  const handleCancelForm = () => {
+    resetFormUbicacion();
+    setEditId(null);
+    setFormModalOpen(false);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formUbicacion.nombre || !formUbicacion.direccion || !formUbicacion.ciudad || !formUbicacion.provincia || !formUbicacion.pais) {
@@ -60,8 +89,9 @@ function UbicacionesAdmin() {
         });
         setMensaje('Ubicación creada');
       }
-      setFormUbicacion({ nombre: '', direccion: '', ciudad: '', provincia: '', pais: '', telefono: '', email: '', lat: '', lng: '' });
+      resetFormUbicacion();
       setEditId(null);
+      setFormModalOpen(false);
       fetchData();
     } catch {
       setMensaje('Error al guardar ubicación');
@@ -81,7 +111,8 @@ function UbicacionesAdmin() {
       lng: ubicacion.lng || ''
     });
     setEditId(ubicacion.id);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setMensaje('');
+    setFormModalOpen(true);
   };
 
   const confirmDelete = (id) => {
@@ -117,43 +148,85 @@ function UbicacionesAdmin() {
 
   return (
     <div className="ubicaciones-admin">
-      <h1>Gestión de Ubicaciones</h1>
-      {mensaje && <p className="alerta">{mensaje}</p>}
+      <header className="ubicaciones-admin-header">
+        <h1>Gestión de Ubicaciones</h1>
+        <button type="button" className="ubicacion-open-form-button" onClick={handleCreate}>
+          <i className="fa-solid fa-circle-plus" aria-hidden="true"></i>
+          Crear ubicación
+        </button>
+      </header>
+      {mensaje && !formModalOpen && <p className="alerta">{mensaje}</p>}
 
-      {/* Formulario */}
-      <form onSubmit={handleSubmit} className="ubicacion-form">
-        <h2>{editId ? 'Editar Ubicación' : 'Crear Ubicación'}</h2>
-        <input type="text" placeholder="Nombre" value={formUbicacion.nombre}
-          onChange={(e) => setFormUbicacion({ ...formUbicacion, nombre: e.target.value })} />
-        <input type="text" placeholder="Dirección" value={formUbicacion.direccion}
-          onChange={(e) => setFormUbicacion({ ...formUbicacion, direccion: e.target.value })} />
-        <input type="text" placeholder="Ciudad" value={formUbicacion.ciudad}
-          onChange={(e) => setFormUbicacion({ ...formUbicacion, ciudad: e.target.value })} />
-        <input type="text" placeholder="Provincia" value={formUbicacion.provincia}
-          onChange={(e) => setFormUbicacion({ ...formUbicacion, provincia: e.target.value })} />
-        <input type="text" placeholder="País" value={formUbicacion.pais}
-          onChange={(e) => setFormUbicacion({ ...formUbicacion, pais: e.target.value })} />
-        <input type="text" placeholder="Teléfono" value={formUbicacion.telefono}
-          onChange={(e) => setFormUbicacion({ ...formUbicacion, telefono: e.target.value })} />
-        <input type="email" placeholder="Email" value={formUbicacion.email}
-          onChange={(e) => setFormUbicacion({ ...formUbicacion, email: e.target.value })} />
-        <input type="number" step="0.000001" placeholder="Latitud" value={formUbicacion.lat}
-          onChange={(e) => setFormUbicacion({ ...formUbicacion, lat: e.target.value })} />
-        <input type="number" step="0.000001" placeholder="Longitud" value={formUbicacion.lng}
-          onChange={(e) => setFormUbicacion({ ...formUbicacion, lng: e.target.value })} />
-        <div className="form-actions">
-          <button type="submit" className="btn-primary">{editId ? 'Actualizar' : 'Crear'} Ubicación</button>
-          {editId && (
-            <button type="button" className="btn-secondary" onClick={() => {
-              setFormUbicacion({ nombre: '', direccion: '', ciudad: '', provincia: '', pais: '', telefono: '', email: '', lat: '', lng: '' });
-              setEditId(null);
-            }}>Cancelar</button>
-          )}
-        </div>
-      </form>
+      {formModalOpen && (
+        <AdminFormModal
+          title={editId ? 'Editar ubicación' : 'Crear ubicación'}
+          description={editId
+            ? 'Actualiza los datos de esta sede.'
+            : 'Completa los datos para agregar una sede al gimnasio.'}
+          onClose={handleCancelForm}
+        >
+          {mensaje && <p className="alerta modal-form-feedback">{mensaje}</p>}
+          <form onSubmit={handleSubmit} className="ubicacion-form">
+            <label className="ubicacion-field">
+              <span>Nombre</span>
+              <input type="text" placeholder="Nombre" value={formUbicacion.nombre}
+                onChange={(e) => setFormUbicacion({ ...formUbicacion, nombre: e.target.value })} />
+            </label>
+            <label className="ubicacion-field">
+              <span>Dirección</span>
+              <input type="text" placeholder="Dirección" value={formUbicacion.direccion}
+                onChange={(e) => setFormUbicacion({ ...formUbicacion, direccion: e.target.value })} />
+            </label>
+            <label className="ubicacion-field">
+              <span>Ciudad</span>
+              <input type="text" placeholder="Ciudad" value={formUbicacion.ciudad}
+                onChange={(e) => setFormUbicacion({ ...formUbicacion, ciudad: e.target.value })} />
+            </label>
+            <label className="ubicacion-field">
+              <span>Provincia</span>
+              <input type="text" placeholder="Provincia" value={formUbicacion.provincia}
+                onChange={(e) => setFormUbicacion({ ...formUbicacion, provincia: e.target.value })} />
+            </label>
+            <label className="ubicacion-field">
+              <span>País</span>
+              <input type="text" placeholder="País" value={formUbicacion.pais}
+                onChange={(e) => setFormUbicacion({ ...formUbicacion, pais: e.target.value })} />
+            </label>
+            <label className="ubicacion-field">
+              <span>Teléfono</span>
+              <input type="text" placeholder="Teléfono" value={formUbicacion.telefono}
+                onChange={(e) => setFormUbicacion({ ...formUbicacion, telefono: e.target.value })} />
+            </label>
+            <label className="ubicacion-field">
+              <span>Correo electrónico</span>
+              <input type="email" placeholder="Email" value={formUbicacion.email}
+                onChange={(e) => setFormUbicacion({ ...formUbicacion, email: e.target.value })} />
+            </label>
+            <label className="ubicacion-field">
+              <span>Latitud</span>
+              <input type="number" step="0.000001" placeholder="Latitud" value={formUbicacion.lat}
+                onChange={(e) => setFormUbicacion({ ...formUbicacion, lat: e.target.value })} />
+            </label>
+            <label className="ubicacion-field">
+              <span>Longitud</span>
+              <input type="number" step="0.000001" placeholder="Longitud" value={formUbicacion.lng}
+                onChange={(e) => setFormUbicacion({ ...formUbicacion, lng: e.target.value })} />
+            </label>
+            <div className="form-actions">
+              <button type="submit" className="btn-primary">
+                {editId && <i className="fa-solid fa-floppy-disk form-save-icon" aria-hidden="true"></i>}
+                {editId ? 'Guardar cambios' : 'Crear ubicación'}
+              </button>
+              <button type="button" className="btn-secondary" onClick={handleCancelForm}>
+                Cancelar
+              </button>
+            </div>
+          </form>
+        </AdminFormModal>
+      )}
 
       {/* Tabla */}
-      <label>
+      <label className="ubicaciones-inactive-toggle">
         <input
           type="checkbox"
           checked={mostrarInactivas}
@@ -161,52 +234,76 @@ function UbicacionesAdmin() {
         />
         Mostrar ubicaciones inactivas
       </label>
-      <table className="ubicaciones-table">
-        <thead>
-          <tr>
-            <th>Nombre</th>
-            <th>Dirección</th>
-            <th>Ciudad</th>
-            <th>Provincia</th>
-            <th>País</th>
-            <th>Teléfono</th>
-            <th>Email</th>
-            <th>Lat</th>
-            <th>Lng</th>
-            <th>Estado</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {ubicaciones.map((u) => (
-            <tr key={u.id}>
-              <td>{u.nombre}</td>
-              <td>{u.direccion}</td>
-              <td>{u.ciudad}</td>
-              <td>{u.provincia}</td>
-              <td>{u.pais}</td>
-              <td>{u.telefono}</td>
-              <td>{u.email}</td>
-              <td>{u.lat}</td>
-              <td>{u.lng}</td>
-              <td>{u.eliminado ? 'Inactiva' : 'Activa'}</td>
-              <td>
-                {!u.eliminado && (
-                  <>
-                    <button onClick={() => handleEdit(u)} className="btn-secondary">Editar</button>
-                    <button onClick={() => confirmDelete(u.id)} className="btn-danger">Cambiar a inactivo</button>
-                  </>
-                )}
-                {u.eliminado ? (
-                  <button onClick={() => handleActivar(u.id)} className="btn-primary">
-                    Cambiar a activo
-                  </button>
-                ) : null}
-              </td>
+      <div className="ubicaciones-table-container">
+        <table className="ubicaciones-table">
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Dirección</th>
+              <th>Ciudad</th>
+              <th>Provincia</th>
+              <th>País</th>
+              <th>Teléfono</th>
+              <th>Email</th>
+              <th>Lat</th>
+              <th>Lng</th>
+              <th>Estado</th>
+              <th>Acciones</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {ubicaciones.map((u) => (
+              <tr key={u.id}>
+                <td>{u.nombre}</td>
+                <td>{u.direccion}</td>
+                <td>{u.ciudad}</td>
+                <td>{u.provincia}</td>
+                <td>{u.pais}</td>
+                <td>{u.telefono}</td>
+                <td>{u.email}</td>
+                <td>{u.lat}</td>
+                <td>{u.lng}</td>
+                <td>{u.eliminado ? 'Inactiva' : 'Activa'}</td>
+                <td>
+                  {!u.eliminado && (
+                    <>
+                      <button
+                        type="button"
+                        className="ubicacion-action-button ubicacion-action-edit"
+                        onClick={() => handleEdit(u)}
+                        title={`Editar ubicación ${u.nombre}`}
+                        aria-label={`Editar ubicación ${u.nombre}`}
+                      >
+                        <i className="fa-solid fa-pen-to-square" aria-hidden="true"></i>
+                      </button>
+                      <button
+                        type="button"
+                        className="ubicacion-action-button ubicacion-action-disable"
+                        onClick={() => confirmDelete(u.id)}
+                        title={`Cambiar a inactiva la ubicación ${u.nombre}`}
+                        aria-label={`Cambiar a inactiva la ubicación ${u.nombre}`}
+                      >
+                        <i className="fa-solid fa-ban" aria-hidden="true"></i>
+                      </button>
+                    </>
+                  )}
+                  {u.eliminado ? (
+                    <button
+                      type="button"
+                      className="ubicacion-action-button ubicacion-action-enable"
+                      onClick={() => handleActivar(u.id)}
+                      title={`Activar ubicación ${u.nombre}`}
+                      aria-label={`Activar ubicación ${u.nombre}`}
+                    >
+                      <i className="fa-solid fa-circle-check" aria-hidden="true"></i>
+                    </button>
+                  ) : null}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
       {/* Modal de confirmación */}
       {showModal && (
         <div className="modal-overlay">

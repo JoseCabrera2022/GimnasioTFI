@@ -7,14 +7,16 @@ import SidebarAdmin from './SidebarAdmin';
 
 function Layout({ children }) {
   const { usuario } = useAuthStore();
+  const esAdmin = usuario?.rol === 'admin';
+  const esSocio = usuario?.rol === 'socio';
 
   return (
     <div className="layout-container">
       <Navbar />
-      <div className="layout-body">
-        {usuario?.rol === 'socio' && <SidebarSocio />}
-        {usuario?.rol === 'admin' && <SidebarAdmin />}
-        <main className={`layout-main ${usuario?.rol === 'socio' || usuario?.rol === 'admin' ? 'with-sidebar' : ''}`}>
+      <div className={`layout-body${esAdmin ? ' layout-body-admin' : ''}`}>
+        {esSocio && <SidebarSocio />}
+        {esAdmin && <SidebarAdmin />}
+        <main className={`layout-main ${esAdmin ? 'with-admin-sidebar' : esSocio ? 'with-sidebar' : ''}`}>
           {children}
         </main>
       </div>

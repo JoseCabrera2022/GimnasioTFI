@@ -1,7 +1,7 @@
-import jwt from 'jsonwebtoken';
 import db from '../configs/database.js';
 import fs from 'fs/promises';
 import path from 'path';
+import { crearTokenSesion } from '../utils/sessionToken.js';
 
 export const getPerfil = async (req, res) => {
   try {
@@ -70,17 +70,13 @@ export const updatePerfil = async (req, res) => {
     );
 
     // 🔹 Generar nuevo token con ubicacion_id actualizado
-    const token = jwt.sign(
-      {
-        id: updated[0].id,
-        correo_electronico: updated[0].correo_electronico,
-        rol: updated[0].rol,
-        telefono: updated[0].telefono,
-        ubicacion_id: updated[0].ubicacion_id
-      },
-      process.env.JWT_SECRET,
-      { expiresIn: '1h' }
-    );
+    const token = crearTokenSesion({
+      id: updated[0].id,
+      correo_electronico: updated[0].correo_electronico,
+      rol: updated[0].rol,
+      telefono: updated[0].telefono,
+      ubicacion_id: updated[0].ubicacion_id
+    });
 
     res.json({ usuario: updated[0], token });
   } catch (error) {

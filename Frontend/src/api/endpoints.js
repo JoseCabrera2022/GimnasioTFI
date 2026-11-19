@@ -5,6 +5,7 @@ export const API_LOCAL = API_BASE_URL;
 export const ENDPOINTS = {
   REGISTER: `${API_BASE_URL}/api/register`,
   LOGIN: `${API_BASE_URL}/api/login`,
+  SESSION_REFRESH: `${API_BASE_URL}/api/auth/refresh`,
   FORGOT_PASSWORD: `${API_BASE_URL}/api/forgot-password`,
   RESET_PASSWORD: `${API_BASE_URL}/api/reset-password`,
   MEMBRESIAS: `${API_BASE_URL}/api/membresias`,

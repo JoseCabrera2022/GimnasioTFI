@@ -21,7 +21,7 @@ const app = express();
 
 //middlewares
 app.use(express.json());
-app.use(cors());
+app.use(cors({ exposedHeaders: ['X-Auth-Token'] }));
 
 //app.use('/', cursos);
 app.use('/api/pagos', pagosRoutes);

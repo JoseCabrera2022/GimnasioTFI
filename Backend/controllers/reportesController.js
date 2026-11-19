@@ -119,11 +119,10 @@ export const obtenerReporteAdministrativo = async (req, res) => {
 
     const [pagos] = await db.query(`
       SELECT p.id, p.usuario_id, p.monto, p.estado, p.metodo_pago,
-             p.fecha_aprobado, p.creado_en
+             p.fecha_aprobado, p.creado_en, u.nombre AS socio
       FROM pagos p
-      JOIN usuarios u ON u.id = p.usuario_id
-      WHERE u.rol = 'socio' AND u.estado = 'activo' AND u.eliminado = 0
-      ORDER BY p.usuario_id, COALESCE(p.fecha_aprobado, p.creado_en) DESC
+      LEFT JOIN usuarios u ON u.id = p.usuario_id
+      ORDER BY COALESCE(p.fecha_aprobado, p.creado_en) DESC
     `);
 
     const [membresias] = await db.query(`

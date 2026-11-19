@@ -26,6 +26,7 @@ import ActividadesAdmin from './pages/ActividadesAdmin';
 import MensajesAdmin from './pages/MensajesAdmin';
 import PlanesAdmin from './pages/PlanesAdmin';
 import UbicacionesAdmin from './pages/UbicacionesAdmin';
+import SessionManager from './components/SessionManager';
 
 function App() {
   const loadUser = useAuthStore((state) => state.loadUser);
@@ -40,6 +41,7 @@ function App() {
 
   return (
     <BrowserRouter>
+      <SessionManager />
       <Layout>
         <Routes>
           <Route path={ROUTES.HOME} element={<Home />} />
