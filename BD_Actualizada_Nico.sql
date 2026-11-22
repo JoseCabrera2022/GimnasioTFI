@@ -332,7 +332,12 @@ CREATE TABLE `usuarios` (
 
 LOCK TABLES `usuarios` WRITE;
 /*!40000 ALTER TABLE `usuarios` DISABLE KEYS */;
-INSERT INTO `usuarios` VALUES (1,'José Francisco Cabrera','jose.cabrera.2k7@gmail.com','$2b$10$Ru1FK/t89qxk1ZDnlT4rreuRZLHlUXHKEB2qJOyWM/X6tW3kz7oFq','admin','3816558684','2025-12-03 05:59:24',NULL,'2026-10-20 23:46:16','activo',1,0),(4,'Usuario','jose.cabrera.2k7@outlook.es','$2b$10$iSXiOJob.hlQIChy4Pmynu8OeLOwT/RPp5YCP4w2sUJUlpYOrrcf6','socio','3816558684','2026-10-20 20:07:24',NULL,'2026-11-02 13:07:40','activo',1,0),(5,'Nicolas Zelarayan','nicolaszelarayan2003@gmail.com','$2b$10$6EYwhOHAzOPCzUo0QadMNeTnsdx4mz2mZjvEKYsuaAIFmxte.EvN6','admin','3813242343','2026-11-04 20:55:03','/uploads/1793825856071.jpg','2026-11-04 23:37:50','activo',1,0),(6,'prueba','prueba@gmail.com','$2b$10$57WSUPETuXS/xZqyR2v9.OZT90DGyZhJgV4x5GJaimGI06qZDh3vK','socio','1233434','2026-11-04 21:57:01',NULL,NULL,'activo',1,0),(7,'prueba2','prueba2@gmail.com','$2b$10$NqG2cxBZNsLQeGS7T5AVxuhLoYLhTYNcS/xjZR17O0/6SQe9xwzMe','socio','1241274712','2026-11-04 22:16:13',NULL,NULL,'activo',1,0),(8,'Martin','martin@gmail.com','$2b$10$BOJo3/WdeZWNEBbtCXnqbeXbHDIh6E5rJOZmKnjfY1mGEoXmaQIKa','socio','2414214124','2026-11-05 00:24:04',NULL,NULL,'activo',2,0);
+INSERT INTO `usuarios` VALUES (1,'José Francisco Cabrera','jose.cabrera.2k7@gmail.com','$2b$10$Ru1FK/t89qxk1ZDnlT4rreuRZLHlUXHKEB2qJOyWM/X6tW3kz7oFq','admin','3816558684','2025-12-03 05:59:24',NULL,'2026-10-20 23:46:16','activo',1,0),
+(4,'Usuario','jose.cabrera.2k7@outlook.es','$2b$10$iSXiOJob.hlQIChy4Pmynu8OeLOwT/RPp5YCP4w2sUJUlpYOrrcf6','socio','3816558684','2026-10-20 20:07:24',NULL,'2026-11-02 13:07:40','activo',1,0),
+(5,'Nicolas Zelarayan','nicolaszelarayan2003@gmail.com','$2b$10$6EYwhOHAzOPCzUo0QadMNeTnsdx4mz2mZjvEKYsuaAIFmxte.EvN6','admin','3813242343','2026-11-04 20:55:03','/uploads/1793825856071.jpg','2026-11-04 23:37:50','activo',1,0),
+(6,'prueba','prueba@gmail.com','$2b$10$57WSUPETuXS/xZqyR2v9.OZT90DGyZhJgV4x5GJaimGI06qZDh3vK','socio','1233434','2026-11-04 21:57:01',NULL,NULL,'activo',1,0),
+(7,'prueba2','prueba2@gmail.com','$2b$10$NqG2cxBZNsLQeGS7T5AVxuhLoYLhTYNcS/xjZR17O0/6SQe9xwzMe','socio','1241274712','2026-11-04 22:16:13',NULL,NULL,'activo',1,0),
+(8,'Martin','martin@gmail.com','$2b$10$BOJo3/WdeZWNEBbtCXnqbeXbHDIh6E5rJOZmKnjfY1mGEoXmaQIKa','socio','2414214124','2026-11-05 00:24:04',NULL,NULL,'activo',2,0);
 /*!40000 ALTER TABLE `usuarios` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
