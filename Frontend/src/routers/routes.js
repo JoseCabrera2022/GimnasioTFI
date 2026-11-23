@@ -4,6 +4,7 @@ export const ROUTES = {
   FORGOT_PASSWORD: '/recuperar-contrasena',
   RESET_PASSWORD: '/restablecer-contrasena',
   REGISTER: '/register',
+  VERIFY_EMAIL: '/verificar-email',
   PLANES: '/planes',
   CONTACTO: '/contacto',
   PERFIL: '/perfil',

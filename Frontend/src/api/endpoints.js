@@ -4,6 +4,7 @@ export const API_LOCAL = API_BASE_URL;
 
 export const ENDPOINTS = {
   REGISTER: `${API_BASE_URL}/api/register`,
+  VERIFY_EMAIL: `${API_BASE_URL}/api/verify-email`,
   LOGIN: `${API_BASE_URL}/api/login`,
   SESSION_REFRESH: `${API_BASE_URL}/api/auth/refresh`,
   FORGOT_PASSWORD: `${API_BASE_URL}/api/forgot-password`,
