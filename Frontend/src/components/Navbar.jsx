@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { ROUTES } from '../routers/routes';
 import { useAuthStore } from '../store/useAuthStore';
 import '../styles/Navbar.css';
@@ -19,11 +19,39 @@ const SECCIONES_ADMIN = {
   [ROUTES.PERFIL]: 'Mi perfil',
 };
 
+const SECCIONES_SOCIO = {
+  [ROUTES.HOME]: 'Inicio',
+  [ROUTES.MEMBRESIAS]: 'Mi membresía',
+  [ROUTES.HISTORIALPAGOS]: 'Historial de pagos',
+  [ROUTES.PERFIL]: 'Mi perfil',
+  [ROUTES.RESERVAS]: 'Mis reservas',
+  [ROUTES.ACTIVIDADES]: 'Actividades',
+  [ROUTES.PLANES]: 'Planes disponibles',
+  [ROUTES.UBICACIONES]: 'Sedes',
+  [ROUTES.CONTACTO]: 'Contacto',
+  [ROUTES.PAGOREXITOSO]: 'Estado del pago',
+  [ROUTES.PAGOPENDIENTE]: 'Estado del pago',
+  [ROUTES.PAGOFALLIDO]: 'Estado del pago',
+};
+
+const SECCIONES_EMPLEADO = {
+  [ROUTES.EMPLEADO]: 'Operación de hoy',
+  [ROUTES.PERFIL]: 'Mi perfil',
+};
+
 function Navbar() {
   const { usuario, logout, updateUsuario } = useAuthStore();
   const [avatarUrl, setAvatarUrl] = useState(null);
   const esAdmin = usuario?.rol === 'admin';
+  const esSocio = usuario?.rol === 'socio';
+  const esEmpleado = usuario?.rol === 'empleado';
   const { pathname } = useLocation();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate(ROUTES.LOGIN, { replace: true });
+  };
 
   useEffect(() => {
     const fetchPerfil = async () => {
@@ -33,7 +61,7 @@ function Navbar() {
         const res = await http.get(ENDPOINTS_LOCAL.PERFIL, {
           headers: { Authorization: `Bearer ${token}` }
         });
-        updateUsuario(res.data);
+        updateUsuario(res.data, token);
       } catch (error) {
         console.error("Error al refrescar perfil en Navbar:", error);
       }
@@ -76,23 +104,30 @@ function Navbar() {
   }, [usuario?.foto]);
 
   return (
-    <nav className={`navbar${esAdmin ? ' navbar-admin' : ''}`}>
+    <nav className={`navbar${esAdmin ? ' navbar-admin' : ''}${esSocio ? ' navbar-member' : ''}${esEmpleado ? ' navbar-employee' : ''}`}>
       <Link
-        to={esAdmin ? ROUTES.ADMIN : ROUTES.HOME}
+        to={esAdmin ? ROUTES.ADMIN : esEmpleado ? ROUTES.EMPLEADO : ROUTES.HOME}
         className="navbar-logo"
       >
-        <span>{esAdmin ? 'Fuerza Vital' : 'GymManager Pro'}</span>
+        <span>{esAdmin || esEmpleado ? 'Fuerza Vital' : esSocio ? 'Fuerza Vital' : 'Fuerza Vital'}</span>
       </Link>
 
-      {esAdmin && (
+      {(esAdmin || esSocio || esEmpleado) && (
         <div className="navbar-admin-context">
-          <span>Panel de administración</span>
-          <strong>{SECCIONES_ADMIN[pathname] || 'Administración'}</strong>
+          <span>{esAdmin ? 'Panel de administración' : esEmpleado ? 'Portal del empleado' : 'Portal del socio'}</span>
+          <strong>
+            {(esAdmin
+              ? SECCIONES_ADMIN[pathname]
+              : esEmpleado
+                ? SECCIONES_EMPLEADO[pathname]
+                : SECCIONES_SOCIO[pathname])
+              || (esAdmin ? 'Administración' : esEmpleado ? 'Operación de hoy' : 'Mi espacio')}
+          </strong>
         </div>
       )}
 
-      <ul className={`navbar-links${esAdmin ? ' navbar-links-admin' : ''}`}>
-        {!esAdmin && (
+      <ul className={`navbar-links${esAdmin ? ' navbar-links-admin' : ''}${esSocio ? ' navbar-links-member' : ''}${esEmpleado ? ' navbar-links-employee' : ''}`}>
+        {!usuario && (
           <>
             <li><Link to={ROUTES.HOME}>Inicio</Link></li>
             <li><Link to={ROUTES.PLANES}>Planes</Link></li>
@@ -108,6 +143,20 @@ function Navbar() {
           </li>
         )}
 
+        {esSocio && (
+          <li className="navbar-member-identity">
+            <span>{usuario.nombre}</span>
+            <small>Socio</small>
+          </li>
+        )}
+
+        {esEmpleado && (
+          <li className="navbar-employee-identity">
+            <span>{usuario.nombre}</span>
+            <small>Empleado</small>
+          </li>
+        )}
+
         {!usuario && (
           <>
             <li><Link to={ROUTES.LOGIN}>Login</Link></li>
@@ -115,9 +164,9 @@ function Navbar() {
           </>
         )}
 
-        {usuario && (
+        {usuario && !esSocio && !esAdmin && !esEmpleado && (
           <li>
-            <button className="navbar-button" onClick={logout}>
+            <button className="navbar-button" onClick={handleLogout}>
               Cerrar sesión
             </button>
           </li>

@@ -27,6 +27,10 @@ function Reservas() {
 
   useEffect(() => {
     if (token) fetchReservas();
+    const intervalId = token ? window.setInterval(fetchReservas, 60_000) : null;
+    return () => {
+      if (intervalId) window.clearInterval(intervalId);
+    };
   }, [token, fetchReservas]);
 
   const cancelarReserva = async (id) => {
@@ -46,6 +50,10 @@ function Reservas() {
   return (
     <div className="reservas-container">
       <h2>📅 Mis Reservas</h2>
+      <aside className="reservas-policy" role="note">
+        Puedes cancelar hasta 24 horas antes del turno. Si reservas con menos anticipación, no podrás cancelarla.
+        Si no se registra tu asistencia, la reserva expira una hora después del inicio.
+      </aside>
 
       {/* 🔹 Mensaje dinámico */}
       {mensaje && (
@@ -84,17 +92,37 @@ function Reservas() {
         </div>
       ) : (
         <ul className="reservas-list">
-          {reservas.map(r => (
-            <li key={r.id}>
-              <span>
-                {r.actividad} - {new Date(r.fecha).toLocaleString()} 
-                <span className={`estado-badge ${r.estado}`}>{r.estado}</span>
-              </span>
-              {r.estado !== 'cancelada' && (
-                <button className="btn-cancelar" onClick={() => cancelarReserva(r.id)}>Cancelar</button>
-              )}
-            </li>
-          ))}
+          {reservas.map((r) => {
+            const puedeCancelar = Number(r.puede_cancelar) === 1;
+            const etiquetasEstado = {
+              confirmada: 'Confirmada',
+              cancelada: 'Cancelada',
+              expirada: 'Expirada',
+              asistida: 'Asistida',
+              pendiente: 'Pendiente',
+            };
+
+            return (
+              <li key={r.id}>
+                <div className="reserva-detalle">
+                  <span>
+                    {r.actividad} - {new Date(r.fecha).toLocaleString()}
+                    <span className={`estado-badge ${r.estado}`}>
+                      {etiquetasEstado[r.estado] || r.estado}
+                    </span>
+                  </span>
+                  {r.estado === 'confirmada' && !puedeCancelar && (
+                    <small className="reservas-cancelacion-cerrada">
+                      Ya no se puede cancelar: faltan menos de 24 horas para el turno.
+                    </small>
+                  )}
+                </div>
+                {puedeCancelar && (
+                  <button className="btn-cancelar" onClick={() => cancelarReserva(r.id)}>Cancelar</button>
+                )}
+              </li>
+            );
+          })}
         </ul>
       )}
     </div>

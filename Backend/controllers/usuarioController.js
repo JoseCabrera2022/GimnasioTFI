@@ -71,6 +71,14 @@ export const createUsuario = async (req, res) => {
       return res.status(400).json({ error: 'Estado inválido' });
     }
 
+    const [ubicaciones] = await db.query(
+      'SELECT id FROM ubicaciones WHERE id=? AND eliminado=0',
+      [ubicacion_id]
+    );
+    if (ubicaciones.length === 0) {
+      return res.status(400).json({ error: 'La sede no existe o está inactiva' });
+    }
+
     // 🔹 Verificar si el correo ya existe
     const [rows] = await db.query(
       'SELECT id FROM usuarios WHERE correo_electronico = ?',
@@ -118,6 +126,14 @@ export const updateUsuario = async (req, res) => {
     }
     if (estado && !['activo','inactivo'].includes(estado)) {
       return res.status(400).json({ error: 'Estado inválido' });
+    }
+
+    const [ubicaciones] = await db.query(
+      'SELECT id FROM ubicaciones WHERE id=? AND eliminado=0',
+      [ubicacion_id]
+    );
+    if (ubicaciones.length === 0) {
+      return res.status(400).json({ error: 'La sede no existe o está inactiva' });
     }
 
     // Verificar si el correo ya existe
@@ -172,7 +188,7 @@ export const activarUsuario = async (req, res) => {
   try {
     const { id } = req.params;
     const [result] = await db.query(
-      'UPDATE usuarios SET eliminado=0 WHERE id=? AND eliminado=1',
+      'UPDATE usuarios SET eliminado=0, estado="activo" WHERE id=? AND eliminado=1',
       [id]
     );
     if (result.affectedRows === 0) {

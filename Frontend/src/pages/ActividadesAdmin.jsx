@@ -8,10 +8,23 @@ import TablePagination from '../components/TablePagination';
 import useTablePagination from '../hooks/useTablePagination';
 import AdminFormModal from '../components/AdminFormModal';
 
+const inicioDeSemana = (fecha) => {
+  const inicio = new Date(fecha.getFullYear(), fecha.getMonth(), fecha.getDate());
+  const diasDesdeLunes = (inicio.getDay() + 6) % 7;
+  inicio.setDate(inicio.getDate() - diasDesdeLunes);
+  return inicio;
+};
+
+const normalizarBusqueda = (valor) => String(valor ?? '')
+  .normalize('NFD')
+  .replace(/[\u0300-\u036f]/g, '')
+  .toLocaleLowerCase();
+
 function ActividadesAdmin() {
   const { token } = useAuthStore();
   const [actividades, setActividades] = useState([]);
   const [ubicaciones, setUbicaciones] = useState([]);
+  const [empleados, setEmpleados] = useState([]);
   const [busqueda, setBusqueda] = useState('');
   const [filtroEstado, setFiltroEstado] = useState('activas');
   const [filtroUbicacion, setFiltroUbicacion] = useState('');
@@ -32,13 +45,17 @@ function ActividadesAdmin() {
   // Turnos
   const [turnos, setTurnos] = useState([]);
   const [actividadSeleccionada, setActividadSeleccionada] = useState(null);
+  const [busquedaTurnos, setBusquedaTurnos] = useState('');
+  const [filtroEntrenadoresTurnos, setFiltroEntrenadoresTurnos] = useState('todos');
+  const [semanaTurnos, setSemanaTurnos] = useState(() => inicioDeSemana(new Date()));
 
   // Form crear turno
-  const [turnoForm, setTurnoForm] = useState({ fecha: '', cupo_maximo: '' });
+  const [turnoForm, setTurnoForm] = useState({ fecha: '', cupo_maximo: '', entrenadores: [] });
+  const [turnoFormOpen, setTurnoFormOpen] = useState(false);
 
   // Form editar turno
   const [turnoEditMode, setTurnoEditMode] = useState(null); // turno id que se edita
-  const [turnoEditForm, setTurnoEditForm] = useState({ fecha: '', cupo_maximo: '' });
+  const [turnoEditForm, setTurnoEditForm] = useState({ fecha: '', cupo_maximo: '', entrenadores: [] });
 
   const actividadesFiltradas = useMemo(() => {
     const termino = busqueda.trim().toLocaleLowerCase();
@@ -66,6 +83,41 @@ function ActividadesAdmin() {
     });
     return Array.from(ubicacionesPorId.values());
   }, [actividades]);
+  const finSemanaTurnos = useMemo(() => {
+    const fin = new Date(semanaTurnos);
+    fin.setDate(fin.getDate() + 7);
+    return fin;
+  }, [semanaTurnos]);
+  const turnosSemana = useMemo(() => turnos.filter((turno) => {
+    const fecha = new Date(turno.fecha);
+    return fecha >= semanaTurnos && fecha < finSemanaTurnos;
+  }), [turnos, semanaTurnos, finSemanaTurnos]);
+  const turnosFiltrados = useMemo(() => {
+    const termino = normalizarBusqueda(busquedaTurnos.trim());
+    return turnosSemana.filter((turno) => {
+      const fechaTurno = new Date(turno.fecha);
+      const diaSemana = normalizarBusqueda(fechaTurno.toLocaleDateString('es-AR', { weekday: 'long' }));
+      const fecha = normalizarBusqueda(fechaTurno.toLocaleString('es-AR'));
+      const entrenadores = normalizarBusqueda(turno.entrenadores);
+      const coincideBusqueda = !termino
+        || diaSemana.includes(termino)
+        || fecha.includes(termino)
+        || entrenadores.includes(termino);
+      const tieneEntrenadores = Boolean(turno.entrenador_ids);
+      const coincideFiltroEntrenadores = filtroEntrenadoresTurnos === 'todos'
+        || (filtroEntrenadoresTurnos === 'asignados' && tieneEntrenadores)
+        || (filtroEntrenadoresTurnos === 'sin-asignar' && !tieneEntrenadores);
+      return coincideBusqueda && coincideFiltroEntrenadores;
+    });
+  }, [turnosSemana, busquedaTurnos, filtroEntrenadoresTurnos]);
+  const moverSemanaTurnos = (semanas) => {
+    setSemanaTurnos((actual) => {
+      const siguiente = new Date(actual);
+      siguiente.setDate(siguiente.getDate() + semanas * 7);
+      return siguiente;
+    });
+  };
+  const volverASemanaActual = () => setSemanaTurnos(inicioDeSemana(new Date()));
 
   // Cargar actividades
   const fetchActividades = useCallback(async () => {
@@ -92,10 +144,48 @@ function ActividadesAdmin() {
     }
   }, []);
 
+  const fetchEmpleados = useCallback(async () => {
+    try {
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+      const [activos, inactivos] = await Promise.all([
+        axios.get(ENDPOINTS_LOCAL.USUARIOS, config),
+        axios.get(`${ENDPOINTS_LOCAL.USUARIOS}?soloInactivos=true`, config),
+      ]);
+      const empleadosPorId = new Map(
+        [...activos.data, ...inactivos.data]
+          .filter((usuario) => usuario.rol === 'empleado')
+          .map((usuario) => [Number(usuario.id), usuario])
+      );
+      setEmpleados(Array.from(empleadosPorId.values()));
+    } catch (error) {
+      setTipoMensaje('error');
+      setMensaje(error.response?.data?.error || 'No se pudieron cargar los empleados');
+    }
+  }, [token]);
+
   useEffect(() => {
     fetchActividades();
     fetchUbicaciones();
-  }, [fetchActividades, fetchUbicaciones]);
+    fetchEmpleados();
+  }, [fetchActividades, fetchUbicaciones, fetchEmpleados]);
+
+  const cambiarEntrenador = (actualizarFormulario, entrenadorId, seleccionado) => {
+    const id = Number(entrenadorId);
+    actualizarFormulario((actual) => ({
+      ...actual,
+      entrenadores: seleccionado
+        ? [...actual.entrenadores, id]
+        : actual.entrenadores.filter((actualId) => actualId !== id),
+    }));
+  };
+
+  const empleadosParaFormulario = (entrenadoresSeleccionados) => {
+    const sedeId = String(actividadSeleccionada?.ubicacion_id);
+    const idsSeleccionados = new Set(entrenadoresSeleccionados.map(Number));
+    return empleados.filter((empleado) => (
+      String(empleado.ubicacion_id) === sedeId || idsSeleccionados.has(Number(empleado.id))
+    ));
+  };
 
   const resetFoto = () => {
     setFoto(null);
@@ -216,11 +306,16 @@ function ActividadesAdmin() {
       const res = await axios.get(`${ENDPOINTS_LOCAL.ACTIVIDADES}/${actividad.id}/turnos`, {
         headers: { Authorization: `Bearer ${token}` }
       });
+      if (String(actividadSeleccionada?.id) !== String(actividad.id)) {
+        setBusquedaTurnos('');
+        setFiltroEntrenadoresTurnos('todos');
+      }
       setTurnos(res.data);
       setActividadSeleccionada(actividad);
-      setTurnoForm({ fecha: '', cupo_maximo: '' });
+      setTurnoForm({ fecha: '', cupo_maximo: '', entrenadores: [] });
+      setTurnoFormOpen(false);
       setTurnoEditMode(null);
-      setTurnoEditForm({ fecha: '', cupo_maximo: '' });
+      setTurnoEditForm({ fecha: '', cupo_maximo: '', entrenadores: [] });
       // Scroll a sección turnos
       const el = document.querySelector('.turnos-section');
       if (el) el.scrollIntoView({ behavior: 'smooth' });
@@ -230,6 +325,20 @@ function ActividadesAdmin() {
     }
   };
 
+  const handleOpenCreateTurno = () => {
+    setTurnoForm({ fecha: '', cupo_maximo: '', entrenadores: [] });
+    setMensaje('');
+    setTipoMensaje('');
+    setTurnoFormOpen(true);
+  };
+
+  const handleCloseCreateTurno = () => {
+    setTurnoFormOpen(false);
+    setTurnoForm({ fecha: '', cupo_maximo: '', entrenadores: [] });
+    setMensaje('');
+    setTipoMensaje('');
+  };
+
   // Crear turno
   const handleCreateTurno = async (e) => {
     e.preventDefault();
@@ -237,7 +346,7 @@ function ActividadesAdmin() {
     setTipoMensaje('');
 
     if (!actividadSeleccionada) return;
-    const { fecha, cupo_maximo } = turnoForm;
+    const { fecha, cupo_maximo, entrenadores } = turnoForm;
     if (!fecha || !cupo_maximo) {
       setTipoMensaje('error');
       setMensaje('Fecha y cupo máximo son obligatorios');
@@ -248,14 +357,16 @@ function ActividadesAdmin() {
       await axios.post(ENDPOINTS_LOCAL.TURNOS, {
         actividad_id: actividadSeleccionada.id,
         fecha,
-        cupo_maximo: Number(cupo_maximo)
+        cupo_maximo: Number(cupo_maximo),
+        entrenadores,
       }, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setTipoMensaje('success');
       setMensaje('Turno creado con éxito');
       await handleViewTurnos(actividadSeleccionada);
-      setTurnoForm({ fecha: '', cupo_maximo: '' });
+      setTurnoForm({ fecha: '', cupo_maximo: '', entrenadores: [] });
+      setTurnoFormOpen(false);
     } catch (error) {
       setTipoMensaje('error');
       setMensaje(error.response?.data?.error || 'Error al crear turno');
@@ -264,20 +375,27 @@ function ActividadesAdmin() {
 
   // Iniciar edición de turno
   const startEditTurno = (turno) => {
+    setMensaje('');
+    setTipoMensaje('');
     setTurnoEditMode(turno.id);
     // Normalizar fecha a input datetime-local si viene en ISO completo
     const dt = new Date(turno.fecha);
     const localISO = new Date(dt.getTime() - dt.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
     setTurnoEditForm({
       fecha: localISO,
-      cupo_maximo: turno.cupo_maximo
+      cupo_maximo: turno.cupo_maximo,
+      entrenadores: turno.entrenador_ids
+        ? String(turno.entrenador_ids).split(',').map(Number)
+        : [],
     });
   };
 
   // Cancelar edición de turno
   const cancelEditTurno = () => {
     setTurnoEditMode(null);
-    setTurnoEditForm({ fecha: '', cupo_maximo: '' });
+    setTurnoEditForm({ fecha: '', cupo_maximo: '', entrenadores: [] });
+    setMensaje('');
+    setTipoMensaje('');
   };
 
   // Guardar edición turno
@@ -287,7 +405,7 @@ function ActividadesAdmin() {
     setTipoMensaje('');
 
     if (!turnoEditMode) return;
-    const { fecha, cupo_maximo } = turnoEditForm;
+    const { fecha, cupo_maximo, entrenadores } = turnoEditForm;
     if (!fecha || !cupo_maximo) {
       setTipoMensaje('error');
       setMensaje('Fecha y cupo máximo son obligatorios');
@@ -297,14 +415,14 @@ function ActividadesAdmin() {
     try {
       await axios.put(`${ENDPOINTS_LOCAL.TURNOS}/${turnoEditMode}`, {
         fecha,
-        cupo_maximo: Number(cupo_maximo)
+        cupo_maximo: Number(cupo_maximo),
+        entrenadores,
       }, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setTipoMensaje('success');
       setMensaje('Turno actualizado con éxito');
       await handleViewTurnos(actividadSeleccionada);
-      cancelEditTurno();
     } catch (error) {
       setTipoMensaje('error');
       setMensaje(error.response?.data?.error || 'Error al actualizar turno');
@@ -326,6 +444,19 @@ function ActividadesAdmin() {
     }
   };
 
+  const ultimoDiaSemanaTurnos = new Date(finSemanaTurnos);
+  ultimoDiaSemanaTurnos.setDate(ultimoDiaSemanaTurnos.getDate() - 1);
+  const etiquetaSemanaTurnos = `${semanaTurnos.toLocaleDateString('es-AR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  })} – ${ultimoDiaSemanaTurnos.toLocaleDateString('es-AR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  })}`;
+  const esSemanaActual = semanaTurnos.getTime() === inicioDeSemana(new Date()).getTime();
+
   return (
     <div className="actividades-admin">
       <header className="actividades-admin-header">
@@ -336,7 +467,9 @@ function ActividadesAdmin() {
         </button>
       </header>
 
-      {mensaje && !actividadFormOpen && <p className={`mensaje ${tipoMensaje}`}>{mensaje}</p>}
+      {mensaje && !actividadFormOpen && !turnoFormOpen && !turnoEditMode && (
+        <p className={`mensaje ${tipoMensaje}`}>{mensaje}</p>
+      )}
 
       {actividadFormOpen && (
         <AdminFormModal
@@ -448,7 +581,6 @@ function ActividadesAdmin() {
         >
           <option value="activas">Activas</option>
           <option value="inactivas">Inactivas</option>
-          <option value="todas">Todas</option>
         </select>
         <button
           type="button"
@@ -582,95 +714,273 @@ function ActividadesAdmin() {
       {/* Turnos de actividad seleccionada */}
       {actividadSeleccionada && (
         <div className="turnos-section">
-          <h2>Turnos de {actividadSeleccionada.nombre}</h2>
-
-          {/* Crear turno */}
-          <form onSubmit={handleCreateTurno} className="turno-form">
-            <div className="row">
-              <div className="col">
-                <label>Fecha y hora</label>
-                <input
-                  type="datetime-local"
-                  value={turnoForm.fecha}
-                  onChange={(e) => setTurnoForm({ ...turnoForm, fecha: e.target.value })}
-                />
-              </div>
-              <div className="col">
-                <label>Cupo máximo</label>
-                <input
-                  type="number"
-                  min="1"
-                  value={turnoForm.cupo_maximo}
-                  onChange={(e) => setTurnoForm({ ...turnoForm, cupo_maximo: e.target.value })}
-                />
-              </div>
+            <div className="turnos-section-header">
+              <h2>Turnos de {actividadSeleccionada.nombre}</h2>
+              <button
+                type="button"
+                className="actividad-open-form-button"
+                onClick={handleOpenCreateTurno}
+              >
+                <i className="fa-solid fa-plus" aria-hidden="true"></i>
+                Crear turno
+              </button>
             </div>
-            <button type="submit" className="btn-primary">Crear turno</button>
-          </form>
 
           {/* Lista de turnos */}
+            <nav className="turnos-week-navigation" aria-label="Navegación por semana">
+              <button
+                type="button"
+                className="turnos-week-arrow"
+                onClick={() => moverSemanaTurnos(-1)}
+                aria-label="Ver semana anterior"
+                title="Semana anterior"
+              >
+                <i className="fa-solid fa-chevron-left" aria-hidden="true"></i>
+              </button>
+              <strong>{etiquetaSemanaTurnos}</strong>
+              <button
+                type="button"
+                className="turnos-week-arrow"
+                onClick={() => moverSemanaTurnos(1)}
+                aria-label="Ver semana siguiente"
+                title="Semana siguiente"
+              >
+                <i className="fa-solid fa-chevron-right" aria-hidden="true"></i>
+              </button>
+              {!esSemanaActual && (
+                <button
+                  type="button"
+                  className="btn-secondary turnos-week-current"
+                  onClick={volverASemanaActual}
+                >
+                  Esta semana
+                </button>
+              )}
+            </nav>
+            <div className="turnos-filtros">
+              <label>
+                <span>Buscar por día o entrenador</span>
+                <input
+                  type="search"
+                  value={busquedaTurnos}
+                  onChange={(event) => setBusquedaTurnos(event.target.value)}
+                  placeholder="Ej.: lunes o nombre del entrenador"
+                />
+              </label>
+              <label>
+                <span>Asignación de entrenadores</span>
+                <select
+                  value={filtroEntrenadoresTurnos}
+                  onChange={(event) => setFiltroEntrenadoresTurnos(event.target.value)}
+                >
+                  <option value="todos">Todos los turnos</option>
+                  <option value="asignados">Con entrenadores</option>
+                  <option value="sin-asignar">Sin entrenadores</option>
+                </select>
+              </label>
+            </div>
+            <p className="turnos-resultados">
+              Mostrando {turnosFiltrados.length} de {turnosSemana.length} turnos de la semana seleccionada
+            </p>
           <ul className="turnos-list">
-            {turnos.map(t => {
-              const isEditing = turnoEditMode === t.id;
+              {turnosFiltrados.map(t => {
               return (
                 <li key={t.id} className="turno-item">
-                  {!isEditing ? (
-                    <div className="turno-view">
-                      <p><strong>Fecha:</strong> {new Date(t.fecha).toLocaleString()}</p>
+                  <div className="turno-view">
+                    <div>
+                      <p>
+                        <strong>Fecha:</strong>{' '}
+                        {new Date(t.fecha).toLocaleString('es-AR', {
+                          weekday: 'long',
+                          day: '2-digit',
+                          month: '2-digit',
+                          year: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })}
+                      </p>
                       <p><strong>Cupo:</strong> {t.cupo_disponible} / {t.cupo_maximo}</p>
-                      <div className="item-actions">
-                        <button
-                          type="button"
-                          className="actividad-action-button actividad-action-edit"
-                          onClick={() => startEditTurno(t)}
-                          title="Editar turno"
-                          aria-label="Editar turno"
-                        >
-                          <i className="fa-solid fa-pen-to-square" aria-hidden="true"></i>
-                        </button>
-                        <button
-                          type="button"
-                          className="actividad-action-button actividad-action-delete"
-                          onClick={() => handleDeleteTurno(t.id)}
-                          title="Eliminar turno"
-                          aria-label="Eliminar turno"
-                        >
-                          <i className="fa-solid fa-trash" aria-hidden="true"></i>
-                        </button>
-                      </div>
+                      <p><strong>Entrenadores:</strong> {t.entrenadores || 'Sin asignar'}</p>
                     </div>
-                  ) : (
-                    <form onSubmit={handleUpdateTurno} className="turno-edit-form">
-                      <div className="row">
-                        <div className="col">
-                          <label>Fecha y hora</label>
-                          <input
-                            type="datetime-local"
-                            value={turnoEditForm.fecha}
-                            onChange={(e) => setTurnoEditForm({ ...turnoEditForm, fecha: e.target.value })}
-                          />
-                        </div>
-                        <div className="col">
-                          <label>Cupo máximo</label>
-                          <input
-                            type="number"
-                            min="1"
-                            value={turnoEditForm.cupo_maximo}
-                            onChange={(e) => setTurnoEditForm({ ...turnoEditForm, cupo_maximo: e.target.value })}
-                          />
-                        </div>
-                      </div>
-                      <div className="form-actions">
-                        <button type="submit" className="btn-primary">Guardar</button>
-                        <button type="button" className="btn-secondary" onClick={cancelEditTurno}>Cancelar</button>
-                      </div>
-                    </form>
-                  )}
+                    <div className="item-actions">
+                      <button
+                        type="button"
+                        className="actividad-action-button actividad-action-edit"
+                        onClick={() => startEditTurno(t)}
+                        title="Editar turno"
+                        aria-label="Editar turno"
+                      >
+                        <i className="fa-solid fa-pen-to-square" aria-hidden="true"></i>
+                      </button>
+                      <button
+                        type="button"
+                        className="actividad-action-button actividad-action-delete"
+                        onClick={() => handleDeleteTurno(t.id)}
+                        title="Eliminar turno"
+                        aria-label="Eliminar turno"
+                      >
+                        <i className="fa-solid fa-trash" aria-hidden="true"></i>
+                      </button>
+                    </div>
+                  </div>
                 </li>
               );
             })}
+            {turnosFiltrados.length === 0 && (
+              <li className="turnos-vacio">
+                {turnosSemana.length === 0
+                  ? 'No hay turnos programados para la semana seleccionada.'
+                  : 'No hay turnos que coincidan con los filtros.'}
+              </li>
+            )}
           </ul>
         </div>
+      )}
+
+      {turnoFormOpen && actividadSeleccionada && (
+        <AdminFormModal
+            title="Crear turno"
+            description={`Define la fecha, el cupo y los entrenadores para ${actividadSeleccionada.nombre}.`}
+            onClose={handleCloseCreateTurno}
+        >
+            {mensaje && <p className={`mensaje ${tipoMensaje} modal-form-feedback`}>{mensaje}</p>}
+            <form onSubmit={handleCreateTurno} className="turno-form">
+              <div className="row">
+                <div className="col">
+                  <label htmlFor="turno-fecha">Fecha y hora</label>
+                  <input
+                    id="turno-fecha"
+                    type="datetime-local"
+                    value={turnoForm.fecha}
+                    onChange={(e) => setTurnoForm({ ...turnoForm, fecha: e.target.value })}
+                    required
+                  />
+                </div>
+                <div className="col">
+                  <label htmlFor="turno-cupo">Cupo máximo</label>
+                  <input
+                    id="turno-cupo"
+                    type="number"
+                    min="1"
+                    value={turnoForm.cupo_maximo}
+                    onChange={(e) => setTurnoForm({ ...turnoForm, cupo_maximo: e.target.value })}
+                    required
+                  />
+                </div>
+              </div>
+              <fieldset className="turno-entrenadores">
+                <legend>Entrenadores del turno</legend>
+                <p>Un empleado no puede quedar asignado a turnos que se superpongan dentro del bloque de dos horas.</p>
+                <div className="turno-entrenadores-list">
+                  {empleadosParaFormulario(turnoForm.entrenadores).map((empleado) => {
+                    const seleccionado = turnoForm.entrenadores.includes(Number(empleado.id));
+                    const mismaSede = String(empleado.ubicacion_id) === String(actividadSeleccionada.ubicacion_id);
+                    const activo = empleado.estado === 'activo'
+                      && !Number(empleado.eliminado)
+                      && mismaSede;
+                    return (
+                      <label className="turno-entrenador-option" key={empleado.id}>
+                        <input
+                          type="checkbox"
+                          checked={seleccionado}
+                          disabled={!activo && !seleccionado}
+                          onChange={(event) => cambiarEntrenador(setTurnoForm, empleado.id, event.target.checked)}
+                        />
+                        <span>
+                          {empleado.nombre}
+                          {!activo
+                            ? seleccionado
+                              ? ' (no disponible; desmarca para quitarlo)'
+                              : ' (no disponible)'
+                            : ''}
+                        </span>
+                      </label>
+                    );
+                  })}
+                  {empleadosParaFormulario(turnoForm.entrenadores).length === 0 && (
+                    <span className="turno-entrenadores-empty">No hay empleados asignables en esta sede.</span>
+                  )}
+                </div>
+              </fieldset>
+              <div className="form-actions">
+                <button type="submit" className="btn-primary">Crear turno</button>
+                <button type="button" className="btn-secondary" onClick={handleCloseCreateTurno}>Cancelar</button>
+              </div>
+            </form>
+        </AdminFormModal>
+      )}
+
+      {turnoEditMode && actividadSeleccionada && (
+        <AdminFormModal
+            title="Editar turno"
+            description={`Actualiza la fecha, el cupo o los entrenadores de ${actividadSeleccionada.nombre}.`}
+            onClose={cancelEditTurno}
+        >
+            {mensaje && <p className={`mensaje ${tipoMensaje} modal-form-feedback`}>{mensaje}</p>}
+            <form onSubmit={handleUpdateTurno} className="turno-form">
+              <div className="row">
+                <div className="col">
+                  <label htmlFor="turno-editar-fecha">Fecha y hora</label>
+                  <input
+                    id="turno-editar-fecha"
+                    type="datetime-local"
+                    value={turnoEditForm.fecha}
+                    onChange={(e) => setTurnoEditForm({ ...turnoEditForm, fecha: e.target.value })}
+                    required
+                  />
+                </div>
+                <div className="col">
+                  <label htmlFor="turno-editar-cupo">Cupo máximo</label>
+                  <input
+                    id="turno-editar-cupo"
+                    type="number"
+                    min="1"
+                    value={turnoEditForm.cupo_maximo}
+                    onChange={(e) => setTurnoEditForm({ ...turnoEditForm, cupo_maximo: e.target.value })}
+                    required
+                  />
+                </div>
+              </div>
+              <fieldset className="turno-entrenadores">
+                <legend>Entrenadores del turno</legend>
+                <p>Un empleado no puede quedar asignado a turnos que se superpongan dentro del bloque de dos horas.</p>
+                <div className="turno-entrenadores-list">
+                  {empleadosParaFormulario(turnoEditForm.entrenadores).map((empleado) => {
+                    const seleccionado = turnoEditForm.entrenadores.includes(Number(empleado.id));
+                    const mismaSede = String(empleado.ubicacion_id) === String(actividadSeleccionada.ubicacion_id);
+                    const activo = empleado.estado === 'activo'
+                      && !Number(empleado.eliminado)
+                      && mismaSede;
+                    return (
+                      <label className="turno-entrenador-option" key={empleado.id}>
+                        <input
+                          type="checkbox"
+                          checked={seleccionado}
+                          disabled={!activo && !seleccionado}
+                          onChange={(event) => cambiarEntrenador(setTurnoEditForm, empleado.id, event.target.checked)}
+                        />
+                        <span>
+                          {empleado.nombre}
+                          {!activo
+                            ? seleccionado
+                              ? ' (no disponible; desmarca para quitarlo)'
+                              : ' (no disponible)'
+                            : ''}
+                        </span>
+                      </label>
+                    );
+                  })}
+                  {empleadosParaFormulario(turnoEditForm.entrenadores).length === 0 && (
+                    <span className="turno-entrenadores-empty">No hay empleados asignables en esta sede.</span>
+                  )}
+                </div>
+              </fieldset>
+              <div className="form-actions">
+                <button type="submit" className="btn-primary">Guardar cambios</button>
+                <button type="button" className="btn-secondary" onClick={cancelEditTurno}>Cancelar</button>
+              </div>
+            </form>
+        </AdminFormModal>
       )}
     </div>
   );

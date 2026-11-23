@@ -1,13 +1,21 @@
 import axios from 'axios';
 
-export const traducirEstado = (estado) => ({
+export const capitalizarPrimeraLetra = (texto) => {
+  if (typeof texto !== 'string' || texto.length === 0) return texto;
+  return texto.charAt(0).toLocaleUpperCase('es-AR') + texto.slice(1);
+};
+
+export const traducirEstado = (estado) => capitalizarPrimeraLetra(({
   approved: 'Aprobado',
   pending: 'Pendiente',
   rejected: 'Rechazado',
   in_process: 'En proceso',
+  in_mediation: 'En mediación',
+  authorized: 'Autorizado',
   cancelled: 'Cancelado',
-  refunded: 'Reembolsado'
-}[estado] || estado);
+  refunded: 'Reembolsado',
+  charged_back: 'Contracargo'
+}[estado] || estado));
 
 export const traducirMetodo = (metodo) => ({
   credit_card: 'Tarjeta de crédito',

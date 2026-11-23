@@ -1,5 +1,5 @@
 import './App.css'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import PagoResultado from './pages/PagoResultado';
 import { ROUTES } from './routers/routes';
 import Login from './pages/Login';
@@ -16,7 +16,6 @@ import Planes from './pages/Planes';
 import Membresias from './pages/Membresias';
 import HistorialPagos from './pages/HistorialPagos';
 import Reservas from './pages/Reservas';
-import CalendarioActividades from './pages/CalendarioActividades';
 import Actividades from './pages/Actividades';
 import Ubicaciones from './pages/Ubicaciones';
 import AdminDashboard from './pages/AdminDashboard';
@@ -26,6 +25,7 @@ import ActividadesAdmin from './pages/ActividadesAdmin';
 import MensajesAdmin from './pages/MensajesAdmin';
 import PlanesAdmin from './pages/PlanesAdmin';
 import UbicacionesAdmin from './pages/UbicacionesAdmin';
+import Empleado from './pages/Empleado';
 import SessionManager from './components/SessionManager';
 
 function App() {
@@ -51,16 +51,20 @@ function App() {
           <Route path={ROUTES.REGISTER} element={<Register />} />
           <Route path={ROUTES.PLANES} element={<Planes />} />
           <Route path={ROUTES.CONTACTO} element={<Contacto />} />
-          <Route path={ROUTES.PERFIL} element={<Perfil />} />
-          <Route path={ROUTES.MEMBRESIAS} element={<Membresias />} />
+          <Route path={ROUTES.PERFIL} element={<ProtectedRoute><Perfil /></ProtectedRoute>} />
+          <Route path={ROUTES.MEMBRESIAS} element={<ProtectedRoute role="socio"><Membresias /></ProtectedRoute>} />
           <Route path={ROUTES.PAGOREXITOSO} element={<PagoResultado />} />
           <Route path={ROUTES.PAGOPENDIENTE} element={<PagoResultado />} />
           <Route path={ROUTES.PAGOFALLIDO} element={<PagoResultado />} />
-          <Route path={ROUTES.HISTORIALPAGOS} element={<HistorialPagos />} />
-          <Route path={ROUTES.RESERVAS} element={<Reservas />} />
-          <Route path={ROUTES.CALENDARIO} element={<CalendarioActividades />} />
-          <Route path={ROUTES.ACTIVIDADES} element={<Actividades />} />
+          <Route path={ROUTES.HISTORIALPAGOS} element={<ProtectedRoute role="socio"><HistorialPagos /></ProtectedRoute>} />
+          <Route path={ROUTES.RESERVAS} element={<ProtectedRoute role="socio"><Reservas /></ProtectedRoute>} />
+          <Route
+            path={ROUTES.CALENDARIO}
+            element={<Navigate to={`${ROUTES.ACTIVIDADES}?vista=calendario`} replace />}
+          />
+          <Route path={ROUTES.ACTIVIDADES} element={<ProtectedRoute role="socio"><Actividades /></ProtectedRoute>} />
           <Route path={ROUTES.UBICACIONES} element={<Ubicaciones />} />
+          <Route path={ROUTES.EMPLEADO} element={<ProtectedRoute role="empleado"><Empleado /></ProtectedRoute>} />
           {/* 🔹 Ruta protegida para admin */}
           <Route path={ROUTES.ADMIN} element={<ProtectedRoute role="admin"> <AdminDashboard /></ProtectedRoute>} />
           <Route path={ROUTES.USUARIOS} element={<ProtectedRoute role="admin"> <Usuarios /></ProtectedRoute>} />

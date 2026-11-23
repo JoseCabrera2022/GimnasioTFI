@@ -1,0 +1,465 @@
+.empleado-page {
+  display: grid;
+  gap: 22px;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 32px clamp(18px, 3vw, 42px) 48px;
+  color: #202236;
+}
+
+.empleado-header,
+.empleado-panel-heading,
+.empleado-turno {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.empleado-header h1 {
+  margin: 5px 0;
+  color: #17192b;
+  font-size: clamp(1.7rem, 3vw, 2.3rem);
+}
+
+.empleado-header p,
+.empleado-panel-heading p {
+  margin: 0;
+  color: #6f7184;
+}
+
+.empleado-eyebrow {
+  color: #6a60e8;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+}
+
+.empleado-refresh,
+.empleado-turno button,
+.empleado-search > button,
+.empleado-checkin {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 9px 14px;
+  border: 0;
+  border-radius: 9px;
+  background: #6a60e8;
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.empleado-refresh:disabled,
+.empleado-checkin:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.empleado-spinning {
+  animation: empleado-spin 0.8s linear infinite;
+}
+
+@keyframes empleado-spin {
+  to { transform: rotate(360deg); }
+}
+
+.empleado-feedback {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  background: #e9f8ef;
+  color: #17653b;
+}
+
+.empleado-feedback.error {
+  background: #fff0f0;
+  color: #a52b36;
+}
+
+.empleado-feedback button {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font-weight: 800;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.empleado-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.empleado-summary article,
+.empleado-panel {
+  border: 1px solid #e7e8ef;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 8px 28px rgb(22 26 54 / 5%);
+}
+
+.empleado-summary article {
+  display: grid;
+  gap: 7px;
+  padding: 18px 20px;
+}
+
+.empleado-summary span {
+  color: #737589;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.empleado-summary strong {
+  color: #262843;
+  font-size: 1.8rem;
+}
+
+.empleado-panel {
+  min-width: 0;
+  padding: 22px;
+}
+
+.empleado-panel-heading {
+  margin-bottom: 18px;
+}
+
+.empleado-panel-heading h2 {
+  margin: 0 0 5px;
+  color: #202238;
+  font-size: 1.15rem;
+}
+
+.empleado-turnos {
+  display: grid;
+  gap: 10px;
+}
+
+.empleado-turno {
+  padding: 14px;
+  border: 1px solid #ececf3;
+  border-radius: 11px;
+}
+
+.empleado-turno.seleccionado {
+  border-color: #8e87f0;
+  background: #f7f6ff;
+}
+
+.empleado-turno-time {
+  display: grid;
+  min-width: 140px;
+  gap: 4px;
+}
+
+.empleado-turno-time strong {
+  color: #5148c7;
+  font-size: 1.15rem;
+}
+
+.empleado-turno-time span,
+.empleado-turno-info span {
+  color: #737589;
+  font-size: 0.82rem;
+}
+
+.empleado-turno-info {
+  display: grid;
+  flex: 1;
+  gap: 5px;
+  align-content: center;
+}
+
+.empleado-turno-info h3 {
+  margin: 0 0 2px;
+  color: #252741;
+}
+
+.empleado-turno-info span {
+  display: block;
+  line-height: 1.4;
+}
+
+.empleado-upcoming-list {
+  display: grid;
+  gap: 10px;
+}
+
+.empleado-upcoming-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.empleado-upcoming-filters label {
+  display: grid;
+  min-width: min(220px, 100%);
+  flex: 1 1 200px;
+  gap: 5px;
+  color: #696b80;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.empleado-upcoming-filters select {
+  min-height: 40px;
+  padding: 8px 11px;
+  border: 1px solid #dfe0e9;
+  border-radius: 9px;
+  background: #fff;
+  color: #252741;
+  font: inherit;
+}
+
+.empleado-upcoming-count {
+  margin: 0 0 10px;
+  color: #737589;
+  font-size: 0.78rem;
+}
+
+.empleado-upcoming-item {
+  display: grid;
+  grid-template-columns: minmax(170px, 0.8fr) minmax(0, 1.5fr) auto;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 16px;
+  border: 1px solid #ececf3;
+  border-radius: 11px;
+}
+
+.empleado-upcoming-date,
+.empleado-upcoming-info {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+
+.empleado-upcoming-date strong {
+  color: #5148c7;
+  font-size: 0.88rem;
+  text-transform: capitalize;
+}
+
+.empleado-upcoming-date span,
+.empleado-upcoming-info span {
+  color: #737589;
+  font-size: 0.82rem;
+}
+
+.empleado-upcoming-info h3 {
+  overflow: hidden;
+  margin: 0;
+  color: #252741;
+  font-size: 0.98rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.empleado-upcoming-capacity {
+  padding: 7px 10px;
+  border-radius: 999px;
+  background: #f0efff;
+  color: #5148c7;
+  font-size: 0.78rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.empleado-show-more {
+  display: block;
+  min-height: 40px;
+  margin: 14px auto 0;
+  padding: 8px 16px;
+  border: 1px solid #d9d7fb;
+  border-radius: 9px;
+  background: #f7f6ff;
+  color: #5148c7;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.empleado-show-more:hover {
+  background: #efedff;
+}
+
+.empleado-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.empleado-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.empleado-table th,
+.empleado-table td {
+  padding: 12px 10px;
+  border-bottom: 1px solid #ececf3;
+  vertical-align: middle;
+}
+
+.empleado-table th {
+  color: #696b80;
+  font-size: 0.76rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.empleado-table td {
+  color: #34364c;
+  font-size: 0.9rem;
+}
+
+.empleado-status {
+  display: inline-flex;
+  padding: 5px 9px;
+  border-radius: 999px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.empleado-status.vigente {
+  background: #e8f7ee;
+  color: #217342;
+}
+
+.empleado-status.vencida {
+  background: #fff0f0;
+  color: #a52b36;
+}
+
+.empleado-search {
+  display: flex;
+  align-items: center;
+  max-width: 760px;
+  gap: 10px;
+  margin-bottom: 16px;
+  padding: 15px;
+  border: 1px solid #e8edf4;
+  border-radius: 13px;
+  background: #fff;
+  box-shadow: 0 4px 14px rgb(23 32 51 / 4%);
+}
+
+.empleado-search-field {
+  position: relative;
+  min-width: 0;
+  flex: 1;
+}
+
+.empleado-search input {
+  min-width: 0;
+  width: 100%;
+  min-height: 42px;
+  padding: 9px 11px;
+  border: 1px solid #dce3ed;
+  border-radius: 9px;
+  color: #334155;
+  background: #fff;
+  font-size: 0.88rem;
+}
+
+.empleado-search input:focus {
+  outline: none;
+  border-color: #8c82ff;
+  box-shadow: 0 0 0 3px rgb(106 96 232 / 14%);
+}
+
+.empleado-suggestions {
+  position: absolute;
+  z-index: 5;
+  top: calc(100% + 6px);
+  right: 0;
+  left: 0;
+  max-height: 280px;
+  overflow-y: auto;
+  margin: 0;
+  padding: 5px;
+  list-style: none;
+  border: 1px solid #e8edf4;
+  border-radius: 11px;
+  background: #fff;
+  box-shadow: 0 8px 24px rgb(23 32 51 / 12%);
+}
+
+.empleado-suggestions li + li {
+  border-top: 1px solid #eef1f5;
+}
+
+.empleado-suggestion {
+  display: grid;
+  width: 100%;
+  padding: 10px 11px;
+  border: 0;
+  border-radius: 7px;
+  background: #fff;
+  color: #334155;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.86rem;
+  text-align: left;
+}
+
+.empleado-suggestion:hover,
+.empleado-suggestion:focus-visible {
+  outline: none;
+  background: #f5f4ff;
+  color: #5148c7;
+}
+
+.empleado-suggestions-message {
+  padding: 10px 11px;
+  color: #737589;
+  font-size: 0.82rem;
+}
+
+.empleado-suggestions-message.error {
+  color: #a52b36;
+}
+
+.empleado-empty {
+  margin: 0;
+  padding: 20px;
+  border-radius: 10px;
+  background: #f7f7fb;
+  color: #737589;
+  text-align: center;
+}
+
+.empleado-page button:focus-visible,
+.empleado-search input:focus-visible,
+.empleado-upcoming-filters select:focus-visible {
+  outline: 3px solid rgb(106 96 232 / 35%);
+  outline-offset: 2px;
+}
+
+@media (max-width: 760px) {
+  .empleado-summary { grid-template-columns: 1fr; }
+  .empleado-header { align-items: flex-start; }
+  .empleado-turno { flex-wrap: wrap; }
+  .empleado-turno button { width: 100%; }
+  .empleado-upcoming-item { grid-template-columns: minmax(0, 1fr) auto; }
+  .empleado-upcoming-info { grid-column: 1 / -1; grid-row: 2; }
+  .empleado-upcoming-capacity { grid-column: 2; grid-row: 1; }
+  .empleado-panel { padding: 16px; }
+}
+
+@media (max-width: 520px) {
+  .empleado-page { padding: 24px 14px 36px; }
+  .empleado-header { flex-direction: column; }
+  .empleado-refresh { width: 100%; }
+  .empleado-search { flex-direction: column; }
+  .empleado-search-field { width: 100%; }
+}

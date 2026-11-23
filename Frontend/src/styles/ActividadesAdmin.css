@@ -416,19 +416,99 @@
   padding: 18px;
 }
 
-.actividades-admin .turnos-section > h2 {
+.actividades-admin .turnos-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
   margin-bottom: 14px;
 }
 
-.actividades-admin .turno-form,
-.actividades-admin .turno-edit-form {
+.actividades-admin .turno-form {
   display: grid;
+  gap: 14px;
+}
+
+.actividades-admin .turnos-week-navigation {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  padding: 10px 12px;
+  border: 1px solid #e6ebf2;
+  border-radius: 10px;
+  background: #f8fafc;
+}
+
+.actividades-admin .turnos-week-navigation strong {
+  min-width: 190px;
+  color: #344054;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.actividades-admin .turnos-week-arrow {
+  display: inline-grid;
+  width: 36px;
+  min-width: 36px;
+  place-items: center;
+  padding: 0;
+  border-color: #dce3ed;
+  background: #fff;
+  color: #344054;
+}
+
+.actividades-admin .turnos-week-arrow:hover {
+  border-color: #c5d0df;
+  background: #eaf0f7;
+}
+
+.actividades-admin .turnos-week-current {
+  margin-left: 4px;
+}
+
+.actividades-admin .turnos-filtros {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(210px, 0.6fr);
   gap: 12px;
-  margin-bottom: 16px;
+  margin-bottom: 8px;
   padding: 14px;
   border: 1px solid #e6ebf2;
   border-radius: 10px;
   background: #f8fafc;
+}
+
+.actividades-admin .turnos-filtros label {
+  display: grid;
+  min-width: 0;
+  gap: 7px;
+  color: #475569;
+  font-size: 0.84rem;
+  font-weight: 650;
+}
+
+.actividades-admin .turnos-resultados {
+  margin: 0 0 10px;
+  color: #68758a;
+  font-size: 0.84rem;
+}
+
+.actividades-admin .turnos-vacio {
+  padding: 18px;
+  border: 1px dashed #d5deea;
+  border-radius: 10px;
+  color: #64748b;
+  text-align: center;
+}
+
+.actividades-admin .admin-form-modal .turno-form {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
 }
 
 .actividades-admin .row {
@@ -439,6 +519,56 @@
 
 .actividades-admin .col {
   min-width: 0;
+}
+
+.actividades-admin .turno-entrenadores {
+  min-width: 0;
+  margin: 0;
+  padding: 12px;
+  border: 1px solid #dce3ed;
+  border-radius: 9px;
+}
+
+.actividades-admin .turno-entrenadores legend {
+  padding: 0 5px;
+  color: #475569;
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
+.actividades-admin .turno-entrenadores > p {
+  margin: 0 0 10px;
+  color: #64748b;
+  font-size: 0.8rem;
+}
+
+.actividades-admin .turno-entrenadores-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 8px;
+}
+
+.actividades-admin .turno-entrenador-option {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 8px;
+  color: #344054;
+  font-size: 0.84rem;
+  font-weight: 500;
+}
+
+.actividades-admin .turno-entrenador-option input {
+  width: 16px;
+  min-height: 16px;
+  flex: 0 0 16px;
+  margin: 0;
+  padding: 0;
+}
+
+.actividades-admin .turno-entrenadores-empty {
+  color: #64748b;
+  font-size: 0.84rem;
 }
 
 .actividades-admin .turnos-list {
@@ -461,6 +591,10 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+}
+
+.actividades-admin .turno-view p {
+  margin: 0 0 5px;
 }
 
 .actividades-admin .item-actions {
@@ -525,5 +659,22 @@
   .actividades-admin .turno-view {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .actividades-admin .turnos-section-header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .actividades-admin .turnos-filtros {
+    grid-template-columns: 1fr;
+  }
+
+  .actividades-admin .turnos-week-navigation {
+    flex-wrap: wrap;
+  }
+
+  .actividades-admin .turnos-week-navigation strong {
+    min-width: auto;
   }
 }

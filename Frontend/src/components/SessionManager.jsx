@@ -10,7 +10,8 @@ const ACTIVITY_STORAGE_KEY = 'authLastActivityAt';
 const HEARTBEAT_STORAGE_KEY = 'authLastHeartbeatAt';
 
 function SessionManager() {
-  const hasSession = useAuthStore((state) => Boolean(state.token));
+  const token = useAuthStore((state) => state.token);
+  const hasSession = Boolean(token);
   const sessionExpired = useAuthStore((state) => state.sessionExpired);
   const navigate = useNavigate();
 
@@ -27,8 +28,9 @@ function SessionManager() {
     let heartbeatInFlight = false;
 
     const closeExpiredSession = () => {
-      useAuthStore.getState().expireSession();
-      navigate(ROUTES.LOGIN, { replace: true });
+      if (useAuthStore.getState().expireSession(token)) {
+        navigate(ROUTES.LOGIN, { replace: true });
+      }
     };
 
     const scheduleIdleTimeout = () => {
@@ -92,22 +94,33 @@ function SessionManager() {
         lastHeartbeatAt = Number(event.newValue) || 0;
       }
 
-      if (event.key === 'auth' && !event.newValue && useAuthStore.getState().token) {
+      if (
+        event.key === 'auth'
+        && !event.newValue
+        && !localStorage.getItem('auth')
+        && useAuthStore.getState().token
+      ) {
         useAuthStore.getState().logout();
         navigate(ROUTES.LOGIN, { replace: true });
       } else if (event.key === 'auth' && event.newValue) {
         try {
           const auth = JSON.parse(event.newValue);
-          if (auth.token && auth.token !== useAuthStore.getState().token) {
-            useAuthStore.getState().updateToken(auth.token);
+          const currentAuth = useAuthStore.getState();
+          if (auth.usuario && auth.token && auth.token !== currentAuth.token) {
+            currentAuth.login(auth.usuario, auth.token);
           }
         } catch (error) {
           console.error('No se pudo sincronizar la sesión entre pestañas:', error);
         }
       }
 
-      if (event.key === 'sessionExpired' && event.newValue === 'true') {
-        useAuthStore.getState().expireSession();
+      if (
+        event.key === 'sessionExpired'
+        && event.newValue === 'true'
+        && !localStorage.getItem('auth')
+        && useAuthStore.getState().token
+      ) {
+        useAuthStore.getState().logout();
         navigate(ROUTES.LOGIN, { replace: true });
       }
     };
@@ -131,7 +144,7 @@ function SessionManager() {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       window.removeEventListener('storage', handleStorage);
     };
-  }, [hasSession, navigate, sessionExpired]);
+  }, [hasSession, navigate, sessionExpired, token]);
 
   return null;
 }

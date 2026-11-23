@@ -117,139 +117,199 @@
 
 /* Tarjetas de planes */
 .tarjetas-planes {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 270px), 320px));
   gap: 20px;
   justify-content: center;
-  flex-wrap: wrap;
+  align-items: stretch;
 }
 
 .tarjeta {
-  background-color: #000000;
-  border-radius: 12px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-  padding: 20px;
-  width: 280px;
-  text-align: center;
+  background: linear-gradient(160deg, #fff 0%, #fafaff 100%);
+  border: 1px solid #e3e5f0;
+  border-radius: 18px;
+  box-shadow: 0 10px 28px rgb(22 26 54 / 8%);
+  padding: 25px 23px 21px;
+  width: 100%;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: 420px;
+  gap: 20px;
+  min-height: 430px;
   position: relative;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
 .tarjeta:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 12px 28px rgba(0,0,0,0.3);
+  transform: translateY(-4px);
+  box-shadow: 0 16px 34px rgb(22 26 54 / 13%);
 }
 
 .tarjeta.destacada {
-  border: 2px solid #0077cc;
-  box-shadow: 0 12px 32px rgba(0,0,0,0.4);
-  transform: translateY(-4px);
+  border: 1px solid #857af4;
+  box-shadow: 0 14px 34px rgb(91 78 205 / 16%);
 }
 
 .tarjeta.destacada:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 16px 40px rgba(0,0,0,0.5);
+  box-shadow: 0 18px 40px rgb(91 78 205 / 21%);
 }
 
-/* Insignia Premium */
+.tarjeta.plan-actual {
+  border: 2px solid #36a66a;
+  background: linear-gradient(160deg, #fff 0%, #f0fbf4 100%);
+  box-shadow: 0 14px 34px rgb(34 130 76 / 14%);
+}
+
+.tarjeta.plan-actual:hover {
+  box-shadow: 0 18px 40px rgb(34 130 76 / 19%);
+}
+
+.tarjeta.plan-bloqueado {
+  background: #f7f7fa;
+}
+
+.plan-card-contenido {
+  flex: 1;
+}
+
 .insignia-premium {
-  position: absolute;
-  top: -10px;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: #ffcc00;
-  color: #333;
-  font-weight: bold;
-  padding: 4px 10px;
-  border-radius: 12px;
-  font-size: 0.85rem;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  margin-bottom: 18px;
+  padding: 6px 11px;
+  border-radius: 999px;
+  background: #fff4d6;
+  color: #795b12;
+  font-size: 0.78rem;
+  font-weight: 800;
 }
 
-/* Título con línea divisoria */
+.insignia-plan-actual {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 7px;
+  margin-bottom: 18px;
+  padding: 6px 11px;
+  border-radius: 999px;
+  background: #e4f6eb;
+  color: #217342;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.plan-tipo {
+  margin: 0 0 6px;
+  color: #737589;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
 .titulo-plan {
-  font-size: 1.8rem;
-  margin-bottom: 10px;
-  color: #ffffff;
-  text-align: center;
-  position: relative;
+  margin: 0;
+  color: #202236;
+  font-size: 1.55rem;
+  line-height: 1.2;
 }
 
-.titulo-plan::after {
-  content: '';
-  display: block;
-  height: 3px;
-  background-color: #0077cc;
-  margin: 10px auto 0 auto;
-  border-radius: 2px;
-  width: 60px;
+.plan-precio {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 20px 0 16px;
 }
 
-/* Precio */
 .precio {
-  font-size: 1.2rem;
-  font-weight: bold;
-  color: #b8c2c9;
-  margin-bottom: 15px;
+  margin: 0;
+  color: #4541a8;
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: -0.04em;
 }
 
-/* Beneficios con línea divisoria */
-.tarjeta ul {
+.plan-precio span {
+  color: #77798b;
+  font-size: 0.84rem;
+}
+
+.plan-beneficios {
   list-style: none;
   padding: 0;
-  margin-bottom: 10px;
-  border-bottom: 2px solid #e0e0e0;
+  margin: 0;
+  display: grid;
+  gap: 12px;
 }
 
-.tarjeta li {
-  margin: 6px 0;
-  font-size: 0.95rem;
-  color: #c9bdbd;
+.plan-beneficios li {
+  display: grid;
+  grid-template-columns: 18px 1fr;
+  align-items: start;
+  gap: 9px;
+  color: #4f5165;
+  font-size: 0.92rem;
+  line-height: 1.4;
 }
 
-/* Botón de pago */
+.plan-beneficios li i {
+  margin-top: 3px;
+  color: #2a9b5b;
+}
+
 .btn-pagar {
-  padding: 10px 20px;
-  background-color: #28a745;
-  color: white;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  width: 100%;
+  min-height: 46px;
+  padding: 11px 18px;
+  background: #238a4e;
+  color: #fff;
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   font-weight: 600;
   cursor: pointer;
-  position: relative;
-  overflow: hidden;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.2s ease, transform 0.2s ease;
 }
 
 .btn-pagar:hover {
-  background-color: #218838;
+  background: #176f3c;
+  transform: translateY(-1px);
 }
 
 .btn-destacada {
-  background-color: #0077cc;
+  background: #5b52c8;
 }
 
 .btn-destacada:hover {
-  background-color: #005fa3;
+  background: #4740a9;
 }
 
-.btn-destacada::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: rgba(255,255,255,0.2);
-  transform: skewX(-20deg);
-  transition: left 0.5s ease;
+.plan-card-estado {
+  display: grid;
+  gap: 5px;
+  padding: 13px 14px;
+  border-radius: 11px;
+  font-size: 0.86rem;
 }
 
-.btn-destacada:hover::after {
-  left: 100%;
+.plan-card-estado strong {
+  font-size: 0.9rem;
+}
+
+.plan-card-estado.vigente {
+  border: 1px solid #c5e8d1;
+  background: #eaf8ef;
+  color: #226b40;
+}
+
+.plan-card-estado.bloqueado {
+  border: 1px solid #e5e5ec;
+  background: #f0f0f5;
+  color: #696b7b;
 }
 
 /* Modal */
@@ -323,13 +383,15 @@
 }
 
 .banner-bloqueo {
-  padding: 10px;
-  margin-bottom: 20px;
-  border-radius: 4px;
-  font-weight: bold;
+  padding: 15px 18px;
+  margin: 0 auto 24px;
+  border-radius: 14px;
+  font-weight: 700;
   display: flex;                /* fila */
   justify-content: space-between;
   align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
 }
 
 .banner-icon {
@@ -339,15 +401,15 @@
 
 .banner-text {
   display: flex;
-  flex-direction: row;          /* 🔹 ahora en fila */
-  align-items: center;
-  gap: 12px;                    /* espacio entre elementos */
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
   flex-grow: 1;
 }
 
 .banner-text span,
 .banner-text small {
-  white-space: nowrap;          /* evita saltos de línea */
+  white-space: normal;
 }
 
 .banner-bloqueo.verde {
@@ -369,16 +431,19 @@
 }
 
 .banner-button {
-  background: #3498db;
+  background: #4541a8;
   color: #fff;
   border: none;
-  padding: 6px 12px;
-  border-radius: 4px;
+  padding: 9px 13px;
+  border-radius: 9px;
+  font: inherit;
+  font-size: 0.86rem;
+  font-weight: 700;
   cursor: pointer;
 }
 
 .banner-button:hover {
-  background: #2980b9;
+  background: #36328e;
 }
 
 .bloqueo-membresia {
@@ -390,4 +455,29 @@
   margin-top: 10px;
   font-weight: 600;
   text-align: center;
+}
+
+@media (max-width: 600px) {
+  .duracion-barra {
+    margin-bottom: 22px;
+  }
+
+  .duracion-opcion {
+    padding: 10px 4px;
+    font-size: 0.85rem;
+  }
+
+  .duracion-opcion .descuento {
+    display: block;
+    margin: 3px 0 0;
+    font-size: 0.72rem;
+  }
+
+  .tarjeta {
+    min-height: 0;
+  }
+
+  .banner-bloqueo {
+    align-items: flex-start;
+  }
 }

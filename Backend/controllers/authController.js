@@ -28,6 +28,14 @@ export const registrarUsuario = async (req, res) => {
       return res.status(400).json({ error: 'Teléfono inválido' });
     }
 
+    const [ubicaciones] = await db.query(
+      'SELECT id FROM ubicaciones WHERE id = ? AND eliminado = 0',
+      [ubicacion_id]
+    );
+    if (ubicaciones.length === 0) {
+      return res.status(400).json({ error: 'La sede no existe o no está disponible' });
+    }
+
     // Verificar si el correo ya existe
     const [existe] = await db.query(
       'SELECT id FROM usuarios WHERE correo_electronico = ?',
@@ -81,7 +89,8 @@ export const loginUsuario = async (req, res) => {
     }
 
     const [rows] = await db.query(
-      'SELECT * FROM usuarios WHERE correo_electronico = ? AND eliminado = 0',
+      `SELECT * FROM usuarios
+       WHERE correo_electronico = ? AND eliminado = 0 AND estado = 'activo'`,
       [correo_electronico]
     );
     const usuario = rows[0];

@@ -1,74 +1,181 @@
 .historial-container {
-  max-width: 900px;
+  display: grid;
+  width: min(100%, 1180px);
+  gap: 18px;
   margin: 0 auto;
-  padding: 20px;
-  font-family: 'Segoe UI', sans-serif;
+  padding: 28px clamp(16px, 2.5vw, 32px) 40px;
+  color: #202236;
+}
+
+.historial-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.historial-eyebrow {
+  color: #6a60e8;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+}
+
+.historial-header h1 {
+  margin: 5px 0;
+  color: #17192b;
+  font-size: clamp(1.6rem, 3vw, 2rem);
+}
+
+.historial-header p {
+  margin: 0;
+  color: #6f7184;
+}
+
+.historial-action {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 9px 14px;
+  border: 1px solid #dfe0e9;
+  border-radius: 9px;
+  background: #fff;
+  color: #4541a8;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.historial-action:hover {
+  background: #f5f4ff;
+}
+
+.historial-action.primary {
+  border-color: #6a60e8;
+  background: #6a60e8;
+  color: #fff;
+}
+
+.historial-action.primary:hover {
+  background: #5148c7;
+}
+
+.historial-empty,
+.historial-state,
+.historial-table-wrap {
+  border: 1px solid #e7e8ef;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 8px 28px rgb(22 26 54 / 5%);
 }
 
 .historial-empty {
-  text-align: center;
-  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px;
 }
 
 .historial-empty p {
-  background: #fdecea;
-  color: #b00020;
-  border: 1px solid #f5c2c7;
-  padding: 10px;
-  margin-bottom: 20px;
-  border-radius: 4px;
-  font-weight: bold;
+  margin: 0;
+  color: #6f7184;
 }
 
-.historial-btn-link {
-  margin-top: 12px;
-  padding: 8px 16px;
-  background: #007bff;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 20px;
+.historial-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 22px;
+  color: #737589;
+  text-align: center;
 }
 
-.historial-btn-link:hover {
-  background: #0056b3;
+.historial-state p {
+  margin: 0;
+}
+
+.historial-state.error {
+  flex-direction: column;
+  border-color: #f0c3c6;
+  background: #fff3f3;
+  color: #a52c36;
+}
+
+.historial-table-wrap {
+  width: 100%;
+  overflow-x: auto;
 }
 
 .historial-table {
   width: 100%;
+  min-width: 760px;
   border-collapse: collapse;
-  margin-top: 20px;
 }
 
 .historial-table th,
 .historial-table td {
-  border: 1px solid #ccc;
-  padding: 10px;
-  text-align: center;
+  padding: 13px 14px;
+  border-bottom: 1px solid #ececf3;
+  text-align: left;
+  white-space: nowrap;
 }
 
 .historial-table th {
-  background-color: #f0f8ff;
+  background: #f7f7fb;
+  color: #696b80;
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
-.estado-badge {
-  padding: 4px 10px;
-  border-radius: 6px;
-  font-weight: bold;
+.historial-table tbody tr:last-child td {
+  border-bottom: 0;
 }
 
-.estado-badge.approved {
-  background-color: #28a745;
-  color: #fff;
+.historial-status {
+  display: inline-flex;
+  padding: 5px 9px;
+  border-radius: 999px;
+  background: #eef0f5;
+  color: #475569;
+  font-size: 0.78rem;
+  font-weight: 700;
 }
 
-.estado-badge.rejected {
-  background-color: #dc3545;
-  color: #fff;
+.historial-status.approved {
+  background: #e8f7ee;
+  color: #217342;
 }
 
-.estado-badge.pending {
-  background-color: #ffc107;
-  color: #333;
+.historial-status.pending,
+.historial-status.in_process,
+.historial-status.in_mediation,
+.historial-status.authorized {
+  background: #fff5d6;
+  color: #795b12;
+}
+
+.historial-status.rejected,
+.historial-status.cancelled,
+.historial-status.refunded,
+.historial-status.charged_back {
+  background: #fff0f0;
+  color: #a52b36;
+}
+
+.historial-container button:focus-visible {
+  outline: 2px solid #8c82ff;
+  outline-offset: 2px;
+}
+
+@media (max-width: 680px) {
+  .historial-header,
+  .historial-empty {
+    align-items: stretch;
+    flex-direction: column;
+  }
 }

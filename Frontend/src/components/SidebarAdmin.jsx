@@ -1,10 +1,16 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { ROUTES } from '../routers/routes';
 import { useAuthStore } from '../store/useAuthStore';
 import '../styles/Sidebar.css';
 
 function SidebarAdmin() {
-  const { usuario } = useAuthStore();
+  const { usuario, logout } = useAuthStore();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate(ROUTES.LOGIN, { replace: true });
+  };
 
   if (!usuario) return null;
 
@@ -33,6 +39,17 @@ function SidebarAdmin() {
           <NavLink to={ROUTES.MENSAJES} className={navClassName}>✉️ Mensajes de contacto</NavLink>
         </div>
       </nav>
+      <div className="sidebar-footer">
+        <button
+          className="btn-logout"
+          onClick={handleLogout}
+          aria-label="Cerrar sesión"
+          title="Cerrar sesión"
+        >
+          <i className="fa-solid fa-arrow-right-from-bracket" aria-hidden="true"></i>
+          <span>Cerrar sesión</span>
+        </button>
+      </div>
     </aside>
   );
 }

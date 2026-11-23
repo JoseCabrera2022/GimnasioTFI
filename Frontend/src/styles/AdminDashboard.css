@@ -38,8 +38,27 @@
 
 .dashboard-header-actions {
   display: flex;
+  align-items: flex-end;
   flex-wrap: wrap;
   gap: 10px;
+}
+
+.dashboard-period-picker {
+  display: grid;
+  gap: 4px;
+  color: #748094;
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.dashboard-period-picker input {
+  min-height: 42px;
+  padding: 0 10px;
+  color: #334155;
+  background: #fff;
+  border: 1px solid #dce3ed;
+  border-radius: 9px;
+  font: inherit;
 }
 
 .dashboard-button {
@@ -212,6 +231,104 @@
   font-size: 0.84rem;
 }
 
+.dashboard-trend-positive {
+  color: #187044;
+}
+
+.dashboard-trend-negative {
+  color: #a33232;
+}
+
+.dashboard-costs-panel {
+  margin-bottom: 22px;
+  padding: 20px;
+  background: #fff;
+  border: 1px solid #e8edf4;
+  border-radius: 13px;
+  box-shadow: 0 4px 14px rgba(23, 32, 51, 0.04);
+}
+
+.dashboard-demo-badge {
+  padding: 6px 9px;
+  color: #8a5700;
+  background: #fff4d6;
+  border: 1px solid #f1d58f;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.dashboard-costs-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.dashboard-cost-card {
+  padding: 15px;
+  background: #f8fafc;
+  border: 1px solid #e8edf4;
+  border-radius: 10px;
+}
+
+.dashboard-cost-card h3 {
+  margin: 0 0 12px;
+  color: #273449;
+  font-size: 0.88rem;
+}
+
+.dashboard-cost-card > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 7px 0;
+  color: #748094;
+  font-size: 0.8rem;
+}
+
+.dashboard-cost-card strong {
+  color: #334155;
+  white-space: nowrap;
+}
+
+.dashboard-cost-card .dashboard-cost-subtotal {
+  margin-top: 4px;
+  padding-top: 10px;
+  color: #334155;
+  border-top: 1px solid #dfe6ef;
+  font-weight: 700;
+}
+
+.dashboard-cost-card .dashboard-cost-subtotal strong {
+  color: #162238;
+}
+
+.dashboard-costs-total {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 12px;
+  padding: 12px 15px;
+  color: #26364f;
+  background: #edf4ff;
+  border-radius: 9px;
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.dashboard-costs-total strong {
+  white-space: nowrap;
+}
+
+.dashboard-demo-disclaimer {
+  margin: 10px 0 0;
+  color: #788599;
+  font-size: 0.75rem;
+}
+
 .dashboard-content-grid {
   display: grid;
   grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
@@ -262,6 +379,11 @@
 
 .dashboard-text-link:hover {
   text-decoration: underline;
+}
+
+.dashboard-panel-note {
+  color: #8490a2;
+  font-size: 0.76rem;
 }
 
 .dashboard-chart {
@@ -458,6 +580,19 @@
     flex-direction: column;
   }
 
+  .dashboard-header-actions {
+    align-items: stretch;
+    width: 100%;
+  }
+
+  .dashboard-period-picker {
+    flex: 1 1 150px;
+  }
+
+  .dashboard-header-actions .dashboard-button {
+    flex: 1 1 170px;
+  }
+
   .dashboard-secondary-metrics {
     grid-template-columns: 1fr;
   }
@@ -468,6 +603,14 @@
 
   .dashboard-panel {
     padding: 15px;
+  }
+
+  .dashboard-costs-panel {
+    padding: 15px;
+  }
+
+  .dashboard-costs-grid {
+    grid-template-columns: 1fr;
   }
 
   .dashboard-payments-table {

@@ -13,6 +13,17 @@
   margin-bottom: 20px;
 }
 
+.reservas-policy {
+  margin: 0 0 18px;
+  padding: 12px 14px;
+  border: 1px solid #d8d5ff;
+  border-radius: 8px;
+  background: #f5f4ff;
+  color: #48417e;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
 .reservas-empty {
   text-align: center;
   margin-top: 20px;
@@ -52,11 +63,17 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 12px;
   background: #f8f9fa;
   border: 1px solid #ddd;
   padding: 10px 14px;
   border-radius: 6px;
   margin-bottom: 10px;
+}
+
+.reserva-detalle {
+  display: grid;
+  gap: 5px;
 }
 
 .estado-badge {
@@ -70,6 +87,13 @@
 .estado-badge.confirmada { background-color: #28a745; color: #fff; }
 .estado-badge.pendiente { background-color: #ffc107; color: #333; }
 .estado-badge.cancelada { background-color: #dc3545; color: #fff; }
+.estado-badge.expirada { background-color: #6b7280; color: #fff; }
+.estado-badge.asistida { background-color: #2563eb; color: #fff; }
+
+.reservas-cancelacion-cerrada {
+  color: #8a5a00;
+  font-size: 0.8rem;
+}
 
 .btn-cancelar {
   padding: 6px 12px;

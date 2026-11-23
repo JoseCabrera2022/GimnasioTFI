@@ -28,6 +28,16 @@ const fechaHora = (valor) => {
   return Number.isNaN(fecha.getTime()) ? 'Sin fecha' : fecha.toLocaleString('es-AR');
 };
 
+const periodoActual = () => {
+  const ahora = new Date();
+  return `${ahora.getFullYear()}-${String(ahora.getMonth() + 1).padStart(2, '0')}`;
+};
+
+const gastosOperativosEjemplo = [
+  { sede: 'Sede Banda del Río Salí', luz: 650000, mantenimiento: 180000 },
+  { sede: 'Sede San Miguel de Tucumán', luz: 850000, mantenimiento: 250000 },
+];
+
 function AdminDashboard() {
   const { usuario, token } = useAuthStore();
   const [dashboard, setDashboard] = useState(null);
@@ -35,6 +45,7 @@ function AdminDashboard() {
   const [cargando, setCargando] = useState(true);
   const [actualizado, setActualizado] = useState(null);
   const [generandoReporte, setGenerandoReporte] = useState(false);
+  const [periodoReporte, setPeriodoReporte] = useState(periodoActual);
 
   const cargarDashboard = useCallback(async () => {
     setCargando(true);
@@ -77,11 +88,20 @@ function AdminDashboard() {
 
   const maxIngreso = Math.max(...ingresosSemana.map(({ total }) => total), 1);
   const metricas = dashboard?.metricas;
+  const totalGastosEjemplo = gastosOperativosEjemplo.reduce(
+    (total, gasto) => total + gasto.luz + gasto.mantenimiento,
+    0
+  );
+  const variacionIngresos = metricas
+    ? Number(metricas.ingresosMesAnterior) > 0
+      ? `${Number(metricas.ingresosMes) >= Number(metricas.ingresosMesAnterior) ? '+' : ''}${(((Number(metricas.ingresosMes) - Number(metricas.ingresosMesAnterior)) / Number(metricas.ingresosMesAnterior)) * 100).toFixed(1)}% vs. mes anterior`
+      : Number(metricas.ingresosMes) > 0 ? 'Sin base comparativa' : 'Sin ingresos el mes anterior'
+    : '';
 
   const handleDescargarReporte = async () => {
     setGenerandoReporte(true);
     try {
-      await descargarReporteAdministrativo(token);
+      await descargarReporteAdministrativo(token, periodoReporte);
     } catch (requestError) {
       setError(requestError.response?.data?.error || 'No se pudo generar el reporte.');
     } finally {
@@ -114,7 +134,16 @@ function AdminDashboard() {
             <i className={`fa-solid fa-rotate ${cargando ? 'dashboard-spinning' : ''}`} aria-hidden="true"></i>
             Actualizar
           </button>
-          <button type="button" className="dashboard-button dashboard-button-primary" onClick={handleDescargarReporte} disabled={generandoReporte}>
+          <label className="dashboard-period-picker">
+            <span>Período del reporte</span>
+            <input
+              type="month"
+              value={periodoReporte}
+              max={periodoActual()}
+              onChange={(event) => setPeriodoReporte(event.target.value)}
+            />
+          </label>
+          <button type="button" className="dashboard-button dashboard-button-primary" onClick={handleDescargarReporte} disabled={generandoReporte || !periodoReporte}>
             <i className="fa-solid fa-file-arrow-down" aria-hidden="true"></i>
             {generandoReporte ? 'Generando...' : 'Descargar reporte'}
           </button>
@@ -145,7 +174,10 @@ function AdminDashboard() {
           <div className="metric-icon"><i className="fa-solid fa-wallet" aria-hidden="true"></i></div>
           <p>Ingresos del mes</p>
           <strong>{cargando ? '—' : moneda(metricas?.ingresosMes)}</strong>
-          <span>{metricas?.pagosMes ?? 0} pagos aprobados</span>
+          <span>
+            {metricas?.pagosMes ?? 0} pagos aprobados
+            {!cargando && variacionIngresos && <> · <span className={Number(metricas?.ingresosMes) >= Number(metricas?.ingresosMesAnterior) ? 'dashboard-trend-positive' : 'dashboard-trend-negative'}>{variacionIngresos}</span></>}
+          </span>
         </article>
         <article className="dashboard-metric-card metric-orange">
           <div className="metric-icon"><i className="fa-solid fa-calendar-check" aria-hidden="true"></i></div>
@@ -156,9 +188,43 @@ function AdminDashboard() {
       </section>
 
       <section className="dashboard-secondary-metrics" aria-label="Resumen de servicios">
-        <div><i className="fa-solid fa-dumbbell" aria-hidden="true"></i><strong>{cargando ? '—' : metricas?.planesActivos ?? 0}</strong><span>Planes activos</span></div>
-        <div><i className="fa-solid fa-person-running" aria-hidden="true"></i><strong>{cargando ? '—' : metricas?.actividadesActivas ?? 0}</strong><span>Actividades activas</span></div>
-        <div><i className="fa-solid fa-location-dot" aria-hidden="true"></i><strong>{cargando ? '—' : metricas?.ubicacionesActivas ?? 0}</strong><span>Sedes activas</span></div>
+        <div><i className="fa-solid fa-clipboard-check" aria-hidden="true"></i><strong>{cargando ? '—' : metricas?.asistenciasHoy ?? 0}</strong><span>Asistencias de hoy</span></div>
+        <div><i className="fa-solid fa-person-walking" aria-hidden="true"></i><strong>{cargando ? '—' : metricas?.ingresosLibresHoy ?? 0}</strong><span>Visitas libres de hoy</span></div>
+        <div title="Socios con una membresía vigente cuya fecha de vencimiento ocurre dentro de los próximos siete días.">
+          <i className="fa-solid fa-hourglass-half" aria-hidden="true"></i>
+          <strong>{cargando ? '—' : metricas?.membresiasPorVencer ?? 0}</strong>
+          <span>Membresías que vencen en los próximos 7 días</span>
+        </div>
+      </section>
+
+      <section className="dashboard-costs-panel" aria-labelledby="dashboard-costs-title">
+        <div className="dashboard-panel-heading">
+          <div>
+            <h2 id="dashboard-costs-title">Gastos operativos mensuales</h2>
+            <p>Ejemplo de luz y mantenimiento por sede</p>
+          </div>
+          <span className="dashboard-demo-badge">Datos ficticios</span>
+        </div>
+        <div className="dashboard-costs-grid">
+          {gastosOperativosEjemplo.map((gasto) => (
+            <article className="dashboard-cost-card" key={gasto.sede}>
+              <h3>{gasto.sede}</h3>
+              <div><span>Electricidad</span><strong>{moneda(gasto.luz)}</strong></div>
+              <div><span>Mantenimiento</span><strong>{moneda(gasto.mantenimiento)}</strong></div>
+              <div className="dashboard-cost-subtotal">
+                <span>Estimado mensual</span>
+                <strong>{moneda(gasto.luz + gasto.mantenimiento)}</strong>
+              </div>
+            </article>
+          ))}
+        </div>
+        <div className="dashboard-costs-total">
+          <span>Total mensual de ejemplo</span>
+          <strong>{moneda(totalGastosEjemplo)}</strong>
+        </div>
+        <p className="dashboard-demo-disclaimer">
+          Son montos de muestra: no provienen de pagos reales, no se guardan en la base de datos y no se descuentan de los ingresos.
+        </p>
       </section>
 
       <section className="dashboard-content-grid">
@@ -208,6 +274,7 @@ function AdminDashboard() {
                   <div className="dashboard-schedule-info">
                     <strong>{turno.actividad}</strong>
                     <span>{[turno.ubicacion, turno.ciudad].filter(Boolean).join(' · ') || 'Sede no disponible'}</span>
+                    <span>{turno.entrenadores || 'Entrenador sin asignar'}</span>
                   </div>
                   <span className="dashboard-capacity">{turno.reservas}/{turno.cupo_maximo}</span>
                 </div>
@@ -224,7 +291,7 @@ function AdminDashboard() {
               <h2>Últimos pagos</h2>
               <p>Movimientos recientes de socios</p>
             </div>
-            <Link to={ROUTES.HISTORIALPAGOS} className="dashboard-text-link">Ver historial</Link>
+            <span className="dashboard-panel-note">Todos los estados</span>
           </div>
           {cargando ? (
             <p className="dashboard-empty">Cargando pagos...</p>

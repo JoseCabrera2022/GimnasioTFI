@@ -29,7 +29,19 @@
   padding: 0 28px;
 }
 
-.navbar-admin .navbar-logo {
+.navbar-member {
+  height: 88px;
+  padding: 0 28px;
+}
+
+.navbar-employee {
+  height: 88px;
+  padding: 0 28px;
+}
+
+.navbar-admin .navbar-logo,
+.navbar-member .navbar-logo,
+.navbar-employee .navbar-logo {
   min-width: 220px;
 }
 
@@ -113,7 +125,9 @@
 
 .navbar-links a:hover { color: #9b94ff; }
 
-.navbar-admin-identity {
+.navbar-admin-identity,
+.navbar-member-identity,
+.navbar-employee-identity {
   display: flex;
   flex-direction: column;
   max-width: 160px;
@@ -123,19 +137,25 @@
   line-height: 1.25;
 }
 
-.navbar-admin-identity span {
+.navbar-admin-identity span,
+.navbar-member-identity span,
+.navbar-employee-identity span {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.navbar-admin-identity small {
+.navbar-admin-identity small,
+.navbar-member-identity small,
+.navbar-employee-identity small {
   color: #a7a9bd;
   font-size: 0.7rem;
   font-weight: 500;
 }
 
-.navbar-links-admin {
+.navbar-links-admin,
+.navbar-links-member,
+.navbar-links-employee {
   gap: 16px;
 }
 
@@ -168,8 +188,12 @@
 @media (max-width: 900px) {
   .navbar { height: auto; min-height: 78px; padding: 12px 20px; }
   .navbar-links { gap: 12px; flex-wrap: wrap; justify-content: flex-end; }
-  .navbar-admin { min-height: 78px; }
-  .navbar-admin .navbar-logo { min-width: auto; }
+  .navbar-admin,
+  .navbar-member,
+  .navbar-employee { min-height: 78px; }
+  .navbar-admin .navbar-logo,
+  .navbar-member .navbar-logo,
+  .navbar-employee .navbar-logo { min-width: auto; }
   .navbar-admin-context { padding: 0 16px; }
   .gym-logo-right { width: 46px; height: 46px; }
   .navbar-avatar { width: 46px; height: 46px; }
@@ -181,6 +205,8 @@
   .navbar-links li:nth-child(3),
   .navbar-links li:nth-child(4) { display: none; }
   .navbar-admin-context,
-  .navbar-admin-identity { display: none; }
+  .navbar-admin-identity,
+  .navbar-member-identity,
+  .navbar-employee-identity { display: none; }
   .navbar-links-admin li.navbar-brand-icon { display: flex; }
 }

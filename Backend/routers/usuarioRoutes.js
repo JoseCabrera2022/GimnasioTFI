@@ -2,22 +2,17 @@ import express from 'express';
 import { verificarToken } from '../middlewares/verificarToken.js';
 import { getUsuarios, createUsuario, updateUsuario, deleteUsuario, activarUsuario, getUsuarioById } from '../controllers/usuarioController.js';
 import { upload } from '../configs/multer.js';
+import { requireRole } from '../middlewares/requireRole.js';
 
 const router = express.Router();
-
-const soloAdmin = (req, res, next) => {
-  if (req.usuario?.rol !== 'admin') {
-    return res.status(403).json({ error: 'Se requieren permisos de administrador' });
-  }
-  next();
-};
+const soloAdmin = [verificarToken, requireRole('admin')];
 
 // Todas protegidas y solo admin
-router.get('/api/usuarios', verificarToken, getUsuarios);
-router.get('/api/usuarios/:id', verificarToken, getUsuarioById);
-router.post('/api/usuarios', verificarToken, createUsuario);
-router.put('/api/usuarios/:id', verificarToken, upload.single('foto'), updateUsuario);
-router.delete('/api/usuarios/:id', verificarToken, soloAdmin, deleteUsuario);
-router.patch('/api/usuarios/:id/activar', verificarToken, soloAdmin, activarUsuario);
+router.get('/api/usuarios', ...soloAdmin, getUsuarios);
+router.get('/api/usuarios/:id', ...soloAdmin, getUsuarioById);
+router.post('/api/usuarios', ...soloAdmin, createUsuario);
+router.put('/api/usuarios/:id', ...soloAdmin, upload.single('foto'), updateUsuario);
+router.delete('/api/usuarios/:id', ...soloAdmin, deleteUsuario);
+router.patch('/api/usuarios/:id/activar', ...soloAdmin, activarUsuario);
 
 export default router;

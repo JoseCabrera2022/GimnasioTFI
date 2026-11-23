@@ -13,7 +13,8 @@ export const getMembresiasUsuario = async (req, res) => {
 
     // 🔹 Traer membresías con datos del plan, duración y pago
     const [rows] = await db.query(`
-      SELECT m.id, 
+      SELECT m.id,
+             m.plan_id,
              p.nombre AS plan, 
              d.nombre AS duracion,
              m.fecha_inicio, 

@@ -36,8 +36,18 @@ export const updatePerfil = async (req, res) => {
     }
 
     // Buscar foto anterior
-    const [rows] = await db.query('SELECT foto FROM usuarios WHERE id=?', [req.usuario.id]);
-    const fotoAnterior = rows[0]?.foto;
+    const [rows] = await db.query(
+      'SELECT foto, rol, ubicacion_id FROM usuarios WHERE id=? AND eliminado=0 AND estado="activo"',
+      [req.usuario.id]
+    );
+    if (rows.length === 0) {
+      return res.status(404).json({ error: 'Usuario no encontrado o inactivo' });
+    }
+    const usuarioActual = rows[0];
+    const fotoAnterior = usuarioActual.foto;
+    const ubicacionFinal = usuarioActual.rol === 'empleado'
+      ? usuarioActual.ubicacion_id
+      : ubicacion_id;
 
     if (fotoAnterior && nuevaFoto) {
       const rutaAnterior = path.join(process.cwd(), fotoAnterior);
@@ -60,7 +70,7 @@ export const updatePerfil = async (req, res) => {
     // Actualizar BD
     await db.query(
       'UPDATE usuarios SET nombre=?, correo_electronico=?, telefono=?, foto=?, ubicacion_id=? WHERE id=?',
-      [nombre, correo_electronico, telefono, nuevaFoto || fotoAnterior, ubicacion_id, req.usuario.id]
+      [nombre, correo_electronico, telefono, nuevaFoto || fotoAnterior, ubicacionFinal, req.usuario.id]
     );
 
     // Obtener perfil actualizado

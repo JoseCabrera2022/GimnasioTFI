@@ -11,6 +11,11 @@
   background: #f7f7fb;
 }
 
+.layout-body-socio {
+  min-width: 0;
+  align-items: stretch;
+}
+
 .layout-main {
   flex: 1;
   min-width: 0;
@@ -18,7 +23,7 @@
 }
 
 .layout-main.with-sidebar {
-  margin-left: 180px;
+  margin-left: 0;
 }
 
 .layout-main.with-admin-sidebar {
@@ -27,6 +32,7 @@
 
 @media (max-width: 900px) {
   .layout-main.with-sidebar { margin-left: 0; }
+  .layout-body-socio { flex-direction: column; }
   .layout-body-admin { flex-direction: column; }
   .layout-main.with-admin-sidebar { margin-left: 0; }
 }

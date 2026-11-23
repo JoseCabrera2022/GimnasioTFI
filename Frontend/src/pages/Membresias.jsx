@@ -1,11 +1,10 @@
-// src/pages/Membresias.jsx
 import { useEffect, useState } from 'react';
 import { useAuthStore } from '../store/useAuthStore';
 import http from '../utils/axiosConfig';
 import { ENDPOINTS_LOCAL } from '../api/endpoints';
 import '../styles/Membresias.css';
 import SessionBanner from '../components/SessionBanner';
-import { traducirEstado, traducirMetodo } from '../utils/conversiones';
+import { capitalizarPrimeraLetra, traducirEstado } from '../utils/conversiones';
 import { ROUTES } from '../routers/routes';
 import { useNavigate } from 'react-router-dom';
 
@@ -13,27 +12,45 @@ function Membresias() {
   const { usuario, token, sessionExpired } = useAuthStore();
   const [membresias, setMembresias] = useState([]);
   const [horaActual, setHoraActual] = useState(new Date());
+  const [cargando, setCargando] = useState(true);
+  const [error, setError] = useState('');
+  const [intentoCarga, setIntentoCarga] = useState(0);
   const navigate = useNavigate();
 
   useEffect(() => {
+    let vigente = true;
+
     const fetchMembresias = async () => {
-      if (!token || sessionExpired) return;
+      if (!token || sessionExpired) {
+        setCargando(false);
+        return;
+      }
+
+      setCargando(true);
+      setError('');
       try {
-        const res = await http.get(ENDPOINTS_LOCAL.MEMBRESIAS, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        setMembresias(res.data);
-      } catch (error) {
-        console.error("Error al obtener membresías:", error);
+        const res = await http.get(ENDPOINTS_LOCAL.MEMBRESIAS);
+        if (!Array.isArray(res.data)) {
+          throw new Error('La respuesta de membresías no es válida.');
+        }
+        if (vigente) setMembresias(res.data);
+      } catch (requestError) {
+        if (vigente) {
+          setError(requestError.response?.data?.error || 'No se pudieron cargar tus membresías.');
+        }
+      } finally {
+        if (vigente) setCargando(false);
       }
     };
+
     fetchMembresias();
-  }, [token, sessionExpired]);
+    return () => {
+      vigente = false;
+    };
+  }, [token, sessionExpired, intentoCarga]);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setHoraActual(new Date());
-    }, 1000);
+    const interval = setInterval(() => setHoraActual(new Date()), 1000);
     return () => clearInterval(interval);
   }, []);
 
@@ -41,93 +58,105 @@ function Membresias() {
     return <SessionBanner />;
   }
 
-  const obtenerColor = (m) => {
-    const fechaFin = new Date(m.fecha_fin);
-    const diff = fechaFin - horaActual;
-    const diasRestantes = Math.floor(diff / (1000 * 60 * 60 * 24));
-    if (m.estado === 'vencida' || diff <= 0) return 'rojo';
-    if (diasRestantes <= 7) return 'amarillo';
+  const obtenerColor = (membresia) => {
+    const fechaFin = new Date(membresia.fecha_fin);
+    const diasRestantes = Math.floor((fechaFin - horaActual) / 86400000);
+    if (membresia.estado === 'cancelada' || membresia.estado === 'vencida' || fechaFin <= horaActual) {
+      return 'rojo';
+    }
+    if (membresia.estado === 'pendiente' || diasRestantes <= 7) return 'amarillo';
     return 'verde';
   };
 
-  const obtenerIcono = (m) => {
-    const fechaFin = new Date(m.fecha_fin);
-    const diff = fechaFin - horaActual;
-    const diasRestantes = Math.floor(diff / (1000 * 60 * 60 * 24));
-    if (m.estado === 'vencida' || diff <= 0) return '❌';
-    if (diasRestantes <= 7) return '⚠️';
-    return '✅';
-  };
+  const obtenerCuentaRegresiva = (membresia) => {
+    if (membresia.estado !== 'activa') return traducirEstado(membresia.estado);
 
-  const obtenerCuentaRegresiva = (m) => {
-    const fechaFin = new Date(m.fecha_fin);
-    const diff = fechaFin - horaActual;
-    if (diff <= 0) return "Vencida";
+    const diff = new Date(membresia.fecha_fin) - horaActual;
+    if (diff <= 0) return 'Vencida';
 
-    const dias = Math.floor(diff / (1000 * 60 * 60 * 24));
-    const horas = Math.floor((diff / (1000 * 60 * 60)) % 24);
-    const minutos = Math.floor((diff / (1000 * 60)) % 60);
+    const dias = Math.floor(diff / 86400000);
+    const horas = Math.floor((diff / 3600000) % 24);
+    const minutos = Math.floor((diff / 60000) % 60);
     const segundos = Math.floor((diff / 1000) % 60);
-
     return `${dias}d ${horas}h ${minutos}m ${segundos}s`;
   };
 
+  const tieneMembresiaActiva = membresias.some((membresia) => (
+    membresia.estado === 'activa' && new Date(membresia.fecha_fin) > horaActual
+  ));
+
   return (
-    <div className="membresias-container">
-      <h2>📋 Mis Membresías</h2>
+    <section className="membresias-container">
+      <header className="membresias-header">
+        <div>
+          <span className="membresias-eyebrow">MI CUENTA</span>
+          <h1>Mi membresía</h1>
+          <p>Consulta el plan contratado y el tiempo de vigencia.</p>
+        </div>
+        <button
+          type="button"
+          className="membresias-action"
+          onClick={() => navigate(ROUTES.HISTORIALPAGOS)}
+        >
+          <i className="fa-solid fa-receipt" aria-hidden="true"></i>
+          Historial de pagos
+        </button>
+      </header>
 
-      <div className="hora-actual">
-        🕒 {horaActual.toLocaleDateString('es-ES', {
-          weekday: 'long',
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric'
-        })} – {horaActual.toLocaleTimeString('es-ES')}
-      </div>
-
-      {membresias.length === 0 ? (
-        <div className="membresias-empty">
-          <p>⚠️ No tienes membresías activas ⚠️</p>
-          <button 
-            className="membresia-btn-link" 
-            onClick={() => navigate(ROUTES.PLANES)}
-          >
-            Ver Planes
+      {!cargando && !error && !tieneMembresiaActiva && (
+        <div className="membresias-notice">
+          <div>
+            <strong>{membresias.length ? 'No tienes una membresía vigente' : 'Todavía no tienes membresías'}</strong>
+            <p>
+              {membresias.length
+                ? 'Puedes consultar tus membresías anteriores o elegir un nuevo plan.'
+                : 'Explora los planes disponibles para comenzar a entrenar.'}
+            </p>
+          </div>
+          <button type="button" className="membresias-action primary" onClick={() => navigate(ROUTES.PLANES)}>
+            Ver planes
           </button>
         </div>
-      ) : (
-        <table className="membresias-table">
-          <thead>
-            <tr>
-              <th>Estado</th>
-              <th>Plan</th>
-              <th>Duración</th>
-              <th>Inicio</th>
-              <th>Fin</th>
-              <th>Tiempo restante</th>
-              <th>Monto</th>
-              <th>Método</th>
-              <th>Fecha pago</th>
-            </tr>
-          </thead>
-          <tbody>
-            {membresias.map((m) => (
-              <tr key={m.id} className={obtenerColor(m)}>
-                <td>{obtenerIcono(m)} {traducirEstado(m.estado)}</td>
-                <td>{m.plan}</td>
-                <td>{m.duracion}</td>
-                <td>{new Date(m.fecha_inicio).toLocaleDateString('es-ES')}</td>
-                <td>{new Date(m.fecha_fin).toLocaleDateString('es-ES')}</td>
-                <td>{obtenerCuentaRegresiva(m)}</td>
-                <td>{m.monto ? `$${m.monto}` : '-'}</td>
-                <td>{m.metodo_pago ? traducirMetodo(m.metodo_pago) : '-'}</td>
-                <td>{m.fecha_aprobado ? new Date(m.fecha_aprobado).toLocaleDateString('es-ES') : '-'}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
       )}
-    </div>
+
+      {cargando ? (
+        <p className="membresias-state">Cargando tus membresías...</p>
+      ) : error ? (
+        <div className="membresias-state error" role="alert">
+          <p>{error}</p>
+          <button type="button" className="membresias-action" onClick={() => setIntentoCarga((actual) => actual + 1)}>
+            Reintentar
+          </button>
+        </div>
+      ) : membresias.length === 0 ? null : (
+        <div className="membresias-table-wrap">
+          <table className="membresias-table">
+            <thead>
+              <tr>
+                <th>Estado</th>
+                <th>Plan</th>
+                <th>Duración</th>
+                <th>Inicio</th>
+                <th>Vencimiento</th>
+                <th>Tiempo restante</th>
+              </tr>
+            </thead>
+            <tbody>
+              {membresias.map((membresia) => (
+                <tr key={membresia.id} className={obtenerColor(membresia)}>
+                  <td>{traducirEstado(membresia.estado)}</td>
+                  <td>{membresia.plan}</td>
+                  <td>{capitalizarPrimeraLetra(membresia.duracion)}</td>
+                  <td>{new Date(membresia.fecha_inicio).toLocaleDateString('es-AR')}</td>
+                  <td>{new Date(membresia.fecha_fin).toLocaleDateString('es-AR')}</td>
+                  <td>{obtenerCuentaRegresiva(membresia)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </section>
   );
 }
 

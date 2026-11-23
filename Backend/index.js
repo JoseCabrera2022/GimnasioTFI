@@ -16,6 +16,8 @@ import ubicacionesRoutes from './routers/ubicacionesRoutes.js';
 import usuarioRoutes from './routers/usuarioRoutes.js'
 import turnosRoutes from './routers/turnosRoutes.js'
 import reportesRoutes from './routers/reportesRoutes.js'
+import empleadoRoutes from './routers/empleadoRoutes.js'
+import { expirarReservasVencidas } from './services/reservasService.js';
 
 const app = express();
 
@@ -37,6 +39,7 @@ app.use('/', ubicacionesRoutes);
 app.use('/', usuarioRoutes);
 app.use('/', turnosRoutes);
 app.use('/', reportesRoutes);
+app.use('/', empleadoRoutes);
 
 // Para servir las imágenes subidas
 app.use('/uploads', express.static('uploads'));
@@ -45,6 +48,26 @@ app.use('/uploads', express.static('uploads'));
 app.get('/', (req,res) => {
     res.send('Hola mundo');
 });
+
+let expiracionEnCurso = false;
+const procesarReservasVencidas = async () => {
+    if (expiracionEnCurso) return;
+    expiracionEnCurso = true;
+    try {
+        const cantidad = await expirarReservasVencidas();
+        if (cantidad > 0) {
+            console.log(`Reservas expiradas automáticamente: ${cantidad}`);
+        }
+    } catch (error) {
+        console.error('Error al expirar reservas automáticamente:', error);
+    } finally {
+        expiracionEnCurso = false;
+    }
+};
+
+void procesarReservasVencidas();
+const expiracionReservasTimer = setInterval(procesarReservasVencidas, 60_000);
+expiracionReservasTimer.unref();
 
 app.listen(8000, () =>{
     console.log('Servidor corriendo en el puerto 8000')

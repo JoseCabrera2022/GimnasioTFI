@@ -4,7 +4,6 @@ import { ENDPOINTS_LOCAL } from '../api/endpoints';
 import { convertirImagenABase64, traducirEstado, traducirMetodo } from './conversiones';
 
 const PAGE_WIDTH = 210;
-const PAGE_HEIGHT = 297;
 const MARGIN = 14;
 const CONTENT_WIDTH = PAGE_WIDTH - MARGIN * 2;
 const PAGE_BOTTOM = 275;
@@ -66,81 +65,52 @@ const traducirEstadoSeguro = (estado) => {
   return traducido === valor && /^[a-z0-9_]+$/i.test(valor) ? 'Otro estado' : traducido;
 };
 
-const fechaPago = (pago) => pago.fecha_aprobado || pago.creado_en;
-
-export const descargarReporteAdministrativo = async (token) => {
+export const descargarReporteAdministrativo = async (token, periodoSolicitado) => {
   const { data } = await axios.get(ENDPOINTS_LOCAL.REPORTE_ADMIN, {
     headers: { Authorization: `Bearer ${token}` },
+    params: { periodo: periodoSolicitado },
   });
 
   const generatedAt = convertirFecha(data.generadoEn) || new Date();
-  const socios = data.socios;
-  const pagos = data.pagos;
-  const membresias = data.membresias;
-  const reservas = data.reservas;
-  const planes = data.planes;
-  const actividades = data.actividades;
-  const pagosDelMes = pagos.filter((pago) => {
-    const fecha = convertirFecha(fechaPago(pago));
-    return fecha
-      && fecha.getFullYear() === generatedAt.getFullYear()
-      && fecha.getMonth() === generatedAt.getMonth();
-  });
-  const pagosAprobadosDelMes = pagosDelMes.filter((pago) => pago.estado === 'approved');
-  const ingresosDelMes = pagosAprobadosDelMes.reduce(
-    (total, pago) => total + (Number(pago.monto) || 0),
-    0
-  );
-  const membresiasVigentes = membresias.filter((membresia) => {
-    const fechaFin = convertirFecha(membresia.fecha_fin);
-    return membresia.estado === 'activa' && fechaFin && fechaFin > generatedAt;
-  });
-
-  const pagosPorMetodo = new Map();
-  pagosAprobadosDelMes.forEach((pago) => {
-    const metodo = traducirMetodoSeguro(pago.metodo_pago);
-    const acumulado = pagosPorMetodo.get(metodo) || { cantidad: 0, total: 0 };
-    acumulado.cantidad += 1;
-    acumulado.total += Number(pago.monto) || 0;
-    pagosPorMetodo.set(metodo, acumulado);
-  });
-
-  const pagosPorEstado = new Map();
-  pagosDelMes.forEach((pago) => {
-    const estado = traducirEstadoSeguro(pago.estado);
-    pagosPorEstado.set(estado, (pagosPorEstado.get(estado) || 0) + 1);
-  });
-
-  const membresiasPorPlan = new Map();
-  membresiasVigentes.forEach((membresia) => {
-    const plan = membresia.plan || 'Plan no disponible';
-    membresiasPorPlan.set(plan, (membresiasPorPlan.get(plan) || 0) + 1);
-  });
-
-  const sociosPorSede = new Map();
-  socios.forEach((socio) => {
-    const sede = [socio.ubicacion, socio.ciudad].filter(Boolean).join(' - ') || 'Sin sede';
-    sociosPorSede.set(sede, (sociosPorSede.get(sede) || 0) + 1);
-  });
-
-  const socioPorId = new Map(socios.map((socio) => [Number(socio.id), socio]));
-  const pagosRecientes = [...pagos]
-    .sort((a, b) => (convertirFecha(fechaPago(b))?.getTime() || 0) - (convertirFecha(fechaPago(a))?.getTime() || 0))
-    .slice(0, 8);
-  const reservasProximas = reservas
-    .filter((reserva) => {
-      const fecha = convertirFecha(reserva.fecha_turno);
-      return reserva.estado === 'confirmada' && fecha && fecha >= generatedAt;
-    })
-    .sort((a, b) => convertirFecha(a.fecha_turno).getTime() - convertirFecha(b.fecha_turno).getTime())
-    .slice(0, 8);
-
-  const logo = await convertirImagenABase64('/assets/fuerzavitalgym.png');
-  const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-  const periodo = capitalizar(generatedAt.toLocaleDateString('es-AR', {
+  const periodoSeleccionado = data.periodo || periodoSolicitado;
+  const [anioPeriodo, mesPeriodo] = periodoSeleccionado.split('-').map(Number);
+  const periodo = capitalizar(new Date(anioPeriodo, mesPeriodo - 1, 15).toLocaleDateString('es-AR', {
     month: 'long',
     year: 'numeric',
   }));
+  const sociosActivos = Number(data.sociosActivos) || 0;
+  const membresiasActivas = Number(data.membresiasActivas) || 0;
+  const pagosPorEstado = data.pagosPorEstado || [];
+  const pagosPorMetodo = data.pagosPorMetodo || [];
+  const reservasPorEstado = data.reservasPorEstado || [];
+  const asistenciasPorActividad = data.asistenciasPorActividad || [];
+  const ingresosLibresPorSede = data.ingresosLibresPorSede || [];
+  const ingresosPeriodo = data.ingresosPeriodo || { cantidad: 0, total: 0 };
+  const cantidadReservas = reservasPorEstado.reduce(
+    (total, reserva) => total + Number(reserva.cantidad || 0),
+    0
+  );
+  const cantidadAsistencias = asistenciasPorActividad.reduce(
+    (total, actividad) => total + Number(actividad.cantidad || 0),
+    0
+  );
+  const cantidadIngresosLibres = ingresosLibresPorSede.reduce(
+    (total, sede) => total + Number(sede.cantidad || 0),
+    0
+  );
+  const estadosPagoResumen = pagosPorEstado
+    .map((pago) => `${traducirEstadoSeguro(pago.estado)}: ${Number(pago.cantidad)}`)
+    .join(' · ') || 'No se registraron pagos';
+  const estadosReservaResumen = reservasPorEstado
+    .map((reserva) => `${traducirEstadoSeguro(reserva.estado)}: ${Number(reserva.cantidad)}`)
+    .join(' · ') || 'No se registraron reservas';
+  const visitasPorSedeResumen = ingresosLibresPorSede
+    .slice(0, 2)
+    .map((sede) => `${[sede.ubicacion, sede.ciudad].filter(Boolean).join(' - ') || 'Sin sede'}: ${Number(sede.cantidad)} visitas`)
+    .join(' · ') || 'Sin visitas de entrenamiento libre';
+
+  const logo = await convertirImagenABase64('/assets/fuerzavitalgym.png');
+  const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
   const generado = formatearFechaHora(generatedAt);
   let y = 0;
 
@@ -237,9 +207,9 @@ export const descargarReporteAdministrativo = async (token) => {
   };
 
   const dibujarIndicadores = (indicadores) => {
-    const separacion = 4;
+    const separacion = 3;
     const ancho = (CONTENT_WIDTH - separacion) / 2;
-    const alto = 21;
+    const alto = 18;
     for (let indice = 0; indice < indicadores.length; indice += 2) {
       asegurarEspacio(alto + separacion);
       indicadores.slice(indice, indice + 2).forEach((indicador, columna) => {
@@ -250,11 +220,11 @@ export const descargarReporteAdministrativo = async (token) => {
         pdf.setFont('helvetica', 'normal');
         pdf.setFontSize(7.5);
         pdf.setTextColor(...colors.muted);
-        pdf.text(indicador.etiqueta, x + 5, y + 6);
+        pdf.text(indicador.etiqueta, x + 5, y + 5.5);
         pdf.setFont('helvetica', 'bold');
         pdf.setFontSize(12);
         pdf.setTextColor(...(indicador.destacado ? colors.blue : colors.navy));
-        pdf.text(String(indicador.valor), x + 5, y + 15);
+        pdf.text(String(indicador.valor), x + 5, y + 13);
       });
       y += alto + separacion;
     }
@@ -315,100 +285,46 @@ export const descargarReporteAdministrativo = async (token) => {
   };
 
   const indicadores = [
-    { etiqueta: 'Socios activos', valor: socios.length },
-    { etiqueta: 'Membresías vigentes', valor: membresiasVigentes.length },
-    { etiqueta: 'Ingresos aprobados del mes', valor: formatearMonto(ingresosDelMes), destacado: true },
-    { etiqueta: 'Pagos aprobados del mes', valor: pagosAprobadosDelMes.length },
-    { etiqueta: 'Planes activos', valor: planes.length },
-    { etiqueta: 'Actividades activas', valor: actividades.length },
+    { etiqueta: 'Ingresos cobrados', valor: formatearMonto(ingresosPeriodo.total), destacado: true },
+    { etiqueta: 'Pagos aprobados', valor: ingresosPeriodo.cantidad },
+    { etiqueta: 'Reservas del período', valor: cantidadReservas },
+    { etiqueta: 'Asistencias registradas', valor: cantidadAsistencias },
+    { etiqueta: 'Visitas de entrenamiento libre', valor: cantidadIngresosLibres },
+    { etiqueta: 'Socios / membresías vigentes al corte', valor: `${sociosActivos} / ${membresiasActivas}` },
   ];
 
   dibujarEncabezado(true);
-  dibujarSeccion('Resumen del período', `Actividad registrada durante ${periodo}.`);
+  dibujarSeccion('Resumen ejecutivo', `Operación de ${periodo}; socios y membresías son el estado actual al generar el informe.`);
   dibujarIndicadores(indicadores);
 
-  dibujarSeccion('Pagos del mes por estado');
-  dibujarTabla(
-    ['Estado', 'Cantidad'],
-    Array.from(pagosPorEstado.entries()).sort((a, b) => b[1] - a[1]),
-    [132, 50],
-    'No se registraron pagos durante este período.'
-  );
-
-  dibujarSeccion('Ingresos aprobados por medio de pago');
+  dibujarSeccion('Finanzas registradas', 'El total cobrado no descuenta gastos operativos.');
+  escribirParrafo(`Pagos por estado: ${estadosPagoResumen}`, { size: 7.8 });
   dibujarTabla(
     ['Medio de pago', 'Operaciones', 'Ingresos'],
-    Array.from(pagosPorMetodo.entries())
-      .sort((a, b) => b[1].total - a[1].total)
-      .map(([metodo, resumen]) => [metodo, resumen.cantidad, formatearMonto(resumen.total)]),
+    pagosPorMetodo.slice(0, 3).map((pago) => [
+      traducirMetodoSeguro(pago.metodo_pago),
+      Number(pago.cantidad),
+      formatearMonto(pago.total),
+    ]),
     [80, 42, 60],
     'No hubo pagos aprobados durante este período.'
   );
 
-  dibujarSeccion('Últimos pagos registrados', 'Se muestran los 8 movimientos más recientes.');
+  dibujarSeccion('Actividad y asistencia');
+  escribirParrafo(`Reservas por estado: ${estadosReservaResumen}`, { size: 7.8 });
   dibujarTabla(
-    ['Fecha', 'Socio', 'Método', 'Estado', 'Monto'],
-    pagosRecientes.map((pago) => [
-      formatearFechaHora(fechaPago(pago)),
-      pago.socio || socioPorId.get(Number(pago.usuario_id))?.nombre || 'Socio no disponible',
-      traducirMetodoSeguro(pago.metodo_pago),
-      traducirEstadoSeguro(pago.estado),
-      formatearMonto(pago.monto),
+    ['Actividad', 'Sede', 'Asistencias', 'Socios'],
+    asistenciasPorActividad.slice(0, 4).map((asistencia) => [
+      asistencia.actividad,
+      [asistencia.ubicacion, asistencia.ciudad].filter(Boolean).join(' - ') || 'Sin sede',
+      Number(asistencia.cantidad),
+      Number(asistencia.socios),
     ]),
-    [30, 48, 37, 30, 37],
-    'No hay pagos registrados.'
+    [62, 58, 33, 29],
+    'No se registraron asistencias durante este período.'
   );
 
-  dibujarSeccion('Membresías vigentes por plan');
-  dibujarTabla(
-    ['Plan', 'Membresías'],
-    Array.from(membresiasPorPlan.entries()).sort((a, b) => b[1] - a[1]),
-    [132, 50],
-    'No hay membresías vigentes.'
-  );
-
-  dibujarSeccion('Próximas reservas confirmadas', 'Próximos 8 turnos reservados por socios activos.');
-  dibujarTabla(
-    ['Turno', 'Socio', 'Actividad', 'Sede'],
-    reservasProximas.map((reserva) => {
-      const socio = socioPorId.get(Number(reserva.usuario_id));
-      return [
-        formatearFechaHora(reserva.fecha_turno),
-        socio?.nombre || 'Socio no disponible',
-        reserva.actividad || 'Actividad no disponible',
-        [socio?.ubicacion, socio?.ciudad].filter(Boolean).join(' - ') || 'Sin sede',
-      ];
-    }),
-    [38, 45, 54, 45],
-    'No hay reservas confirmadas próximas.'
-  );
-
-  dibujarSeccion('Socios activos por sede');
-  dibujarTabla(
-    ['Sede', 'Socios'],
-    Array.from(sociosPorSede.entries()).sort((a, b) => b[1] - a[1]),
-    [132, 50],
-    'No hay socios activos.'
-  );
-
-  dibujarSeccion('Oferta activa');
-  escribirParrafo('Planes disponibles', { bold: true, size: 8 });
-  dibujarTabla(
-    ['Plan', 'Tipo', 'Precio'],
-    planes.map((plan) => [plan.nombre || 'Plan sin nombre', capitalizar(plan.tipo), formatearMonto(plan.precio)]),
-    [78, 48, 56],
-    'No hay planes activos.'
-  );
-  escribirParrafo('Actividades disponibles', { bold: true, size: 8 });
-  dibujarTabla(
-    ['Actividad', 'Sede'],
-    actividades.map((actividad) => [
-      actividad.nombre || 'Actividad sin nombre',
-      [actividad.ubicacion, actividad.ciudad].filter(Boolean).join(' - ') || 'Sin sede',
-    ]),
-    [100, 82],
-    'No hay actividades activas.'
-  );
+  escribirParrafo(`Entrenamiento libre por sede: ${visitasPorSedeResumen}`, { size: 7.8 });
 
   const totalPaginas = pdf.getNumberOfPages();
   for (let pagina = 1; pagina <= totalPaginas; pagina += 1) {
@@ -423,10 +339,5 @@ export const descargarReporteAdministrativo = async (token) => {
     pdf.text(`Página ${pagina} de ${totalPaginas}`, PAGE_WIDTH - MARGIN, 288, { align: 'right' });
   }
 
-  const fechaArchivo = [
-    generatedAt.getFullYear(),
-    String(generatedAt.getMonth() + 1).padStart(2, '0'),
-    String(generatedAt.getDate()).padStart(2, '0'),
-  ].join('-');
-  pdf.save(`reporte_administrativo_${fechaArchivo}.pdf`);
+  pdf.save(`reporte_administrativo_${periodoSeleccionado}.pdf`);
 };

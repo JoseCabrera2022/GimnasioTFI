@@ -42,7 +42,7 @@ function Login() {
       if (rol === 'admin') {
         navigate(ROUTES.ADMIN);
       } else if (rol === 'empleado') {
-        navigate(ROUTES.EMPLEADO);
+        navigate(ROUTES.EMPLEADO, { replace: true });
       } else {
         navigate(ROUTES.HOME);
       }

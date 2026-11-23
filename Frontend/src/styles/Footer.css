@@ -24,6 +24,38 @@
   margin: 0;
 }
 
+.footer-member {
+  padding: 18px 24px;
+  border-top: 1px solid rgb(255 255 255 / 8%);
+  background: #101222;
+}
+
+.footer-member-content {
+  max-width: 1180px;
+}
+
+.footer-member .footer-brand h3 {
+  color: #fff;
+  font-size: 0.95rem;
+}
+
+.footer-member .footer-brand p {
+  color: #a7a9bd;
+}
+
+.footer-member .footer-links {
+  gap: 20px;
+}
+
+.footer-member .footer-links a {
+  color: #c9cada;
+  font-size: 0.86rem;
+}
+
+.footer-member .footer-links a:hover {
+  color: #9b94ff;
+}
+
 .footer-content {
   display: flex;
   justify-content: space-between;
@@ -104,41 +136,43 @@
 }
 
 .footer-social a:hover {
-  color: #3498db;
   transform: scale(1.1);
 }
 
-/* 🔹 Hover con colores específicos */
-.footer-social a:hover {
-  transform: scale(1.1);
-}
-
-.footer-social a .fa-facebook-f:hover {
+.footer-social a:hover .fa-facebook-f {
   color: #1877f2;
 }
 
-.footer-social a .fa-instagram:hover {
+.footer-social a:hover .fa-instagram {
   color: #e4405f;
 }
 
-.footer-social a .fa-twitter:hover {
+.footer-social a:hover .fa-twitter {
   color: #1da1f2;
 }
 
-.footer-social a .fa-youtube:hover {
+.footer-social a:hover .fa-youtube {
   color: #ff0000;
 }
 
-.footer-social a .fa-linkedin-in:hover {
+.footer-social a:hover .fa-linkedin-in {
   color: #0077b5;
 }
 
-.footer-social a .fa-tiktok:hover {
-  color: #000000;
+.footer-social a:hover .fa-tiktok {
+  color: #000;
 }
 
-.footer-social a .fa-whatsapp:hover {
+.footer-social a:hover .fa-whatsapp {
   color: #25d366;
+}
+
+.footer-admin .footer-social a {
+  width: 22px;
+  height: 22px;
+  color: #c9cada;
+  background: rgb(255 255 255 / 12%);
+  font-size: 13px;
 }
 
 /* Responsive */

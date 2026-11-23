@@ -18,6 +18,7 @@ function Planes() {
   const [errorPlanes, setErrorPlanes] = useState('');
   const [mostrarBanner, setMostrarBanner] = useState(false);
   const [tieneMembresiaActiva, setTieneMembresiaActiva] = useState(false);
+  const [membresiaActual, setMembresiaActual] = useState(null);
   const [fechaVencimiento, setFechaVencimiento] = useState(null);
   const [bannerColor, setBannerColor] = useState('');
   const [horaActual, setHoraActual] = useState(new Date());
@@ -55,32 +56,36 @@ function Planes() {
 
   useEffect(() => {
     const fetchMembresias = async () => {
-      if (!usuario || !token) return;
+      if (usuario?.rol !== 'socio' || !token) return;
       try {
         const res = await axios.get(ENDPOINTS_LOCAL.MEMBRESIAS, {
           headers: { Authorization: `Bearer ${token}` }
         });
 
-        const ultima = res.data[0];
-        if (ultima) {
-          const fechaFin = new Date(ultima.fecha_fin);
+        const membresias = Array.isArray(res.data) ? res.data : [];
+        const ahora = new Date();
+        const activa = membresias.find((membresia) => (
+          membresia.estado === 'activa' && new Date(membresia.fecha_fin) > ahora
+        ));
+
+        if (activa) {
+          const fechaFin = new Date(activa.fecha_fin);
+          const diasRestantes = Math.floor((fechaFin - ahora) / (1000 * 60 * 60 * 24));
+          setMembresiaActual(activa);
           setFechaVencimiento(fechaFin);
+          setTieneMembresiaActiva(true);
+          setBannerColor(diasRestantes <= 7 ? 'amarillo' : 'verde');
+          return;
+        }
 
-          const diff = fechaFin - new Date();
-          const diasRestantes = Math.floor(diff / (1000 * 60 * 60 * 24));
-
-          if (ultima.estado === 'vencida' || diff <= 0) {
-            setBannerColor('rojo');
-            setTieneMembresiaActiva(false);
-          } else if (diasRestantes <= 7) {
-            setBannerColor('amarillo');
-            setTieneMembresiaActiva(true);
-          } else {
-            setBannerColor('verde');
-            setTieneMembresiaActiva(true);
-          }
+        setMembresiaActual(null);
+        setTieneMembresiaActiva(false);
+        const ultima = membresias[0];
+        const fechaFinUltima = ultima?.fecha_fin ? new Date(ultima.fecha_fin) : null;
+        if (fechaFinUltima && fechaFinUltima <= ahora) {
+          setFechaVencimiento(fechaFinUltima);
+          setBannerColor('rojo');
         } else {
-          setTieneMembresiaActiva(false);
           setFechaVencimiento(null);
           setBannerColor('');
         }
@@ -89,7 +94,7 @@ function Planes() {
       }
     };
     fetchMembresias();
-  }, [usuario, token]);
+  }, [usuario?.rol, token]);
 
   const obtenerCuentaRegresiva = () => {
     if (!fechaVencimiento) return '';
@@ -128,18 +133,11 @@ function Planes() {
 
   const generarLink = async (plan) => {
     try {
-      const precio = obtenerPrecio(plan);
-      const nombre = `${plan.nombre} - ${duracion}`;
-
       const res = await axios.post(ENDPOINTS_LOCAL.PAGOS, {
-        nombre,
-        precio,
-        tipo: plan.tipo,
-        duracion,
-        usuario_id: usuario?.id,
         plan_id: plan.id,
-        correo_electronico: usuario?.correo_electronico,
-        beneficios: plan.descripcion
+        duracion,
+      }, {
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       window.location.href = res.data.init_point;
@@ -215,6 +213,7 @@ function Planes() {
             generarLink={generarLink}
             setMostrarBanner={setMostrarBanner}
             tieneMembresiaActiva={tieneMembresiaActiva}
+            membresiaActual={membresiaActual}
             bannerColor={bannerColor}
             fechaVencimiento={fechaVencimiento}
           />

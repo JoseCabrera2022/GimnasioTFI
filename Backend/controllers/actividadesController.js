@@ -9,7 +9,12 @@ export const getActividadesConTurnos = async (req, res) => {
     const [rows] = await db.query(`
       SELECT a.id AS actividad_id, a.nombre, a.descripcion, a.foto,
              t.id AS turno_id, t.fecha, t.cupo_maximo,
-             (t.cupo_maximo - COUNT(r.id)) AS cupo_disponible
+             (t.cupo_maximo - COUNT(r.id)) AS cupo_disponible,
+             (SELECT GROUP_CONCAT(u.nombre ORDER BY u.nombre SEPARATOR ', ')
+              FROM turno_entrenadores te
+              JOIN usuarios u ON u.id = te.empleado_id
+                AND u.estado = 'activo' AND u.eliminado = 0
+              WHERE te.turno_id = t.id) AS entrenadores
       FROM actividades a
       JOIN turnos t ON a.id = t.actividad_id
       JOIN ubicaciones u ON u.id = a.ubicacion_id AND u.eliminado = 0

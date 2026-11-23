@@ -1,72 +1,122 @@
 import { useEffect, useState } from 'react';
-import axios from 'axios';
 import { useAuthStore } from '../store/useAuthStore';
+import http from '../utils/axiosConfig';
 import { ENDPOINTS_LOCAL } from '../api/endpoints';
 import '../styles/HistorialPagos.css';
-import { traducirEstado, traducirMetodo } from '../utils/conversiones';
+import { capitalizarPrimeraLetra, traducirEstado, traducirMetodo } from '../utils/conversiones';
 import { ROUTES } from '../routers/routes';
 import { useNavigate } from 'react-router-dom';
+import SessionBanner from '../components/SessionBanner';
 
 function HistorialPagos() {
-  const { token } = useAuthStore();
+  const { usuario, token, sessionExpired } = useAuthStore();
   const [pagos, setPagos] = useState([]);
+  const [cargando, setCargando] = useState(true);
+  const [error, setError] = useState('');
+  const [intentoCarga, setIntentoCarga] = useState(0);
   const navigate = useNavigate();
 
   useEffect(() => {
+    let vigente = true;
+
     const fetchPagos = async () => {
+      if (!token || sessionExpired) {
+        setCargando(false);
+        return;
+      }
+
+      setCargando(true);
+      setError('');
       try {
-        const res = await axios.get(ENDPOINTS_LOCAL.HISTORIALPAGOS, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        setPagos(res.data);
-      } catch (error) {
-        console.error('Error al obtener historial:', error);
+        const res = await http.get(ENDPOINTS_LOCAL.HISTORIALPAGOS);
+        if (!Array.isArray(res.data)) {
+          throw new Error('La respuesta del historial no es válida.');
+        }
+        if (vigente) setPagos(res.data);
+      } catch (requestError) {
+        if (vigente) {
+          setError(requestError.response?.data?.error || 'No se pudo cargar el historial de pagos.');
+        }
+      } finally {
+        if (vigente) setCargando(false);
       }
     };
+
     fetchPagos();
-  }, [token]);
+    return () => {
+      vigente = false;
+    };
+  }, [token, sessionExpired, intentoCarga]);
+
+  if (!usuario || sessionExpired) return <SessionBanner />;
 
   return (
-    <div className="historial-container">
-      <h2>📜 Historial de Pagos</h2>
+    <section className="historial-container">
+      <header className="historial-header">
+        <div>
+          <span className="historial-eyebrow">MI CUENTA</span>
+          <h1>Historial de pagos</h1>
+          <p>Consulta el estado y los datos de tus transacciones.</p>
+        </div>
+        <button
+          type="button"
+          className="historial-action"
+          onClick={() => navigate(ROUTES.MEMBRESIAS)}
+        >
+          <i className="fa-solid fa-id-card" aria-hidden="true"></i>
+          Mi membresía
+        </button>
+      </header>
 
-      {pagos.length === 0 ? (
+      {cargando ? (
+        <p className="historial-state">Cargando tus pagos...</p>
+      ) : error ? (
+        <div className="historial-state error" role="alert">
+          <p>{error}</p>
+          <button type="button" className="historial-action" onClick={() => setIntentoCarga((actual) => actual + 1)}>
+            Reintentar
+          </button>
+        </div>
+      ) : pagos.length === 0 ? (
         <div className="historial-empty">
-          <p>⚠️ No tiene pagos registrados ⚠️</p>
-          <button 
-            className="historial-btn-link" 
-            onClick={() => navigate(ROUTES.PLANES)}
-          >
-            Ver Planes
+          <p>Todavía no tienes pagos registrados.</p>
+          <button type="button" className="historial-action primary" onClick={() => navigate(ROUTES.PLANES)}>
+            Ver planes
           </button>
         </div>
       ) : (
-        <table className="historial-table">
-          <thead>
-            <tr>
-              <th>Fecha</th>
-              <th>Monto</th>
-              <th>Método</th>
-              <th>Estado</th>
-              <th>Plan</th>
-              <th>Duración</th>
-            </tr>
-          </thead>
-          <tbody>
-            {pagos.map((p) => (
-              <tr key={p.id} className={p.estado}>
-                <td>{new Date(p.creado_en).toLocaleString('es-ES')}</td>
-                <td>${p.monto}</td>
-                <td>{traducirMetodo(p.metodo_pago)}</td>
-                <td><span className={`estado-badge ${p.estado}`}>{traducirEstado(p.estado)}</span></td>
-                <td>{p.plan || '-'}</td>
-                <td>{p.duracion || '-'}</td>
+        <div className="historial-table-wrap">
+          <table className="historial-table">
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Plan</th>
+                <th>Duración</th>
+                <th>Monto</th>
+                <th>Método</th>
+                <th>Estado</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {pagos.map((pago) => (
+                <tr key={pago.id}>
+                  <td>{pago.fecha_pago ? new Date(pago.fecha_pago).toLocaleString('es-AR') : '—'}</td>
+                  <td>{pago.plan || '—'}</td>
+                  <td>{capitalizarPrimeraLetra(pago.duracion) || '—'}</td>
+                  <td>{pago.monto == null ? '—' : `$${Number(pago.monto).toLocaleString('es-AR')}`}</td>
+                  <td>{pago.metodo_pago ? traducirMetodo(pago.metodo_pago) : '—'}</td>
+                  <td>
+                    <span className={`historial-status ${pago.estado}`}>
+                      {traducirEstado(pago.estado)}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
-    </div>
+    </section>
   );
 }
 

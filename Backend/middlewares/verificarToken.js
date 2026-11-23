@@ -3,8 +3,8 @@ import db from '../configs/database.js';
 import { crearTokenSesion, SESSION_TOKEN_REFRESH_THRESHOLD_SECONDS } from '../utils/sessionToken.js';
 
 export const verificarToken = (req, res, next) => {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
+  const authHeader = req.get('authorization')?.trim();
+  const token = authHeader?.match(/^Bearer\s+(\S+)$/i)?.[1];
   if (!token) {
     return res.status(401).json({ code: 'TOKEN_REQUIRED', error: 'Token requerido' });
   }
@@ -20,7 +20,9 @@ export const verificarToken = (req, res, next) => {
 
     try {
       const [rows] = await db.query(
-        'SELECT id FROM usuarios WHERE id=? AND eliminado=0',
+        `SELECT id, nombre, correo_electronico, rol, telefono, estado, ubicacion_id
+         FROM usuarios
+         WHERE id = ? AND eliminado = 0 AND estado = 'activo'`,
         [decoded.id]
       );
       if (rows.length === 0) {
@@ -30,16 +32,29 @@ export const verificarToken = (req, res, next) => {
         });
       }
 
+      const cuenta = rows[0];
       const tiempoRestante = decoded.exp - Math.floor(Date.now() / 1000);
       if (tiempoRestante <= SESSION_TOKEN_REFRESH_THRESHOLD_SECONDS) {
-        const payload = { ...decoded };
-        delete payload.iat;
-        delete payload.exp;
-        delete payload.nbf;
-        res.setHeader('X-Auth-Token', crearTokenSesion(payload));
+        res.setHeader('X-Auth-Token', crearTokenSesion({
+          id: cuenta.id,
+          correo_electronico: cuenta.correo_electronico,
+          rol: cuenta.rol,
+          telefono: cuenta.telefono,
+          ubicacion_id: cuenta.ubicacion_id,
+          estado: cuenta.estado,
+        }));
       }
 
-      req.usuario = decoded;
+      req.usuario = {
+        ...decoded,
+        id: cuenta.id,
+        nombre: cuenta.nombre,
+        correo_electronico: cuenta.correo_electronico,
+        rol: cuenta.rol,
+        telefono: cuenta.telefono,
+        estado: cuenta.estado,
+        ubicacion_id: cuenta.ubicacion_id,
+      };
       next();
     } catch (error) {
       console.error('Error al verificar el estado de la cuenta:', error);

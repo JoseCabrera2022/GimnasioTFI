@@ -23,6 +23,11 @@ export const ENDPOINTS = {
   DURACIONES: `${API_BASE_URL}/api/duraciones`,
   REPORTE_ADMIN: `${API_BASE_URL}/api/reportes/admin`,
   DASHBOARD_ADMIN: `${API_BASE_URL}/api/reportes/dashboard`,
+  EMPLEADO_RESUMEN: `${API_BASE_URL}/api/empleado/resumen`,
+  EMPLEADO_SOCIOS: `${API_BASE_URL}/api/empleado/socios`,
+  EMPLEADO_INGRESOS: `${API_BASE_URL}/api/empleado/ingresos`,
+  EMPLEADO_TURNOS: `${API_BASE_URL}/api/empleado/turnos`,
+  EMPLEADO_ASISTENCIAS: `${API_BASE_URL}/api/empleado/reservas`,
 };
 
 export const ENDPOINTS_LOCAL = ENDPOINTS;
