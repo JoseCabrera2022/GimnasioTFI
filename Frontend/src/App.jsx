@@ -6,6 +6,7 @@ import Login from './pages/Login';
 import RecuperarPassword from './pages/RecuperarPassword';
 import RestablecerPassword from './pages/RestablecerPassword';
 import Register from './pages/Register';
+import VerificarEmail from './pages/VerificarEmail';
 import Layout from './components/Layout';
 import Home from './pages/Home';
 import Contacto from './pages/Contacto';
@@ -49,6 +50,7 @@ function App() {
           <Route path={ROUTES.FORGOT_PASSWORD} element={<RecuperarPassword />} />
           <Route path={ROUTES.RESET_PASSWORD} element={<RestablecerPassword />} />
           <Route path={ROUTES.REGISTER} element={<Register />} />
+          <Route path={ROUTES.VERIFY_EMAIL} element={<VerificarEmail />} />
           <Route path={ROUTES.PLANES} element={<Planes />} />
           <Route path={ROUTES.CONTACTO} element={<Contacto />} />
           <Route path={ROUTES.PERFIL} element={<ProtectedRoute><Perfil /></ProtectedRoute>} />

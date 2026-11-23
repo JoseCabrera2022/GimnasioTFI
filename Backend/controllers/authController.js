@@ -12,7 +12,8 @@ const obtenerVersionPassword = (hash) =>
 
 export const registrarUsuario = async (req, res) => {
   try {
-    const { nombre, correo_electronico, password, telefono, ubicacion_id } = req.body;
+    const { nombre, password, telefono, ubicacion_id } = req.body;
+    const correo_electronico = req.body.correo_electronico?.trim().toLowerCase();
 
     // Validaciones básicas
     if (!nombre || !correo_electronico || !password || !telefono || !ubicacion_id) {
@@ -49,34 +50,103 @@ export const registrarUsuario = async (req, res) => {
     const hash = await bcrypt.hash(password, 10);
 
     const [result] = await db.query(
-      'INSERT INTO usuarios (nombre, correo_electronico, contraseña_hash, telefono, ubicacion_id) VALUES (?, ?, ?, ?, ?)',
+      'INSERT INTO usuarios (nombre, correo_electronico, contraseña_hash, telefono, ubicacion_id, email_verificado) VALUES (?, ?, ?, ?, ?, 0)',
       [nombre, correo_electronico, hash, telefono, ubicacion_id]
     );
 
-    // Obtener usuario recién creado
-    const [rows] = await db.query('SELECT id, nombre, correo_electronico, rol, telefono, ubicacion_id, estado FROM usuarios WHERE id=?', [result.insertId]);
-    const nuevoUsuario = rows[0];
+    try {
+      const tokenVerificacion = jwt.sign(
+        {
+          id: result.insertId,
+          correo_electronico,
+          tipo: 'verificacion-email'
+        },
+        process.env.JWT_SECRET,
+        { expiresIn: '24h' }
+      );
+      const enlace = `${URL_FRONTEND}/verificar-email?token=${encodeURIComponent(tokenVerificacion)}`;
 
-    const token = crearTokenSesion({
-      id: nuevoUsuario.id,
-      correo_electronico: nuevoUsuario.correo_electronico,
-      rol: nuevoUsuario.rol,
-      telefono: nuevoUsuario.telefono,
-      ubicacion_id: nuevoUsuario.ubicacion_id,
-      estado: nuevoUsuario.estado
+      await enviarEmailConGmailAPI({
+        to: correo_electronico,
+        subject: 'Verifica tu correo - Fuerza Vital Gym',
+        html: `
+          <h2>Hola, ${String(nombre).replace(/[&<>"']/g, (caracter) => ({
+            '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+          }[caracter]))}</h2>
+          <p>Gracias por crear una cuenta en Fuerza Vital Gym.</p>
+          <p>Confirma que esta dirección de correo te pertenece:</p>
+          <p><a href="${enlace}">Verificar mi correo electrónico</a></p>
+          <p>El enlace es válido durante 24 horas. Si no creaste esta cuenta, puedes ignorar este mensaje.</p>
+        `
+      });
+    } catch (error) {
+      await db.query(
+        'DELETE FROM usuarios WHERE id = ? AND email_verificado = 0',
+        [result.insertId]
+      );
+      throw error;
+    }
+
+    return res.status(201).json({
+      mensaje: 'Cuenta creada. Revisa tu correo para verificar la dirección antes de iniciar sesión.'
     });
-
-    res.json({ usuario: nuevoUsuario, token });
 
   } catch (error) {
     console.error('Error al registrar usuario:', error);
+    if (error.response?.data?.error === 'invalid_grant') {
+      return res.status(503).json({
+        error: 'El servicio de correo necesita volver a autorizarse. Abre la ruta /auth del backend.'
+      });
+    }
     res.status(500).json({ error: 'No se pudo registrar el usuario' });
+  }
+};
+
+export const verificarEmail = async (req, res) => {
+  try {
+    const { token } = req.query;
+    if (typeof token !== 'string' || !token) {
+      return res.status(400).json({ error: 'Falta el enlace de verificación' });
+    }
+
+    const datos = jwt.verify(token, process.env.JWT_SECRET);
+    if (datos.tipo !== 'verificacion-email' || !datos.id || !datos.correo_electronico) {
+      return res.status(400).json({ error: 'El enlace de verificación no es válido' });
+    }
+
+    const [result] = await db.query(
+      `UPDATE usuarios
+       SET email_verificado = 1
+       WHERE id = ? AND correo_electronico = ? AND eliminado = 0`,
+      [datos.id, datos.correo_electronico]
+    );
+
+    if (result.affectedRows === 0) {
+      const [rows] = await db.query(
+        `SELECT email_verificado FROM usuarios
+         WHERE id = ? AND correo_electronico = ? AND eliminado = 0`,
+        [datos.id, datos.correo_electronico]
+      );
+      if (!rows[0]?.email_verificado) {
+        return res.status(400).json({ error: 'La cuenta no existe o el enlace ya no es válido' });
+      }
+    }
+
+    return res.json({ mensaje: 'Correo verificado correctamente. Ya puedes iniciar sesión.' });
+  } catch (error) {
+    if (error.name === 'TokenExpiredError' || error.name === 'JsonWebTokenError') {
+      return res.status(400).json({ error: 'El enlace de verificación no es válido o expiró' });
+    }
+
+    console.error('Error al verificar correo:', error);
+    return res.status(500).json({ error: 'No se pudo verificar el correo' });
   }
 };
 
 export const loginUsuario = async (req, res) => {
   try {
-    const { correo_electronico, password } = req.body;
+    const { password } = req.body;
+    const correo_electronico = req.body.correo_electronico?.trim().toLowerCase();
 
     if (!correo_electronico || !password) {
       return res.status(400).json({ error: 'Correo y contraseña son obligatorios' });
@@ -99,6 +169,9 @@ export const loginUsuario = async (req, res) => {
 
     const valido = await bcrypt.compare(password, usuario.contraseña_hash);
     if (!valido) return res.status(401).json({ error: 'Contraseña incorrecta' });
+    if (!usuario.email_verificado) {
+      return res.status(403).json({ error: 'Verifica tu correo electrónico antes de iniciar sesión' });
+    }
 
     // 🔹 incluir ubicacion_id en el token
     const token = crearTokenSesion({

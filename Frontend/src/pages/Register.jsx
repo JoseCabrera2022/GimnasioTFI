@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import axios from 'axios';
 import { ENDPOINTS_LOCAL } from '../api/endpoints';
-import { useAuthStore } from '../store/useAuthStore';
 import { useNavigate } from 'react-router-dom';
 import '../styles/Register.css';
 import '../styles/Login.css';
@@ -18,7 +17,7 @@ function Register() {
   const [ubicacionId, setUbicacionId] = useState(null);
   const [errors, setErrors] = useState({});
   const [serverMessage, setServerMessage] = useState('');
-  const loginStore = useAuthStore();
+  const [correoPendiente, setCorreoPendiente] = useState('');
   const navigate = useNavigate();
 
   const validateForm = () => {
@@ -38,16 +37,14 @@ function Register() {
     if (!validateForm()) return;
 
     try {
-      const res = await axios.post(ENDPOINTS_LOCAL.REGISTER, {
+      await axios.post(ENDPOINTS_LOCAL.REGISTER, {
         nombre,
         correo_electronico: correo,
         telefono,
         password,
         ubicacion_id: ubicacionId
       });
-      loginStore.login(res.data.usuario, res.data.token);
-      setServerMessage('✅ Registro exitoso, redirigiendo...');
-      navigate(ROUTES.HOME);
+      setCorreoPendiente(correo);
     } catch (error) {
       setServerMessage(error.response?.data?.error || '❌ Error al registrar usuario');
     }
@@ -55,8 +52,17 @@ function Register() {
 
   return (
     <div className="register-container login-box">
-      <h2 className="login-title">Crear cuenta</h2>
-      <p className="register-subtitle">Completá tus datos para unirte a Fuerza Vital.</p>
+      <h2 className="login-title">{correoPendiente ? 'Revisá tu correo' : 'Crear cuenta'}</h2>
+      <p className="register-subtitle">
+        {correoPendiente
+          ? `Enviamos un enlace de verificación a ${correoPendiente}. Confirmá tu dirección antes de iniciar sesión.`
+          : 'Completá tus datos para unirte a Fuerza Vital.'}
+      </p>
+      {correoPendiente ? (
+        <button type="button" className="login-button" onClick={() => navigate(ROUTES.LOGIN)}>
+          Ir a iniciar sesión
+        </button>
+      ) : (
       <form onSubmit={handleRegister} className="login-form">
         
         <div className="login-field">
@@ -109,6 +115,7 @@ function Register() {
         </button>
         {serverMessage && <p className="login-message">{serverMessage}</p>}
       </form>
+      )}
     </div>
   );
 }
