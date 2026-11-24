@@ -11,6 +11,10 @@
   font-size: 0.92rem;
 }
 
+.register-container.register-glass .register-subtitle {
+  color: rgba(255, 255, 255, 0.8);
+}
+
 .register-location-field .selector-ubicacion {
   display: flex;
   flex-direction: column;

@@ -14,16 +14,22 @@ function Layout({ children }) {
   const esAdmin = usuario?.rol === 'admin';
   const esSocio = usuario?.rol === 'socio';
   const esEmpleado = usuario?.rol === 'empleado';
+  const isLogin = pathname === ROUTES.LOGIN;
+  const isRegister = pathname === ROUTES.REGISTER;
+  const isPasswordRecovery = pathname === ROUTES.FORGOT_PASSWORD;
+  const isContact = pathname === ROUTES.CONTACTO;
+  const isLocations = pathname === ROUTES.UBICACIONES;
   const hasBackgroundImage = [
     ROUTES.PLANES,
     ROUTES.CONTACTO,
     ROUTES.UBICACIONES,
     ROUTES.LOGIN,
-    ROUTES.REGISTER
+    ROUTES.REGISTER,
+    ROUTES.FORGOT_PASSWORD
   ].includes(pathname);
 
   return (
-    <div className={`layout-container${hasBackgroundImage ? ' has-background-image' : ''}`}>
+    <div className={`layout-container${hasBackgroundImage ? ' has-background-image' : ''}${isLogin ? ' has-login-background' : ''}${isRegister ? ' has-register-background' : ''}${isPasswordRecovery ? ' has-password-recovery-background' : ''}${isContact ? ' has-contact-background' : ''}${isLocations ? ' has-locations-background' : ''}`}>
       <Navbar />
       <div className={`layout-body${esAdmin || esEmpleado ? ' layout-body-admin' : ''}${esSocio ? ' layout-body-socio' : ''}`}>
         {esSocio && <SidebarSocio />}

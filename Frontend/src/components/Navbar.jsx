@@ -168,9 +168,9 @@ function Navbar() {
 
         <li className="navbar-brand-icon">
           <Link
-            to={usuario ? ROUTES.PERFIL : ROUTES.HOME}
-            aria-label={usuario ? `Ver el perfil de ${usuario.nombre}` : 'Ir al inicio de GymManager Pro'}
-            title={usuario ? 'Ver perfil' : 'Inicio'}
+            to={ROUTES.LOGIN}
+            aria-label="Ir a iniciar sesión"
+            title="Iniciar sesión"
           >
             <img
               src={usuario ? avatarUrl || defaultAvatar : '/assets/fuerzavitalgym2.png'}

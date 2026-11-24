@@ -149,6 +149,14 @@
   text-decoration: none;
 }
 
+.login-glass .login-link-light {
+  color: #fff;
+}
+
+.login-glass .login-link-light:hover {
+  color: var(--gym-violet, #7770ee);
+}
+
 .login-register-link .login-register-question {
   color: var(--gym-muted, #686a79);
 }

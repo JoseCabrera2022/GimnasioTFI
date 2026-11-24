@@ -137,6 +137,25 @@ export const solicitarRecuperacionPassword = async (req, res) => {
       return res.status(400).json({ error: 'Correo electrónico inválido' });
     }
 
+    const configuracionFaltante = [
+      'JWT_SECRET',
+      'GMAIL_CLIENT_ID',
+      'GMAIL_CLIENT_SECRET',
+      'GMAIL_REDIRECT_URI',
+      'GMAIL_REFRESH_TOKEN',
+      'GMAIL_USER'
+    ].filter((variable) => !process.env[variable]);
+
+    if (configuracionFaltante.length > 0) {
+      console.error(
+        'Recuperación de contraseña no configurada. Variables faltantes:',
+        configuracionFaltante.join(', ')
+      );
+      return res.status(503).json({
+        error: 'El servicio de recuperación no está configurado. Configura JWT y Gmail en Backend/.env.'
+      });
+    }
+
     const [rows] = await db.query(
       'SELECT id, nombre, correo_electronico, contraseña_hash FROM usuarios WHERE correo_electronico = ? AND eliminado = 0',
       [correo_electronico]

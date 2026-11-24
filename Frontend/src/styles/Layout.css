@@ -10,6 +10,38 @@
     url('/images/fondo-gimnasio.jpg') center / cover no-repeat fixed;
 }
 
+.layout-container.has-login-background {
+  background:
+    linear-gradient(rgba(8, 9, 24, 0.18), rgba(8, 9, 24, 0.18)),
+    url('/images/fondo-login.jpg') center / cover no-repeat fixed;
+}
+
+.layout-container.has-register-background {
+  background:
+    linear-gradient(rgba(8, 9, 24, 0.18), rgba(8, 9, 24, 0.18)),
+    url('/images/fondo-register.jpg') center / cover no-repeat fixed;
+}
+
+.layout-container.has-password-recovery-background {
+  background:
+    linear-gradient(rgba(8, 9, 24, 0.18), rgba(8, 9, 24, 0.18)),
+    url('/images/fondo-recupero-pass.jpg') center / cover no-repeat fixed;
+}
+
+.layout-container.has-contact-background {
+  background:
+    linear-gradient(rgba(8, 9, 24, 0.22), rgba(8, 9, 24, 0.22)),
+    url('/images/imagen-para-contacto.jpg') center / cover no-repeat fixed;
+}
+
+.layout-container.has-locations-background {
+  background:
+    linear-gradient(rgba(8, 9, 24, 0.18), rgba(8, 9, 24, 0.18)),
+    url('/images/fondo-ubicaciones.jpg') center / cover no-repeat fixed;
+  background-size: auto, 98% auto;
+  background-color: #080918;
+}
+
 .layout-body {
   display: flex;
   flex: 1;
@@ -42,6 +74,14 @@
 }
 
 @media (max-width: 900px) {
+  .layout-container.has-password-recovery-background,
+  .layout-container.has-contact-background,
+  .layout-container.has-locations-background,
+  .layout-container.has-login-background,
+  .layout-container.has-register-background {
+    background-attachment: scroll;
+  }
+
   .layout-main.with-sidebar { margin-left: 0; }
   .layout-body-socio { flex-direction: column; }
   .layout-body-admin { flex-direction: column; }
