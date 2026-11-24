@@ -5,7 +5,32 @@ import db from '../configs/database.js';
 import { enviarEmailConGmailAPI } from '../services/gmail/gmailApiService.js';
 import { crearTokenSesion } from '../utils/sessionToken.js';
 
-const URL_FRONTEND = process.env.FRONTEND_URL || 'http://localhost:5173';
+const URL_FRONTEND_PUBLICA = 'https://stubbled-attendantly-israel.ngrok-free.dev';
+
+const obtenerUrlFrontend = () => {
+  const configurada = process.env.FRONTEND_URL?.trim();
+  if (!configurada) return URL_FRONTEND_PUBLICA;
+
+  let url;
+  try {
+    url = new URL(configurada);
+  } catch {
+    throw new Error('FRONTEND_URL debe ser una URL válida');
+  }
+
+  if (!['http:', 'https:'].includes(url.protocol)) {
+    throw new Error('FRONTEND_URL debe usar HTTP o HTTPS');
+  }
+
+  if (['localhost', '127.0.0.1', '::1'].includes(url.hostname)) {
+    console.warn('FRONTEND_URL apunta a localhost; los correos usarán el dominio público de ngrok.');
+    return URL_FRONTEND_PUBLICA;
+  }
+
+  return configurada.replace(/\/+$/, '');
+};
+
+const URL_FRONTEND = obtenerUrlFrontend();
 
 const obtenerVersionPassword = (hash) =>
   crypto.createHash('sha256').update(hash).digest('hex');
