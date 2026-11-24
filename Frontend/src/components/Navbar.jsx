@@ -129,7 +129,6 @@ function Navbar() {
       <ul className={`navbar-links${esAdmin ? ' navbar-links-admin' : ''}${esSocio ? ' navbar-links-member' : ''}${esEmpleado ? ' navbar-links-employee' : ''}`}>
         {!usuario && (
           <>
-            <li><Link to={ROUTES.HOME}>Inicio</Link></li>
             <li><Link to={ROUTES.PLANES}>Planes</Link></li>
             <li><Link to={ROUTES.CONTACTO}>Contacto</Link></li>
             <li><Link to={ROUTES.UBICACIONES}>Ubicación</Link></li>
