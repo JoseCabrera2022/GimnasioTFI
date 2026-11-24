@@ -22,6 +22,19 @@ VITE_API_URL=https://tu-dominio-del-backend.ngrok-free.dev
 Reinicia Vite después de cambiar esta variable. Si la URL pública del túnel del
 backend cambia, actualiza el valor y vuelve a reiniciarlo.
 
+## Enlaces de verificación y recuperación por correo
+
+El backend genera los enlaces de verificación de correo y restablecimiento de
+contraseña usando `FRONTEND_URL`. Para que abran el frontend publicado por ngrok,
+configura `Backend/.env` con la URL del túnel del **frontend**:
+
+```env
+FRONTEND_URL=https://stubbled-attendantly-israel.ngrok-free.dev
+```
+
+Reinicia el backend después de cambiarla. Si `FRONTEND_URL` apunta a localhost,
+el backend usará el dominio público de ngrok configurado para este proyecto.
+
 ## Expanding the ESLint configuration
 
 If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
