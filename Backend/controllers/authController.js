@@ -22,8 +22,15 @@ export const registrarUsuario = async (req, res) => {
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo_electronico)) {
       return res.status(400).json({ error: 'Correo electrónico inválido' });
     }
-    if (password.length < 3) {
-      return res.status(400).json({ error: 'La contraseña debe tener al menos 3 caracteres' });
+    if (
+      password.length < 8 ||
+      !/[A-Z]/.test(password) ||
+      !/\d/.test(password) ||
+      !/[^\w\s]/.test(password)
+    ) {
+      return res.status(400).json({
+        error: 'La contraseña debe tener mínimo 8 caracteres, al menos una mayúscula, un número y un carácter especial'
+      });
     }
     if (!/^\d{7,15}$/.test(telefono)) {
       return res.status(400).json({ error: 'Teléfono inválido' });

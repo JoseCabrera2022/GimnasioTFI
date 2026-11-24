@@ -11,6 +11,14 @@
   font-size: 0.92rem;
 }
 
+.password-requirements {
+  display: block;
+  margin-top: 6px;
+  color: #748094;
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
 .register-location-field .selector-ubicacion {
   display: flex;
   flex-direction: column;

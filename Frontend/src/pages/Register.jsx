@@ -25,7 +25,14 @@ function Register() {
     if (!nombre.trim()) newErrors.nombre = 'El nombre es obligatorio';
     if (!correo.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) newErrors.correo = 'Correo inválido';
     if (!telefono.match(/^\d{7,15}$/)) newErrors.telefono = 'Teléfono inválido';
-    if (password.length < 3) newErrors.password = 'La contraseña debe tener al menos 3 caracteres';
+    if (
+      password.length < 8 ||
+      !/[A-Z]/.test(password) ||
+      !/\d/.test(password) ||
+      !/[^\w\s]/.test(password)
+    ) {
+      newErrors.password = 'La contraseña no cumple con los requisitos indicados';
+    }
     if (!ubicacionId) newErrors.ubicacion = 'Selecciona una sede';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -87,9 +94,12 @@ function Register() {
           <label>Contraseña</label>
           <div className="password-input-wrapper">
             <input
+              id="register-password"
               type={mostrarPassword ? 'text' : 'password'}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              aria-describedby="password-requirements"
+              aria-invalid={Boolean(errors.password)}
             />
             <button
               type="button"
@@ -101,6 +111,9 @@ function Register() {
               <i className={`fa-solid ${mostrarPassword ? 'fa-eye' : 'fa-eye-slash'}`} aria-hidden="true" />
             </button>
           </div>
+          <small id="password-requirements" className="password-requirements">
+            Longitud mínima de 8 caracteres, al menos una mayúscula, un número y un carácter especial.
+          </small>
           {errors.password && <span className="login-error">{errors.password}</span>}
         </div>
 
