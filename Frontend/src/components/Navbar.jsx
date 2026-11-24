@@ -157,12 +157,7 @@ function Navbar() {
           </li>
         )}
 
-        {!usuario && (
-          <>
-            <li><Link to={ROUTES.LOGIN}>Login</Link></li>
-            <li><Link to={ROUTES.REGISTER}>Registro</Link></li>
-          </>
-        )}
+        {!usuario && null}
 
         {usuario && !esSocio && !esAdmin && !esEmpleado && (
           <li>

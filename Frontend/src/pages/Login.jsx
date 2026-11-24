@@ -14,6 +14,8 @@ function Login() {
   const [serverMessage, setServerMessage] = useState('');
   const { login, sessionExpired } = useAuthStore();
   const navigate = useNavigate();
+  const usuarioNoEncontrado = serverMessage.toLowerCase().includes('usuario no encontrado');
+  const contrasenaIncorrecta = serverMessage.toLowerCase().includes('contraseña incorrecta');
 
   const validateForm = () => {
     const newErrors = {};
@@ -53,7 +55,7 @@ function Login() {
 
 
   return (
-    <div className="login-box">
+    <div className="login-box login-glass">
       <h2 className="login-title">Login</h2>
 
       {sessionExpired && (
@@ -72,6 +74,10 @@ function Login() {
           />
           {errors.correo && <span className="login-error">{errors.correo}</span>}
         </div>
+
+        {usuarioNoEncontrado && (
+          <p className="login-error" role="alert">{serverMessage}</p>
+        )}
 
         <div className="login-field">
           <label>Contraseña</label>
@@ -94,11 +100,20 @@ function Login() {
           {errors.password && <span className="login-error">{errors.password}</span>}
         </div>
 
-        <button type="submit" className="login-button">Ingresar</button>
+        {contrasenaIncorrecta && (
+          <p className="login-error" role="alert">{serverMessage}</p>
+        )}
+
         <button type="button" className="login-link" onClick={() => navigate(ROUTES.FORGOT_PASSWORD)}>
           ¿Olvidaste tu contraseña?
         </button>
-        {serverMessage && <p className="login-message">{serverMessage}</p>}
+        <button type="submit" className="login-button">Ingresar</button>
+        <button type="button" className="login-link login-register-link" onClick={() => navigate(ROUTES.REGISTER)}>
+          <span className="login-register-question">¿No tenés cuenta?</span>{' '}<span>Registrate</span>
+        </button>
+        {serverMessage && !usuarioNoEncontrado && !contrasenaIncorrecta && (
+          <p className="login-message">{serverMessage}</p>
+        )}
       </form>
     </div>
   );

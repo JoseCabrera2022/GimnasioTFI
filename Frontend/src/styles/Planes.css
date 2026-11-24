@@ -60,6 +60,7 @@
   z-index: 2;
   position: relative;
   outline: none;
+  transition: color 0.2s ease;
 }
 
 .duracion-opcion:focus {
@@ -67,8 +68,12 @@
 }
 
 .duracion-opcion:focus-visible {
-  outline: 2px solid #0077cc;
+  outline: 2px solid var(--gym-violet, #7770ee);
   border-radius: 6px;
+}
+
+.duracion-opcion:hover:not(.activo) {
+  color: var(--gym-violet-dark, #6258d8);
 }
 
 .duracion-opcion.activo {
@@ -82,8 +87,9 @@
   top: 0;
   bottom: 0;
   width: 33.3333%;
-  background-color: #0077cc;
+  background: linear-gradient(135deg, var(--gym-violet-dark, #6258d8), #8c82ff);
   border-radius: 8px;
+  box-shadow: 0 6px 16px rgba(119, 112, 238, 0.25);
   transition: left 0.3s ease;
   z-index: 1;
 }
@@ -103,16 +109,20 @@
   display: block;
   margin: 40px auto 20px auto;
   padding: 10px 20px;
-  background-color: #0077cc;
+  background: linear-gradient(135deg, var(--gym-violet-dark, #6258d8), #8c82ff);
   color: white;
   border: none;
-  border-radius: 8px;
-  font-weight: 600;
+  border-radius: 999px;
+  box-shadow: 0 8px 20px rgba(119, 112, 238, 0.24);
+  font-weight: 700;
   cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
 }
 
 .btn-comparar:hover {
-  background-color: #005fa3;
+  transform: translateY(-2px);
+  filter: brightness(0.92);
+  box-shadow: 0 12px 26px rgba(119, 112, 238, 0.36);
 }
 
 /* Tarjetas de planes */

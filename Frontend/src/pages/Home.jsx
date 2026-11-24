@@ -268,8 +268,8 @@ function Home() {
       </section>
 
       {/* 🔹 Ubicaciones */}
-      <section className="home-section ubicaciones-section">
-        <div className="section-heading">
+      <section className="home-section dark-section ubicaciones-section">
+        <div className="section-heading section-heading-light">
           <span className="section-kicker">Nuestras sedes</span>
           <h2>Entrená cerca de vos</h2>
           <p>Encontrá tu gimnasio más cercano y accedé a todas nuestras instalaciones.</p>

@@ -33,7 +33,7 @@ function Ubicaciones() {
   if (!selected) return <p>No hay ubicaciones disponibles.</p>;
 
   return (
-    <div className="ubicacion-container">
+    <div className="ubicacion-container ubicacion-glass">
       <h2>📍 Nuestras Sedes</h2>
 
       <select onChange={(e) => setSelected(ubicaciones.find(u => u.id === parseInt(e.target.value)))}>
@@ -51,7 +51,7 @@ function Ubicaciones() {
 
       <iframe
         title="Mapa Ubicación"
-        src={`https://www.google.com/maps?q=${selected.lat},${selected.lng}&hl=es&z=15&output=embed`}
+        src={`https://maps.google.com/maps?q=${selected.lat},${selected.lng}&hl=es&z=15&output=embed`}
         width="100%"
         height="400"
         style={{ border: 0 }}
