@@ -117,6 +117,8 @@
   background: linear-gradient(135deg, #090a18 0%, #11132b 100%);
 }
 .section-heading-light h2 { color: #fff; }
+/* Corrección: si no ponemos esto, el <p> de Ubicaciones queda gris oscuro sobre fondo oscuro */
+.section-heading-light p { color: rgba(255, 255, 255, 0.75); }
 
 .carousel { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
 .carousel-item {
@@ -382,6 +384,14 @@
 .member-home a:focus-visible {
   outline: 2px solid #6a60e8;
   outline-offset: 3px;
+}
+
+.ubicaciones-section .ubicacion-container.ubicacion-glass {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.24);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.3);
+  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(18px);
 }
 
 @keyframes fadeInUp {

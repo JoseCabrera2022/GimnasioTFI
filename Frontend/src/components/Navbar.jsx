@@ -127,9 +127,9 @@ function Navbar() {
       )}
 
       <ul className={`navbar-links${esAdmin ? ' navbar-links-admin' : ''}${esSocio ? ' navbar-links-member' : ''}${esEmpleado ? ' navbar-links-employee' : ''}`}>
+        {/* Del Código 2: menú público limpio, sin Inicio ni Login/Registro en texto */}
         {!usuario && (
           <>
-            <li><Link to={ROUTES.HOME}>Inicio</Link></li>
             <li><Link to={ROUTES.PLANES}>Planes</Link></li>
             <li><Link to={ROUTES.CONTACTO}>Contacto</Link></li>
             <li><Link to={ROUTES.UBICACIONES}>Ubicación</Link></li>
@@ -157,13 +157,6 @@ function Navbar() {
           </li>
         )}
 
-        {!usuario && (
-          <>
-            <li><Link to={ROUTES.LOGIN}>Login</Link></li>
-            <li><Link to={ROUTES.REGISTER}>Registro</Link></li>
-          </>
-        )}
-
         {usuario && !esSocio && !esAdmin && !esEmpleado && (
           <li>
             <button className="navbar-button" onClick={handleLogout}>
@@ -173,10 +166,11 @@ function Navbar() {
         )}
 
         <li className="navbar-brand-icon">
+          {/* Unificado: si estás logueado va a Perfil (Código 1), si no va a Login (Código 2) */}
           <Link
-            to={usuario ? ROUTES.PERFIL : ROUTES.HOME}
-            aria-label={usuario ? `Ver el perfil de ${usuario.nombre}` : 'Ir al inicio de GymManager Pro'}
-            title={usuario ? 'Ver perfil' : 'Inicio'}
+            to={usuario ? ROUTES.PERFIL : ROUTES.LOGIN}
+            aria-label={usuario ? `Ver el perfil de ${usuario.nombre}` : 'Ir a iniciar sesión'}
+            title={usuario ? 'Ver perfil' : 'Iniciar sesión'}
           >
             <img
               src={usuario ? avatarUrl || defaultAvatar : '/assets/fuerzavitalgym2.png'}

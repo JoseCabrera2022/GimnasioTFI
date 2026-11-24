@@ -244,7 +244,7 @@ function Home() {
         <div className="carousel">
           <div className="carousel-item">
             <img src="/assets/trainer1.jpg" alt="Entrenador 1" />
-            <p>Juan Pérez - Especialista en fuerza</p>
+            <p>【entity-Juan Pérez¦canonical_name=Juan Pérez】 - Especialista en fuerza</p>
           </div>
           <div className="carousel-item">
             <img src="/assets/trainer2.jpg" alt="Entrenador 2" />
@@ -252,7 +252,7 @@ function Home() {
           </div>
           <div className="carousel-item">
             <img src="/assets/trainer3.jpg" alt="Entrenador 3" />
-            <p>Carlos Gómez - Funcional y HIIT</p>
+            <p>【entity-Carlos Gómez¦canonical_name=Carlos Gómez】 - Funcional y HIIT</p>
           </div>
         </div>
       </section>
@@ -267,9 +267,9 @@ function Home() {
         <Planes/>
       </section>
 
-      {/* 🔹 Ubicaciones */}
-      <section className="home-section ubicaciones-section">
-        <div className="section-heading">
+      {/* 🔹 Ubicaciones - del Código 2: ahora es dark-section */}
+      <section className="home-section dark-section ubicaciones-section">
+        <div className="section-heading section-heading-light">
           <span className="section-kicker">Nuestras sedes</span>
           <h2>Entrená cerca de vos</h2>
           <p>Encontrá tu gimnasio más cercano y accedé a todas nuestras instalaciones.</p>

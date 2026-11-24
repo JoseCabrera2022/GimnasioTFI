@@ -48,7 +48,6 @@
   margin-left: 6px;
 }
 
-
 .duracion-opcion {
   flex: 1;
   background: none;
@@ -60,6 +59,7 @@
   z-index: 2;
   position: relative;
   outline: none;
+  transition: color 0.2s ease;
 }
 
 .duracion-opcion:focus {
@@ -67,8 +67,12 @@
 }
 
 .duracion-opcion:focus-visible {
-  outline: 2px solid #0077cc;
+  outline: 2px solid var(--gym-violet, #7770ee);
   border-radius: 6px;
+}
+
+.duracion-opcion:hover:not(.activo) {
+  color: var(--gym-violet-dark, #6258d8);
 }
 
 .duracion-opcion.activo {
@@ -82,8 +86,9 @@
   top: 0;
   bottom: 0;
   width: 33.3333%;
-  background-color: #0077cc;
+  background: linear-gradient(135deg, var(--gym-violet-dark, #6258d8), #8c82ff);
   border-radius: 8px;
+  box-shadow: 0 6px 16px rgba(119, 112, 238, 0.25);
   transition: left 0.3s ease;
   z-index: 1;
 }
@@ -103,69 +108,75 @@
   display: block;
   margin: 40px auto 20px auto;
   padding: 10px 20px;
-  background-color: #0077cc;
+  background: linear-gradient(135deg, var(--gym-violet-dark, #6258d8), #8c82ff);
   color: white;
   border: none;
-  border-radius: 8px;
-  font-weight: 600;
+  border-radius: 999px;
+  box-shadow: 0 8px 20px rgba(119, 112, 238, 0.24);
+  font-weight: 700;
   cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
 }
 
 .btn-comparar:hover {
-  background-color: #005fa3;
+  transform: translateY(-2px);
+  filter: brightness(0.92);
+  box-shadow: 0 12px 26px rgba(119, 112, 238, 0.36);
 }
 
 /* Tarjetas de planes */
 .tarjetas-planes {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 270px), 320px));
+  display: flex;
   gap: 20px;
   justify-content: center;
-  align-items: stretch;
+  flex-wrap: wrap;
 }
 
 .tarjeta {
-  background: linear-gradient(160deg, #fff 0%, #fafaff 100%);
-  border: 1px solid #e3e5f0;
-  border-radius: 18px;
-  box-shadow: 0 10px 28px rgb(22 26 54 / 8%);
-  padding: 25px 23px 21px;
-  width: 100%;
+  box-sizing: border-box;
+  width: 280px;
+  height: 420px;
+  padding: 20px;
+  background: rgba(9, 10, 24, 0.62);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 12px;
+  box-shadow: 0 24px 60px rgb(0 0 0 / 30%);
+  text-align: center;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: 20px;
-  min-height: 430px;
   position: relative;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(18px);
 }
 
 .tarjeta:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 16px 34px rgb(22 26 54 / 13%);
+  transform: translateY(-6px);
+  box-shadow: 0 12px 28px rgb(0 0 0 / 30%);
 }
 
 .tarjeta.destacada {
-  border: 1px solid #857af4;
-  box-shadow: 0 14px 34px rgb(91 78 205 / 16%);
+  border: 2px solid #0077cc;
+  box-shadow: 0 24px 60px rgb(0 0 0 / 36%);
+  transform: translateY(-4px);
 }
 
 .tarjeta.destacada:hover {
-  box-shadow: 0 18px 40px rgb(91 78 205 / 21%);
+  transform: translateY(-8px);
+  box-shadow: 0 16px 40px rgb(0 0 0 / 50%);
 }
 
 .tarjeta.plan-actual {
   border: 2px solid #36a66a;
-  background: linear-gradient(160deg, #fff 0%, #f0fbf4 100%);
-  box-shadow: 0 14px 34px rgb(34 130 76 / 14%);
 }
 
 .tarjeta.plan-actual:hover {
-  box-shadow: 0 18px 40px rgb(34 130 76 / 19%);
+  box-shadow: 0 12px 28px rgb(0 0 0 / 30%);
 }
 
 .tarjeta.plan-bloqueado {
-  background: #f7f7fa;
+  background: rgba(9, 10, 24, 0.72);
 }
 
 .plan-card-contenido {
@@ -173,89 +184,109 @@
 }
 
 .insignia-premium {
-  display: inline-flex;
-  align-items: center;
-  align-self: flex-start;
-  margin-bottom: 18px;
-  padding: 6px 11px;
-  border-radius: 999px;
-  background: #fff4d6;
-  color: #795b12;
-  font-size: 0.78rem;
-  font-weight: 800;
+  position: absolute;
+  top: 0;
+  left: 50%;
+  z-index: 1;
+  transform: translate(-50%, -50%);
+  background-color: #ffcc00;
+  color: #333;
+  font-weight: bold;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  box-shadow: 0 2px 6px rgb(0 0 0 / 20%);
+  white-space: nowrap;
 }
 
 .insignia-plan-actual {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  z-index: 1;
+  transform: translate(-50%, -50%);
   display: inline-flex;
   align-items: center;
-  align-self: flex-start;
   gap: 7px;
-  margin-bottom: 18px;
   padding: 6px 11px;
   border-radius: 999px;
   background: #e4f6eb;
   color: #217342;
   font-size: 0.78rem;
   font-weight: 800;
+  white-space: nowrap;
 }
 
 .plan-tipo {
   margin: 0 0 6px;
-  color: #737589;
+  color: #b8c2c9;
   font-size: 0.76rem;
-  font-weight: 800;
+  font-weight: bold;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
 .titulo-plan {
-  margin: 0;
-  color: #202236;
-  font-size: 1.55rem;
-  line-height: 1.2;
+  margin: 0 0 10px;
+  color: #fff;
+  font-size: 1.8rem;
+  text-align: center;
+  position: relative;
+}
+
+.titulo-plan::after {
+  content: '';
+  display: block;
+  height: 3px;
+  background-color: #0077cc;
+  margin: 10px auto 0;
+  border-radius: 2px;
+  width: 60px;
 }
 
 .plan-precio {
   display: flex;
+  justify-content: center;
   align-items: baseline;
   gap: 8px;
-  margin: 20px 0 16px;
+  margin: 0 0 15px;
 }
 
+/* Corrección del Código 1: en el 2 el precio quedaba de 1.2rem y no se destacaba */
 .precio {
   margin: 0;
-  color: #4541a8;
+  color: #fff;
   font-size: 2rem;
   font-weight: 800;
   letter-spacing: -0.04em;
 }
 
 .plan-precio span {
-  color: #77798b;
-  font-size: 0.84rem;
+  color: #b8c2c9;
+  font-size: 0.85rem;
 }
 
 .plan-beneficios {
   list-style: none;
   padding: 0;
-  margin: 0;
-  display: grid;
-  gap: 12px;
+  margin: 0 0 10px;
+  border-bottom: 2px solid #e0e0e0;
 }
 
 .plan-beneficios li {
   display: grid;
   grid-template-columns: 18px 1fr;
-  align-items: start;
-  gap: 9px;
-  color: #4f5165;
-  font-size: 0.92rem;
-  line-height: 1.4;
+  align-items: center;
+  gap: 6px;
+  margin: 6px 0;
+  color: #c9bdbd;
+  font-size: 0.95rem;
+  line-height: 1.35;
+  text-align: left;
 }
 
 .plan-beneficios li i {
-  margin-top: 3px;
-  color: #2a9b5b;
+  color: #28a745;
 }
 
 .btn-pagar {
@@ -264,28 +295,45 @@
   justify-content: center;
   gap: 9px;
   width: 100%;
-  min-height: 46px;
-  padding: 11px 18px;
-  background: #238a4e;
-  color: #fff;
+  min-height: 42px;
+  padding: 10px 20px;
+  background-color: #28a745;
+  color: white;
   border: none;
-  border-radius: 10px;
+  border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s ease, transform 0.2s ease;
+  position: relative;
+  overflow: hidden;
+  transition: background-color 0.3s ease;
 }
 
 .btn-pagar:hover {
-  background: #176f3c;
-  transform: translateY(-1px);
+  background-color: #218838;
 }
 
 .btn-destacada {
-  background: #5b52c8;
+  background-color: #0077cc;
 }
 
 .btn-destacada:hover {
-  background: #4740a9;
+  background-color: #005fa3;
+}
+
+.btn-destacada::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: rgb(255 255 255 / 20%);
+  transform: skewX(-20deg);
+  transition: left 0.5s ease;
+}
+
+.btn-destacada:hover::after {
+  left: 100%;
 }
 
 .plan-card-estado {
@@ -387,7 +435,7 @@
   margin: 0 auto 24px;
   border-radius: 14px;
   font-weight: 700;
-  display: flex;                /* fila */
+  display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 14px;
@@ -473,7 +521,10 @@
     font-size: 0.72rem;
   }
 
+  /* Del Código 1: en móvil la tarjeta no queda con altura fija */
   .tarjeta {
+    width: min(100%, 320px);
+    height: auto;
     min-height: 0;
   }
 

@@ -202,11 +202,12 @@
 @media (max-width: 650px) {
   .navbar { align-items: flex-start; }
   .navbar-links { max-width: 270px; }
-  .navbar-links li:nth-child(3),
-  .navbar-links li:nth-child(4) { display: none; }
+  /* Del Código 2: en móvil queda Planes + ícono, no se esconde el avatar */
+  .navbar-links li:nth-child(2),
+  .navbar-links li:nth-child(3) { display: none; }
   .navbar-admin-context,
   .navbar-admin-identity,
   .navbar-member-identity,
   .navbar-employee-identity { display: none; }
-  .navbar-links-admin li.navbar-brand-icon { display: flex; }
+  .navbar-links li.navbar-brand-icon { display: flex; }
 }

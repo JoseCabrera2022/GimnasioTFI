@@ -128,19 +128,41 @@
 }
 
 .login-link {
+  width: 100%;
   display: block;
   border: 0;
-  padding: 0;
+  padding: 8px 12px;
   background: transparent;
-  color: #0077cc;
+  color: var(--gym-violet-dark, #6258d8);
   text-align: center;
   text-decoration: none;
   cursor: pointer;
   font: inherit;
+  font-weight: 700;
+  border-radius: 999px;
+  transition: color 0.2s ease, background-color 0.2s ease;
 }
 
 .login-link:hover {
-  text-decoration: underline;
+  color: var(--gym-violet, #7770ee);
+  background: rgba(119, 112, 238, 0.08);
+  text-decoration: none;
+}
+
+.login-glass .login-link-light {
+  color: #fff;
+}
+
+.login-glass .login-link-light:hover {
+  color: var(--gym-violet, #7770ee);
+}
+
+.login-register-link .login-register-question {
+  color: var(--gym-muted, #686a79);
+}
+
+.login-register-link:hover .login-register-question {
+  color: var(--gym-muted, #686a79);
 }
 
 .login-message {
@@ -160,6 +182,49 @@
   border-radius: 4px;
   font-weight: bold;
   animation: fadeInLogin 0.5s ease;
+}
+
+.login-box.login-glass {
+  color: #fff;
+  background: rgba(9, 10, 24, 0.62);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 20px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.42);
+  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(18px);
+}
+
+.login-glass .login-title,
+.login-glass .login-field label {
+  color: #fff;
+}
+
+.login-glass .login-field input {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.login-glass .login-field input::placeholder {
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.login-glass .login-field input:focus {
+  border-color: rgba(174, 166, 255, 0.9);
+  box-shadow: 0 0 0 3px rgba(140, 130, 255, 0.25);
+}
+
+.login-glass .password-toggle {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.login-glass .login-button {
+  background: linear-gradient(135deg, #6258d8, #8c82ff);
+  box-shadow: 0 10px 24px rgba(98, 88, 216, 0.3);
+}
+
+.login-glass .login-button:hover {
+  background: linear-gradient(135deg, #554bc7, #7770ee);
 }
 
 /* Animaciones */

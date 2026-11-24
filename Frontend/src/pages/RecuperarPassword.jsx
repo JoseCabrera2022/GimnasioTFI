@@ -26,7 +26,7 @@ function RecuperarPassword() {
   };
 
   return (
-    <div className="login-box">
+    <div className="login-box login-glass">
       <h2 className="login-title">Recuperar contraseña</h2>
       <p>Ingresa tu correo y te enviaremos un enlace para restablecerla.</p>
       <form onSubmit={handleSubmit} className="login-form">
@@ -43,7 +43,7 @@ function RecuperarPassword() {
         <button type="submit" className="login-button">Enviar enlace</button>
         {mensaje && <p className="login-message">{mensaje}</p>}
         {error && <p className="login-error">{error}</p>}
-        <Link to={ROUTES.LOGIN} className="login-link">Volver al inicio de sesión</Link>
+        <Link to={ROUTES.LOGIN} className="login-link login-link-light">Volver al inicio de sesión</Link>
       </form>
     </div>
   );

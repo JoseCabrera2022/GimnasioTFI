@@ -6,9 +6,7 @@ import '../styles/Footer.css';
 const REDES_SOCIALES = [
   { nombre: 'Facebook', icono: 'fa-facebook-f', url: 'https://www.facebook.com' },
   { nombre: 'Instagram', icono: 'fa-instagram', url: 'https://www.instagram.com' },
-  { nombre: 'X', icono: 'fa-twitter', url: 'https://x.com' },
   { nombre: 'YouTube', icono: 'fa-youtube', url: 'https://www.youtube.com' },
-  { nombre: 'LinkedIn', icono: 'fa-linkedin-in', url: 'https://www.linkedin.com' },
   { nombre: 'TikTok', icono: 'fa-tiktok', url: 'https://www.tiktok.com' },
   { nombre: 'WhatsApp', icono: 'fa-whatsapp', url: 'https://wa.me/543815551234' },
 ];

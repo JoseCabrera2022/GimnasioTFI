@@ -11,12 +11,22 @@
   font-size: 0.92rem;
 }
 
+/* Del Código 2: subtítulo en blanco cuando es glass */
+.register-container.register-glass .register-subtitle {
+  color: rgba(255, 255, 255, 0.8);
+}
+
 .password-requirements {
   display: block;
   margin-top: 6px;
   color: #748094;
   font-size: 0.82rem;
   line-height: 1.4;
+}
+
+/* Del Código 1 adaptado al glass: si no ponemos esto, el texto queda gris oscuro sobre fondo oscuro y no se lee */
+.register-container.register-glass .password-requirements {
+  color: rgba(255, 255, 255, 0.75);
 }
 
 .register-location-field .selector-ubicacion {

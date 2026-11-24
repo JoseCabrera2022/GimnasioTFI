@@ -10,12 +10,24 @@ const URL_FRONTEND = process.env.FRONTEND_URL || 'http://localhost:5173';
 const obtenerVersionPassword = (hash) =>
   crypto.createHash('sha256').update(hash).digest('hex');
 
+// Validación de config de Gmail / JWT - viene del Código 2
+const verificarConfigCorreo = () => {
+  return [
+    'JWT_SECRET',
+    'GMAIL_CLIENT_ID',
+    'GMAIL_CLIENT_SECRET',
+    'GMAIL_REDIRECT_URI',
+    'GMAIL_REFRESH_TOKEN',
+    'GMAIL_USER'
+  ].filter((variable) => !process.env[variable]);
+};
+
 export const registrarUsuario = async (req, res) => {
   try {
     const { nombre, password, telefono, ubicacion_id } = req.body;
     const correo_electronico = req.body.correo_electronico?.trim().toLowerCase();
 
-    // Validaciones básicas
+    // Validaciones básicas - del Código 1 (más estricto)
     if (!nombre || !correo_electronico || !password || !telefono || !ubicacion_id) {
       return res.status(400).json({ error: 'Todos los campos son obligatorios' });
     }
@@ -56,12 +68,19 @@ export const registrarUsuario = async (req, res) => {
     // Hash de contraseña
     const hash = await bcrypt.hash(password, 10);
 
+    // Del Código 1: se crea con email_verificado = 0
     const [result] = await db.query(
       'INSERT INTO usuarios (nombre, correo_electronico, contraseña_hash, telefono, ubicacion_id, email_verificado) VALUES (?, ?, ?, ?, ?, 0)',
       [nombre, correo_electronico, hash, telefono, ubicacion_id]
     );
 
     try {
+      // Chequeo de config - agregado del Código 2 para dar error claro
+      const configFaltante = verificarConfigCorreo();
+      if (configFaltante.length > 0) {
+        throw new Error(`Config faltante: ${configFaltante.join(', ')}`);
+      }
+
       const tokenVerificacion = jwt.sign(
         {
           id: result.insertId,
@@ -87,6 +106,7 @@ export const registrarUsuario = async (req, res) => {
         `
       });
     } catch (error) {
+      // Si falla el mail, se borra el usuario - del Código 1
       await db.query(
         'DELETE FROM usuarios WHERE id = ? AND email_verificado = 0',
         [result.insertId]
@@ -103,6 +123,11 @@ export const registrarUsuario = async (req, res) => {
     if (error.response?.data?.error === 'invalid_grant') {
       return res.status(503).json({
         error: 'El servicio de correo necesita volver a autorizarse. Abre la ruta /auth del backend.'
+      });
+    }
+    if (error.message?.startsWith('Config faltante')) {
+      return res.status(503).json({
+        error: 'El servicio de correo no está configurado. Configura JWT y Gmail en Backend/.env.'
       });
     }
     res.status(500).json({ error: 'No se pudo registrar el usuario' });
@@ -176,6 +201,7 @@ export const loginUsuario = async (req, res) => {
 
     const valido = await bcrypt.compare(password, usuario.contraseña_hash);
     if (!valido) return res.status(401).json({ error: 'Contraseña incorrecta' });
+    // Del Código 1: bloqueo si no verificó
     if (!usuario.email_verificado) {
       return res.status(403).json({ error: 'Verifica tu correo electrónico antes de iniciar sesión' });
     }
@@ -215,6 +241,18 @@ export const solicitarRecuperacionPassword = async (req, res) => {
 
     if (!correo_electronico || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo_electronico)) {
       return res.status(400).json({ error: 'Correo electrónico inválido' });
+    }
+
+    // Del Código 2: chequeo de config antes de seguir
+    const configuracionFaltante = verificarConfigCorreo();
+    if (configuracionFaltante.length > 0) {
+      console.error(
+        'Recuperación de contraseña no configurada. Variables faltantes:',
+        configuracionFaltante.join(', ')
+      );
+      return res.status(503).json({
+        error: 'El servicio de recuperación no está configurado. Configura JWT y Gmail en Backend/.env.'
+      });
     }
 
     const [rows] = await db.query(

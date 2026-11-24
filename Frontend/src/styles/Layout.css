@@ -5,10 +5,49 @@
   background: #f7f7fb;
 }
 
+/* Del Código 2: fondos por página para que se vean el Login / Register / etc. en glass */
+.layout-container.has-background-image {
+  background:
+    linear-gradient(rgba(8, 9, 24, 0.35), rgba(8, 9, 24, 0.35)),
+    url('/images/fondo-gimnasio.jpg') center / cover no-repeat fixed;
+}
+
+.layout-container.has-login-background {
+  background:
+    linear-gradient(rgba(8, 9, 24, 0.18), rgba(8, 9, 24, 0.18)),
+    url('/images/fondo-login.jpg') center / cover no-repeat fixed;
+}
+
+.layout-container.has-register-background {
+  background:
+    linear-gradient(rgba(8, 9, 24, 0.18), rgba(8, 9, 24, 0.18)),
+    url('/images/fondo-register.jpg') center / cover no-repeat fixed;
+}
+
+.layout-container.has-password-recovery-background {
+  background:
+    linear-gradient(rgba(8, 9, 24, 0.18), rgba(8, 9, 24, 0.18)),
+    url('/images/fondo-recupero-pass.jpg') center / cover no-repeat fixed;
+}
+
+.layout-container.has-contact-background {
+  background:
+    linear-gradient(rgba(8, 9, 24, 0.22), rgba(8, 9, 24, 0.22)),
+    url('/images/imagen-para-contacto.jpg') center / cover no-repeat fixed;
+}
+
+.layout-container.has-locations-background {
+  background:
+    linear-gradient(rgba(8, 9, 24, 0.18), rgba(8, 9, 24, 0.18)),
+    url('/images/fondo-ubicaciones.jpg') center / cover no-repeat fixed;
+  background-size: auto, 98% auto;
+  background-color: #080918;
+}
+
 .layout-body {
   display: flex;
   flex: 1;
-  background: #f7f7fb;
+  background: transparent;
 }
 
 .layout-body-socio {
@@ -19,7 +58,13 @@
 .layout-main {
   flex: 1;
   min-width: 0;
-  background: #f7f7fb;
+  width: 100%;
+  padding: 0;
+  background: transparent;
+}
+
+.layout-main .home-container {
+  background: transparent;
 }
 
 .layout-main.with-sidebar {
@@ -31,6 +76,14 @@
 }
 
 @media (max-width: 900px) {
+  .layout-container.has-password-recovery-background,
+  .layout-container.has-contact-background,
+  .layout-container.has-locations-background,
+  .layout-container.has-login-background,
+  .layout-container.has-register-background {
+    background-attachment: scroll;
+  }
+
   .layout-main.with-sidebar { margin-left: 0; }
   .layout-body-socio { flex-direction: column; }
   .layout-body-admin { flex-direction: column; }

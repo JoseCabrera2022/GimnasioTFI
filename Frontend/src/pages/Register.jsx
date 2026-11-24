@@ -58,7 +58,7 @@ function Register() {
   };
 
   return (
-    <div className="register-container login-box">
+    <div className="register-container login-box login-glass register-glass">
       <h2 className="login-title">{correoPendiente ? 'Revisá tu correo' : 'Crear cuenta'}</h2>
       <p className="register-subtitle">
         {correoPendiente
